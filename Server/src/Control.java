@@ -55,7 +55,7 @@ public class Control extends Thread {
     public synchronized boolean process(Connection con, String msg) {
         System.out.println("PROCESS!");
         System.out.println(msg);
-        con.writeMsg("R: " + msg);
+        con.writeMsg("R: " + msg + '\n');
         return false;
     }
 

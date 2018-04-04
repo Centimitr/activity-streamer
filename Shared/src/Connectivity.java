@@ -5,8 +5,9 @@ import org.apache.logging.log4j.Logger;
 import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
+import java.util.function.Consumer;
 
-@SuppressWarnings("Duplicates")
+@SuppressWarnings({"Duplicates", "WeakerAccess"})
 public class Connectivity extends Thread {
 
     private static final Logger log = LogManager.getLogger();
@@ -16,8 +17,8 @@ public class Connectivity extends Thread {
     private boolean open;
     private Socket socket;
 
-    Connectivity() throws IOException {
-        socket = new Socket(Settings.getRemoteHostname(), Settings.getRemotePort());
+    Connectivity(String hostname, int port) throws IOException {
+        socket = new Socket(hostname, port);
         in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
         out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
         open = true;
@@ -31,9 +32,10 @@ public class Connectivity extends Thread {
 
         System.out.print("REQ: ");
         while (!(inputStr = scanner.nextLine()).equals("exit")) {
-            String received = fetch(inputStr);
-            System.out.println("RES: " + received);
-            System.out.print("REQ: ");
+            fetch(inputStr + "\n", reply -> {
+                System.out.println("RES: " + reply);
+                System.out.print("REQ: ");
+            });
         }
         scanner.close();
     }
@@ -51,23 +53,39 @@ public class Connectivity extends Thread {
         return false;
     }
 
-    public boolean send(String msg, boolean newLine) {
-        return this.send(msg + (newLine ? "\n" : ""));
+    public boolean send(Object src) {
+        return this.send(g.toJson(src) + "\n");
     }
 
-    // send(request) and fetch(request/reply) will use send with newLine
-    public boolean send(Object obj) {
-        return this.send(g.toJson(obj), true);
-    }
-
-    public String fetch(String msg) {
-        send(msg, true);
+    public boolean fetch(String msg, Consumer<String> callback) {
+        boolean ok = send(msg);
+        if (!ok) {
+            return false;
+        }
         try {
-            return in.readLine();
+            String reply = in.readLine();
+            callback.accept(reply);
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
-            return "";
         }
+        return false;
+    }
+
+    public <T> boolean fetch(Object src, Class<T> classOfT, Consumer<T> callback) {
+        boolean ok = send(src);
+        if (!ok) {
+            return false;
+        }
+        try {
+            String reply = in.readLine();
+            T result = g.fromJson(reply, classOfT);
+            callback.accept(result);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public void close() {

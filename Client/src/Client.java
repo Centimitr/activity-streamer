@@ -40,7 +40,7 @@ public class Client extends Thread {
 
     public void run() {
         try {
-            connectivity = new Connectivity();
+            connectivity = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort());
         } catch (IOException e) {
             e.printStackTrace();
         }
