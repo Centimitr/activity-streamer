@@ -24,10 +24,12 @@ public class Control extends Thread {
 
     public Control() {
         // initialize the connections array
+        log.info("Control~");
         connections = new ArrayList<Connection>();
         // start a listener
         try {
             listener = new Listener();
+            log.info("Control1");
         } catch (IOException e1) {
             log.fatal("failed to startup a listening thread: " + e1);
             System.exit(-1);
@@ -51,6 +53,8 @@ public class Control extends Thread {
      * Return true if the connection should close.
      */
     public synchronized boolean process(Connection con, String msg) {
+        System.out.println("PROCESS!");
+        System.out.println(msg);
         return true;
     }
 
@@ -69,7 +73,6 @@ public class Control extends Thread {
         Connection c = new Connection(s);
         connections.add(c);
         return c;
-
     }
 
     /*
@@ -80,7 +83,6 @@ public class Control extends Thread {
         Connection c = new Connection(s);
         connections.add(c);
         return c;
-
     }
 
     @Override
@@ -98,7 +100,6 @@ public class Control extends Thread {
                 log.debug("doing activity");
                 term = doActivity();
             }
-
         }
         log.info("closing " + connections.size() + " connections");
         // clean up
@@ -109,6 +110,7 @@ public class Control extends Thread {
     }
 
     public boolean doActivity() {
+        System.out.println("DoActivity!");
         return false;
     }
 

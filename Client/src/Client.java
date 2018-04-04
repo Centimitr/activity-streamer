@@ -15,6 +15,7 @@ import org.json.simple.parser.ParseException;
 public class Client extends Thread {
     private static final Logger log = LogManager.getLogger();
     private static Client clientSolution;
+    private Socket socket;
     private TextFrame textFrame;
 
 
@@ -26,9 +27,13 @@ public class Client extends Thread {
     }
 
     public Client() {
-
-
-        textFrame = new TextFrame();
+//        textFrame = new TextFrame();
+        try {
+            socket = new Socket(Settings.getRemoteHostname(), Settings.getRemotePort());
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         start();
     }
 
