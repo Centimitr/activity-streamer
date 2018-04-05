@@ -7,6 +7,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+@SuppressWarnings("Duplicates")
 public class App {
 
     private static final Logger log = LogManager.getLogger();

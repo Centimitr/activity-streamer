@@ -26,33 +26,44 @@ public class Client extends Thread {
 
     @SuppressWarnings("unchecked")
     public void sendActivityObject(JSONObject activityObj) {
-        connectivity.sendln(activityObj);
+        if (connectivity != null) {
+            connectivity.sendln(activityObj);
+        }
     }
 
-
     public void disconnect() {
-        connectivity.close();
+        if (connectivity != null) {
+            connectivity.close();
+        }
     }
 
     public void run() {
         try {
-            connectivity = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort(), c -> {
-                Scanner scanner = new Scanner(System.in);
-                String inputStr;
-
-                System.out.print("REQ: ");
-                while (!(inputStr = scanner.nextLine()).equals("exit")) {
-                    log.info("0");
-                    c.fetch(inputStr + "\n", reply -> {
-                        log.info("2");
-                        System.out.println("RES: " + reply);
-                        System.out.print("REQ: ");
-                    });
-                }
-                scanner.close();
-            });
+            connectivity = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort(), this::handleAuthentication);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    // todo: authentication: register, login
+    private void handleAuthentication(Connectivity c) {
+
+    }
+
+    // todo: used to test connectivity, to remove
+    private void test(Connectivity c) {
+        Scanner scanner = new Scanner(System.in);
+        String inputStr;
+
+        System.out.print("REQ: ");
+        while (!(inputStr = scanner.nextLine()).equals("exit")) {
+            log.info("0");
+            c.fetch(inputStr + "\n", reply -> {
+                log.info("2");
+                System.out.println("RES: " + reply);
+                System.out.print("REQ: ");
+            });
+        }
+        scanner.close();
     }
 }
