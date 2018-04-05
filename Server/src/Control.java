@@ -12,10 +12,11 @@ import org.json.simple.JSONObject;
 
 public class Control extends Thread {
     private static final Logger log = LogManager.getLogger();
-    private static ArrayList<Connection> connections;
-    private static boolean term = false;
-    private static Listener listener;
-    private Gson g = new Gson();
+    private static Gson g = new Gson();
+    private ArrayList<Connectivity> clientConns;
+    private Connectivity serverConn;
+    private boolean term = false;
+    private Listener listener;
 
     protected static Control control = null;
 
@@ -27,9 +28,37 @@ public class Control extends Thread {
     }
 
     public Control() {
-        // initialize the connections array
-        connections = new ArrayList<Connection>();
-        // register message handlers
+        clientConns = new ArrayList<Connectivity>();
+        setMessageHandlers();
+        connectServerNode();
+        startListen();
+    }
+
+
+    private void startListen() {
+//        Connectivity self = this;
+        try {
+            listener = new Listener(Settings.getLocalPort(), this::handleIncomingConn);
+        } catch (IOException e) {
+            log.fatal("failed to startup a listening thread: " + e);
+            System.exit(-1);
+        }
+    }
+
+    private void connectServerNode() {
+        if (Settings.getRemoteHostname() != null) {
+            try {
+                serverConn = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort(), c -> {
+
+                });
+            } catch (IOException e) {
+                log.error("failed to make connection to " + Settings.getRemoteHostname() + ":" + Settings.getRemotePort() + " :" + e);
+                System.exit(-1);
+            }
+        }
+    }
+
+    private void setMessageHandlers() {
         MessageProtocol.getInstance()
                 .registerHandler(MessageCommands.LOGOUT, context -> {
                     Message m = context.read(Message.class);
@@ -42,24 +71,30 @@ public class Control extends Thread {
                     log.info("@INVALID_MESSAGE: " + m.info);
                 }
         );
-        // start a listener
-        try {
-            listener = new Listener();
-        } catch (IOException e1) {
-            log.fatal("failed to startup a listening thread: " + e1);
-            System.exit(-1);
-        }
     }
 
-    public void initiateConnection() {
-        // make a connection to another server if remote hostname is supplied
-        if (Settings.getRemoteHostname() != null) {
-            try {
-                outgoingConnection(new Socket(Settings.getRemoteHostname(), Settings.getRemotePort()));
-            } catch (IOException e) {
-                log.error("failed to make connection to " + Settings.getRemoteHostname() + ":" + Settings.getRemotePort() + " :" + e);
-                System.exit(-1);
-            }
+    private void handleIncomingConn(Listener l, Socket s) {
+        log.debug("incoming connection: " + Settings.socketAddress(s));
+
+        try {
+            Connectivity c = new Connectivity(s, conn -> {
+                try {
+                    boolean term = false;
+                    String data;
+                    while (!term && (data = conn.in.readLine()) != null) {
+                        term = process(conn, data);
+                    }
+                    log.debug("connection closed to " + Settings.socketAddress(s));
+                    connectionClosed(conn);
+                    conn.in.close();
+                } catch (IOException e) {
+                    log.error("connection " + Settings.socketAddress(s) + " closed with exception: " + e);
+                    connectionClosed(conn);
+                }
+            });
+            clientConns.add(c);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -67,48 +102,43 @@ public class Control extends Thread {
      * Processing incoming messages from the connection.
      * Return true if the connection should close.
      */
-    public synchronized boolean process(Connection con, String msg) {
-        // test function
+    public synchronized boolean process(Connectivity c, String msg) {
+        // todo: remove this debug use code
         if (!msg.startsWith("{")) {
             System.out.println("RCV: " + msg);
-            con.writeMsg("R: " + msg + '\n');
+            c.sendln("R: " + msg);
             return false;
         }
         MessageContext mc = new MessageContext();
         boolean ok = mc.parse(msg);
         if (ok) {
             mc.process();
+            c.sendln("RJ: " + msg);
             return mc.needClose();
         }
         return true;
     }
 
     /*
-     * The connection has been closed by the other party.
+     * Connection Status Handling
      */
-    public synchronized void connectionClosed(Connection con) {
-        if (!term) connections.remove(con);
+    public synchronized void connectionClosed(Connectivity c) {
+        if (!term) clientConns.remove(c);
     }
 
-    /*
-     * A new incoming connection has been established, and a reference is returned to it
-     */
-    public synchronized Connection incomingConnection(Socket s) throws IOException {
-        log.debug("incomming connection: " + Settings.socketAddress(s));
-        Connection c = new Connection(s);
-        connections.add(c);
-        return c;
-    }
-
-    /*
-     * A new outgoing connection has been established, and a reference is returned to it
-     */
-    public synchronized Connection outgoingConnection(Socket s) throws IOException {
-        log.debug("outgoing connection: " + Settings.socketAddress(s));
-        Connection c = new Connection(s);
-        connections.add(c);
-        return c;
-    }
+//    public synchronized Connection incomingConnection(Socket s) throws IOException {
+//        log.debug("incomming connection: " + Settings.socketAddress(s));
+//        Connection c = new Connection(s);
+//        connections.add(c);
+//        return c;
+//    }
+//
+//    public synchronized Connection outgoingConnection(Socket s) throws IOException {
+//        log.debug("outgoing connection: " + Settings.socketAddress(s));
+//        Connection c = new Connection(s);
+//        connections.add(c);
+//        return c;
+//    }
 
     @Override
     public void run() {
@@ -126,12 +156,15 @@ public class Control extends Thread {
                 term = doActivity();
             }
         }
-        log.info("closing " + connections.size() + " connections");
+        log.info("closing " + clientConns.size() + " connections");
         // clean up
-        for (Connection connection : connections) {
-            connection.closeCon();
+        for (Connectivity c : clientConns) {
+            c.close();
         }
-        listener.setTerm(true);
+        if (serverConn != null) {
+            serverConn.close();
+        }
+        listener.terminate();
     }
 
     public boolean doActivity() {
@@ -139,11 +172,11 @@ public class Control extends Thread {
         return false;
     }
 
-    public final void setTerm(boolean t) {
-        term = t;
+    public final void terminate() {
+        term = true;
     }
 
-    public final ArrayList<Connection> getConnections() {
-        return connections;
-    }
+//    public final ArrayList<Connection> getConnections() {
+//        return connections;
+//    }
 }

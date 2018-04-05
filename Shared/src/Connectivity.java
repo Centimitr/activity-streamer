@@ -12,13 +12,20 @@ public class Connectivity extends Thread {
 
     private static final Logger log = LogManager.getLogger();
     private Gson g = new Gson();
-    private BufferedReader in;
-    private BufferedWriter out;
+    public BufferedReader in;
+    public BufferedWriter out;
     private boolean open;
     private Socket socket;
+    private Consumer<Connectivity> fn;
 
-    Connectivity(String hostname, int port) throws IOException {
-        socket = new Socket(hostname, port);
+
+    Connectivity(String hostname, int port, Consumer<Connectivity> fn) throws IOException {
+        this(new Socket(hostname, port), fn);
+    }
+
+    Connectivity(Socket socket, Consumer<Connectivity> fn) throws IOException {
+        this.socket = socket;
+        this.fn = fn;
         in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
         out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
         open = true;
@@ -27,17 +34,7 @@ public class Connectivity extends Thread {
     }
 
     public void run() {
-        Scanner scanner = new Scanner(System.in);
-        String inputStr;
-
-        System.out.print("REQ: ");
-        while (!(inputStr = scanner.nextLine()).equals("exit")) {
-            fetch(inputStr + "\n", reply -> {
-                System.out.println("RES: " + reply);
-                System.out.print("REQ: ");
-            });
-        }
-        scanner.close();
+        fn.accept(this);
     }
 
     public boolean send(String msg) {
@@ -53,8 +50,12 @@ public class Connectivity extends Thread {
         return false;
     }
 
-    public boolean send(Object src) {
-        return this.send(g.toJson(src) + "\n");
+    public boolean sendln(String msg) {
+        return send(msg + "\n");
+    }
+
+    public boolean sendln(Object src) {
+        return this.sendln(g.toJson(src));
     }
 
     public boolean fetch(String msg, Consumer<String> callback) {
@@ -73,7 +74,7 @@ public class Connectivity extends Thread {
     }
 
     public <T> boolean fetch(Object src, Class<T> classOfT, Consumer<T> callback) {
-        boolean ok = send(src);
+        boolean ok = sendln(src);
         if (!ok) {
             return false;
         }

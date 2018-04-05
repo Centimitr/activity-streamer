@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.Scanner;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,7 +26,7 @@ public class Client extends Thread {
 
     @SuppressWarnings("unchecked")
     public void sendActivityObject(JSONObject activityObj) {
-        connectivity.send(activityObj);
+        connectivity.sendln(activityObj);
     }
 
 
@@ -35,7 +36,21 @@ public class Client extends Thread {
 
     public void run() {
         try {
-            connectivity = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort());
+            connectivity = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort(), c -> {
+                Scanner scanner = new Scanner(System.in);
+                String inputStr;
+
+                System.out.print("REQ: ");
+                while (!(inputStr = scanner.nextLine()).equals("exit")) {
+                    log.info("0");
+                    c.fetch(inputStr + "\n", reply -> {
+                        log.info("2");
+                        System.out.println("RES: " + reply);
+                        System.out.print("REQ: ");
+                    });
+                }
+                scanner.close();
+            });
         } catch (IOException e) {
             e.printStackTrace();
         }
