@@ -1,10 +1,13 @@
-
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.simple.JSONObject;
 
 
 public class Control extends Thread {
@@ -12,6 +15,7 @@ public class Control extends Thread {
     private static ArrayList<Connection> connections;
     private static boolean term = false;
     private static Listener listener;
+    private Gson g = new Gson();
 
     protected static Control control = null;
 
@@ -24,12 +28,10 @@ public class Control extends Thread {
 
     public Control() {
         // initialize the connections array
-        log.info("Control~");
         connections = new ArrayList<Connection>();
         // start a listener
         try {
             listener = new Listener();
-            log.info("Control1");
         } catch (IOException e1) {
             log.fatal("failed to startup a listening thread: " + e1);
             System.exit(-1);
@@ -53,10 +55,51 @@ public class Control extends Thread {
      * Return true if the connection should close.
      */
     public synchronized boolean process(Connection con, String msg) {
-        System.out.println("PROCESS!");
-        System.out.println(msg);
-        con.writeMsg("R: " + msg + '\n');
-        return false;
+        // test function
+        if (!msg.startsWith("{")) {
+            System.out.println("RCV: " + msg);
+            con.writeMsg("R: " + msg + '\n');
+            return false;
+        }
+        MessageParser mp = new MessageParser();
+        mp.parse(msg);
+//        if (mp.is("LOGOUT")) {
+//            Message m = (Message) mp.message;
+//            log.info(m.command);
+//
+//        } else if (mp.is("INVALID_MESSAGE")) {
+//            MessageInfo m = (MessageInfo) mp.message;
+//            log.info(m.command);
+//
+//        } else if (mp.is("AUTHTENTICATION_FAIL")) {
+//
+//        } else if (mp.is("LOGIN_SUCCESS")) {
+//        } else if (mp.is("LOGIN_FAILED")) {
+//        } else if (mp.is("REGISTER_FAILED")) {
+//        } else if (mp.is("REGISTER_SUCCESS")) {
+//
+//            // secret
+//        } else if (mp.is("AUTHENTICATE")) {
+//            // secret, username
+//        } else if (mp.is("LOGIN")) {
+//        } else if (mp.is("REGISTER")) {
+//        } else if (mp.is("LOCK_REQUEST")) {
+//        } else if (mp.is("LOCK_DENIED")) {
+//        } else if (mp.is("LOCK_ALLOWED")) {
+//        }
+//        // activity
+//        else if (mp.is("ACTIVITY_MESSAGE")) {
+//        }
+//        // secret, username, activity
+//        else if (mp.is("ACTIVITY_BROADCAST")) {
+//        }
+//        // hostname, port
+//        else if (mp.is("REDIRECT")) {
+//        }
+//        // hostname, port, id, load
+//        else if (mp.is("SERVER_ANNOUNCE")) {
+//        }
+        return true;
     }
 
     /*
