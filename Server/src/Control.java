@@ -9,14 +9,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
 
-
+@SuppressWarnings("WeakerAccess")
 public class Control extends Thread {
     private static final Logger log = LogManager.getLogger();
     private static Gson g = new Gson();
-    private ArrayList<Connectivity> clientConns;
+
+    private ArrayList<Connectivity> clientConns = new ArrayList<>();
     private Connectivity serverConn;
-    private boolean term = false;
     private Listener listener;
+    private boolean term = false;
 
     protected static Control control = null;
 
@@ -28,7 +29,6 @@ public class Control extends Thread {
     }
 
     public Control() {
-        clientConns = new ArrayList<Connectivity>();
         setMessageHandlers();
         connectServerNode();
         startListen();
@@ -36,7 +36,6 @@ public class Control extends Thread {
 
 
     private void startListen() {
-//        Connectivity self = this;
         try {
             listener = new Listener(Settings.getLocalPort(), this::handleIncomingConn);
         } catch (IOException e) {
@@ -73,7 +72,7 @@ public class Control extends Thread {
         );
     }
 
-    private void handleIncomingConn(Listener l, Socket s) {
+    private synchronized void handleIncomingConn(Listener l, Socket s) {
         log.debug("incoming connection: " + Settings.socketAddress(s));
 
         try {
@@ -85,11 +84,11 @@ public class Control extends Thread {
                         term = process(conn, data);
                     }
                     log.debug("connection closed to " + Settings.socketAddress(s));
-                    connectionClosed(conn);
+                    handleClosedConn(conn);
                     conn.in.close();
                 } catch (IOException e) {
                     log.error("connection " + Settings.socketAddress(s) + " closed with exception: " + e);
-                    connectionClosed(conn);
+                    handleClosedConn(conn);
                 }
             });
             clientConns.add(c);
@@ -98,11 +97,15 @@ public class Control extends Thread {
         }
     }
 
+    private synchronized void handleClosedConn(Connectivity c) {
+        if (!term) clientConns.remove(c);
+    }
+
     /*
      * Processing incoming messages from the connection.
      * Return true if the connection should close.
      */
-    public synchronized boolean process(Connectivity c, String msg) {
+    private synchronized boolean process(Connectivity c, String msg) {
         // todo: remove this debug use code
         if (!msg.startsWith("{")) {
             System.out.println("RCV: " + msg);
@@ -119,26 +122,6 @@ public class Control extends Thread {
         return true;
     }
 
-    /*
-     * Connection Status Handling
-     */
-    public synchronized void connectionClosed(Connectivity c) {
-        if (!term) clientConns.remove(c);
-    }
-
-//    public synchronized Connection incomingConnection(Socket s) throws IOException {
-//        log.debug("incomming connection: " + Settings.socketAddress(s));
-//        Connection c = new Connection(s);
-//        connections.add(c);
-//        return c;
-//    }
-//
-//    public synchronized Connection outgoingConnection(Socket s) throws IOException {
-//        log.debug("outgoing connection: " + Settings.socketAddress(s));
-//        Connection c = new Connection(s);
-//        connections.add(c);
-//        return c;
-//    }
 
     @Override
     public void run() {
