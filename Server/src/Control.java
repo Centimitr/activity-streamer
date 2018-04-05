@@ -47,9 +47,7 @@ public class Control extends Thread {
     private void connectServerNode() {
         if (Settings.getRemoteHostname() != null) {
             try {
-                serverConn = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort(), c -> {
-
-                });
+                serverConn = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort(), this::startAuthentication);
             } catch (IOException e) {
                 log.error("failed to make connection to " + Settings.getRemoteHostname() + ":" + Settings.getRemotePort() + " :" + e);
                 System.exit(-1);
@@ -70,6 +68,13 @@ public class Control extends Thread {
                     log.info("@INVALID_MESSAGE: " + m.info);
                 }
         );
+    }
+
+    private synchronized void startAuthentication(Connectivity c) {
+        boolean ok;
+        ok = c.sendln(new MessageSecret(MessageCommands.AUTHENTICATE.name(), Settings.getSecret()));
+        log.info("Authentication: " + ok);
+        
     }
 
     private synchronized void handleIncomingConn(Listener l, Socket s) {

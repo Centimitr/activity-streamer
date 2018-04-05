@@ -42,10 +42,10 @@ public class Connectivity extends Thread {
             try {
                 out.write(msg);
                 out.flush();
+                return true;
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return true;
         }
         return false;
     }
@@ -56,6 +56,10 @@ public class Connectivity extends Thread {
 
     public boolean sendln(Object src) {
         return this.sendln(g.toJson(src));
+    }
+
+    public String receiveln() throws IOException {
+        return in.readLine();
     }
 
     public boolean fetch(String msg, Consumer<String> callback) {
