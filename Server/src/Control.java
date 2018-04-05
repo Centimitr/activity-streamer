@@ -29,6 +29,19 @@ public class Control extends Thread {
     public Control() {
         // initialize the connections array
         connections = new ArrayList<Connection>();
+        // register message handlers
+        MessageProtocol.getInstance()
+                .registerHandler(MessageCommands.LOGOUT, context -> {
+                    Message m = context.read(Message.class);
+                    // {"command":"LOGOUT"}
+                    log.info("@LOGOUT");
+                    context.close();
+                }).registerHandler(MessageCommands.INVALID_MESSAGE, context -> {
+                    MessageInfo m = context.read(MessageInfo.class);
+                    // {"command":"INVALID_MESSAGE", "info":"this is info"}
+                    log.info("@INVALID_MESSAGE: " + m.info);
+                }
+        );
         // start a listener
         try {
             listener = new Listener();
@@ -61,44 +74,12 @@ public class Control extends Thread {
             con.writeMsg("R: " + msg + '\n');
             return false;
         }
-        MessageParser mp = new MessageParser();
-        mp.parse(msg);
-//        if (mp.is("LOGOUT")) {
-//            Message m = (Message) mp.message;
-//            log.info(m.command);
-//
-//        } else if (mp.is("INVALID_MESSAGE")) {
-//            MessageInfo m = (MessageInfo) mp.message;
-//            log.info(m.command);
-//
-//        } else if (mp.is("AUTHTENTICATION_FAIL")) {
-//
-//        } else if (mp.is("LOGIN_SUCCESS")) {
-//        } else if (mp.is("LOGIN_FAILED")) {
-//        } else if (mp.is("REGISTER_FAILED")) {
-//        } else if (mp.is("REGISTER_SUCCESS")) {
-//
-//            // secret
-//        } else if (mp.is("AUTHENTICATE")) {
-//            // secret, username
-//        } else if (mp.is("LOGIN")) {
-//        } else if (mp.is("REGISTER")) {
-//        } else if (mp.is("LOCK_REQUEST")) {
-//        } else if (mp.is("LOCK_DENIED")) {
-//        } else if (mp.is("LOCK_ALLOWED")) {
-//        }
-//        // activity
-//        else if (mp.is("ACTIVITY_MESSAGE")) {
-//        }
-//        // secret, username, activity
-//        else if (mp.is("ACTIVITY_BROADCAST")) {
-//        }
-//        // hostname, port
-//        else if (mp.is("REDIRECT")) {
-//        }
-//        // hostname, port, id, load
-//        else if (mp.is("SERVER_ANNOUNCE")) {
-//        }
+        MessageContext mc = new MessageContext();
+        boolean ok = mc.parse(msg);
+        if (ok) {
+            mc.process();
+            return mc.needClose();
+        }
         return true;
     }
 
