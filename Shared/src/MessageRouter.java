@@ -5,25 +5,28 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-class MessageProtocol {
-    private static MessageProtocol ourInstance = new MessageProtocol();
+class MessageRouter {
     private static final Logger log = LogManager.getLogger();
 
-    public static MessageProtocol getInstance() {
-        return ourInstance;
-    }
-
-    private MessageProtocol() {
+    MessageRouter() {
     }
 
     private Map<String, Consumer<MessageContext>> handlers = new HashMap<>();
+    private Consumer<MessageContext> errorHandler = c -> {
+        log.warn("No unknown handler configured but invoked.");
+    };
 
     boolean supportCommand(String command) {
         return MessageCommands.contains(command);
     }
 
-    MessageProtocol registerHandler(MessageCommands command, Consumer<MessageContext> handler) {
+    MessageRouter registerHandler(MessageCommands command, Consumer<MessageContext> handler) {
         handlers.put(command.name(), handler);
+        return this;
+    }
+
+    MessageRouter registerErrorHandler(Consumer<MessageContext> handler) {
+        errorHandler = handler;
         return this;
     }
 
@@ -33,4 +36,9 @@ class MessageProtocol {
         }
         return handlers.get(command);
     }
+
+    Consumer<MessageContext> getErrorHandler() {
+        return errorHandler;
+    }
+
 }

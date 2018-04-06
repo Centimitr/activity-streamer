@@ -7,9 +7,15 @@ import java.util.function.Consumer;
 @SuppressWarnings("WeakerAccess")
 class MessageContext {
     private static final Gson g = new Gson();
-    public String command;
     private JsonObject j;
-    private boolean willClose = false;
+    public String command;
+    private boolean willClose;
+    private MessageRouter router;
+    private String reply;
+
+    MessageContext(MessageRouter router) {
+        this.router = router;
+    }
 
     public boolean is(String cmd) {
         return command.equals(cmd);
@@ -18,24 +24,47 @@ class MessageContext {
     public boolean parse(String msg) {
         j = new JsonParser().parse(msg).getAsJsonObject();
         command = j.get("command").getAsString();
-        return MessageProtocol.getInstance().supportCommand(command);
+        willClose = false;
+        reply = null;
+        return router.supportCommand(command);
     }
 
-    public <T> T read(Class<T> classOfT) {
-        return g.fromJson(j, classOfT);
+    public boolean process(Connectivity c, String msg) {
+        boolean valid = parse(msg);
+        handle(valid);
+        if (reply != null) {
+            c.sendln(reply);
+        }
+        // todo: remove this debug print
+        c.sendln("RJ: " + msg);
+        return needClose();
     }
 
-    public void process() {
-        Consumer<MessageContext> handler = MessageProtocol.getInstance().getHandler(command);
+    public void handle(boolean valid) {
+        Consumer<MessageContext> handler = valid ?
+                router.getHandler(command) :
+                router.getErrorHandler();
         handler.accept(this);
-    }
-
-    public void close() {
-        willClose = true;
     }
 
     public boolean needClose() {
         return willClose;
     }
 
+
+    /*
+     * Internal Methods
+     */
+
+    public <T> T read(Class<T> classOfT) {
+        return g.fromJson(j, classOfT);
+    }
+
+    public void write(String reply) {
+        this.reply = reply;
+    }
+
+    public void close() {
+        willClose = true;
+    }
 }

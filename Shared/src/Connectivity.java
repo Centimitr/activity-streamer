@@ -5,6 +5,8 @@ import org.apache.logging.log4j.Logger;
 import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 @SuppressWarnings({"Duplicates", "WeakerAccess"})
@@ -91,6 +93,14 @@ public class Connectivity extends Thread {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public void redirect(BiFunction<Connectivity, String, Boolean> process) throws IOException {
+        boolean term = false;
+        String msg;
+        while (!term && (msg = in.readLine()) != null) {
+            term = process.apply(this, msg);
+        }
     }
 
     public void close() {

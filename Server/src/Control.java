@@ -3,17 +3,16 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.simple.JSONObject;
 
 @SuppressWarnings("WeakerAccess")
 public class Control extends Thread {
     private static final Logger log = LogManager.getLogger();
     private static Gson g = new Gson();
 
+    private MessageRouter clientMessageRouter = new MessageRouter();
+    private MessageRouter serverMessageRouter = new MessageRouter();
     private ArrayList<Connectivity> clientConns = new ArrayList<>();
     private Connectivity serverConn;
     private Listener listener;
@@ -56,38 +55,48 @@ public class Control extends Thread {
     }
 
     private void setMessageHandlers() {
-        MessageProtocol.getInstance()
+        clientMessageRouter
                 .registerHandler(MessageCommands.LOGOUT, context -> {
                     Message m = context.read(Message.class);
                     // {"command":"LOGOUT"}
                     log.info("@LOGOUT");
                     context.close();
-                }).registerHandler(MessageCommands.INVALID_MESSAGE, context -> {
+                })
+                .registerHandler(MessageCommands.INVALID_MESSAGE, context -> {
                     MessageInfo m = context.read(MessageInfo.class);
                     // {"command":"INVALID_MESSAGE", "info":"this is info"}
                     log.info("@INVALID_MESSAGE: " + m.info);
-                }
-        );
+                })
+                .registerErrorHandler(c -> {
+
+                });
+        serverMessageRouter
+                .registerHandler(MessageCommands.AUTHTENTICATION_FAIL, context -> {
+                })
+                .registerHandler(MessageCommands.INVALID_MESSAGE, context -> {
+                })
+                .registerErrorHandler(c -> {
+
+                });
     }
 
     private synchronized void startAuthentication(Connectivity c) {
         boolean ok;
         ok = c.sendln(new MessageSecret(MessageCommands.AUTHENTICATE.name(), Settings.getSecret()));
         log.info("Authentication: " + ok);
-        
+        try {
+            c.redirect(this::handleServerMessage);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private synchronized void handleIncomingConn(Listener l, Socket s) {
-        log.debug("incoming connection: " + Settings.socketAddress(s));
 
         try {
             Connectivity c = new Connectivity(s, conn -> {
                 try {
-                    boolean term = false;
-                    String data;
-                    while (!term && (data = conn.in.readLine()) != null) {
-                        term = process(conn, data);
-                    }
+                    conn.redirect(this::handleClientMessage);
                     log.debug("connection closed to " + Settings.socketAddress(s));
                     handleClosedConn(conn);
                     conn.in.close();
@@ -110,21 +119,18 @@ public class Control extends Thread {
      * Processing incoming messages from the connection.
      * Return true if the connection should close.
      */
-    private synchronized boolean process(Connectivity c, String msg) {
+    private synchronized boolean handleClientMessage(Connectivity c, String msg) {
         // todo: remove this debug use code
         if (!msg.startsWith("{")) {
             System.out.println("RCV: " + msg);
             c.sendln("R: " + msg);
             return false;
         }
-        MessageContext mc = new MessageContext();
-        boolean ok = mc.parse(msg);
-        if (ok) {
-            mc.process();
-            c.sendln("RJ: " + msg);
-            return mc.needClose();
-        }
-        return true;
+        return (new MessageContext(clientMessageRouter)).process(c, msg);
+    }
+
+    private synchronized boolean handleServerMessage(Connectivity c, String msg) {
+        return (new MessageContext(serverMessageRouter)).process(c, msg);
     }
 
 
