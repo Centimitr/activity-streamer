@@ -31,6 +31,7 @@ public class Control extends Thread {
         setMessageHandlers();
         connectServerNode();
         startListen();
+        start();
     }
 
 
