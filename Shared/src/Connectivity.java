@@ -20,7 +20,6 @@ public class Connectivity extends Thread {
     private Socket socket;
     private Consumer<Connectivity> fn;
 
-
     Connectivity(String hostname, int port, Consumer<Connectivity> fn) throws IOException {
         this(new Socket(hostname, port), fn);
     }
@@ -64,6 +63,7 @@ public class Connectivity extends Thread {
         return in.readLine();
     }
 
+    // todo: used for test function
     public boolean fetch(String msg, Consumer<String> callback) {
         boolean ok = send(msg);
         if (!ok) {
@@ -79,6 +79,7 @@ public class Connectivity extends Thread {
         return false;
     }
 
+    // todo: not useful now, may be removed
     public <T> boolean fetch(Object src, Class<T> classOfT, Consumer<T> callback) {
         boolean ok = sendln(src);
         if (!ok) {
@@ -95,13 +96,31 @@ public class Connectivity extends Thread {
         return false;
     }
 
-    // todo: ugly error handling wrapper, catch exception inside
     // todo: improve process, maybe close in stream inside
-    public void redirect(BiFunction<Connectivity, String, Boolean> process) throws IOException {
+    public boolean redirect(BiFunction<Connectivity, String, Boolean> process) {
         boolean term = false;
         String msg;
-        while (!term && (msg = in.readLine()) != null) {
-            term = process.apply(this, msg);
+        try {
+            while (!term && (msg = in.readLine()) != null) {
+                term = process.apply(this, msg);
+            }
+            return true;
+        } catch (IOException e) {
+            log.error("REDIRECT: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
+    // todo: check if only close in stream is necessary
+    public void closeIn() {
+        if (open) {
+            try {
+                in.close();
+            } catch (IOException e) {
+                log.error("received exception closing the connection " + Settings.socketAddress(socket) + ": " + e);
+            }
         }
     }
 

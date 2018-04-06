@@ -22,12 +22,14 @@ public class Client extends Thread {
     }
 
     public Client() {
+        // todo: add gui features
 //        textFrame = new TextFrame();
         setMessageHandlers();
         start();
     }
 
     private void setMessageHandlers() {
+        // todo: add protocol logic
         router
                 .registerHandler(MessageCommands.INVALID_MESSAGE, context -> {
 
@@ -52,19 +54,21 @@ public class Client extends Thread {
 
     public void run() {
         try {
-            connectivity = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort(), this::test);
-//            connectivity = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort(), this::handleAuthentication);
+            connectivity = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort(), this::handleTestREPL);
+//            connectivity = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort(), this::handleConnection);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     // todo: authentication: register, login
-    private void handleAuthentication(Connectivity c) {
+    private void handleConnection(Connectivity c) {
+        boolean ok = c.redirect((conn, msg) -> (new MessageContext(router)).process(conn, msg));
+        // todo: close the connection
     }
 
     // todo: used to test connectivity, to remove
-    private void test(Connectivity c) {
+    private void handleTestREPL(Connectivity c) {
         Scanner scanner = new Scanner(System.in);
         String inputStr;
 

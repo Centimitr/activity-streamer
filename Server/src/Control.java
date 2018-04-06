@@ -80,29 +80,34 @@ public class Control extends Thread {
                 });
     }
 
+    // todo: check if synchronized is appropriate
     private synchronized void startAuthentication(Connectivity c) {
         boolean ok;
         ok = c.sendln(new MessageSecret(MessageCommands.AUTHENTICATE.name(), Settings.getSecret()));
         log.info("Authentication: " + ok);
-        try {
-            c.redirect(this::handleServerMessage);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        ok = c.redirect(this::handleServerMessage);
+        ok = c.redirect((conn, msg) -> (new MessageContext(serverMessageRouter)).process(conn, msg));
+        // todo: if error happens in the S/S process, maybe disconnect?
     }
 
     private synchronized void handleIncomingConn(Listener l, Socket s) {
-
         try {
-            Connectivity c = new Connectivity(s, conn -> {
-                try {
-                    conn.redirect(this::handleClientMessage);
+            Connectivity c = new Connectivity(s, con -> {
+//                boolean ok = conn.redirect(this::handleClientMessage);
+                boolean ok = con.redirect((conn, msg) -> {
+                    // todo: remove this debug use code
+                    if (!msg.startsWith("{")) {
+                        System.out.println("RCV: " + msg);
+                        conn.sendln("R: " + msg);
+                        return false;
+                    }
+                    return (new MessageContext(clientMessageRouter)).process(conn, msg);
+                });
+                if (!ok) {
                     log.debug("connection closed to " + Settings.socketAddress(s));
-                    handleClosedConn(conn);
-                    conn.in.close();
-                } catch (IOException e) {
-                    log.error("connection " + Settings.socketAddress(s) + " closed with exception: " + e);
-                    handleClosedConn(conn);
+                    handleClosedConn(con);
+                    // todo: find a good time to close in stream to ensure the I/O order
+                    // conn.in.close();
                 }
             });
             clientConns.add(c);
@@ -115,23 +120,19 @@ public class Control extends Thread {
         if (!term) clientConns.remove(c);
     }
 
-    /*
-     * Processing incoming messages from the connection.
-     * Return true if the connection should close.
-     */
-    private synchronized boolean handleClientMessage(Connectivity c, String msg) {
-        // todo: remove this debug use code
-        if (!msg.startsWith("{")) {
-            System.out.println("RCV: " + msg);
-            c.sendln("R: " + msg);
-            return false;
-        }
-        return (new MessageContext(clientMessageRouter)).process(c, msg);
-    }
-
-    private synchronized boolean handleServerMessage(Connectivity c, String msg) {
-        return (new MessageContext(serverMessageRouter)).process(c, msg);
-    }
+//    private synchronized boolean handleClientMessage(Connectivity c, String msg) {
+//        // todo: remove this debug use code
+//        if (!msg.startsWith("{")) {
+//            System.out.println("RCV: " + msg);
+//            c.sendln("R: " + msg);
+//            return false;
+//        }
+//        return (new MessageContext(clientMessageRouter)).process(c, msg);
+//    }
+//
+//    private synchronized boolean handleServerMessage(Connectivity c, String msg) {
+//        return (new MessageContext(serverMessageRouter)).process(c, msg);
+//    }
 
 
     @Override
