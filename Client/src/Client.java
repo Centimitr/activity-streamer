@@ -9,6 +9,8 @@ import org.json.simple.JSONObject;
 public class Client extends Thread {
     private static final Logger log = LogManager.getLogger();
     private static Client clientSolution;
+
+    private MessageRouter router = new MessageRouter();
     private Connectivity connectivity;
     private TextFrame textFrame;
 
@@ -21,7 +23,18 @@ public class Client extends Thread {
 
     public Client() {
 //        textFrame = new TextFrame();
+        setMessageHandlers();
         start();
+    }
+
+    private void setMessageHandlers() {
+        router
+                .registerHandler(MessageCommands.INVALID_MESSAGE, context -> {
+
+                })
+                .registerErrorHandler(context -> {
+
+                });
     }
 
     @SuppressWarnings("unchecked")
@@ -39,7 +52,8 @@ public class Client extends Thread {
 
     public void run() {
         try {
-            connectivity = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort(), this::handleAuthentication);
+            connectivity = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort(), this::test);
+//            connectivity = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort(), this::handleAuthentication);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -47,7 +61,6 @@ public class Client extends Thread {
 
     // todo: authentication: register, login
     private void handleAuthentication(Connectivity c) {
-
     }
 
     // todo: used to test connectivity, to remove
@@ -57,9 +70,7 @@ public class Client extends Thread {
 
         System.out.print("REQ: ");
         while (!(inputStr = scanner.nextLine()).equals("exit")) {
-            log.info("0");
             c.fetch(inputStr + "\n", reply -> {
-                log.info("2");
                 System.out.println("RES: " + reply);
                 System.out.print("REQ: ");
             });

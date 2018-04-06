@@ -95,6 +95,8 @@ public class Connectivity extends Thread {
         return false;
     }
 
+    // todo: ugly error handling wrapper, catch exception inside
+    // todo: improve process, maybe close in stream inside
     public void redirect(BiFunction<Connectivity, String, Boolean> process) throws IOException {
         boolean term = false;
         String msg;
