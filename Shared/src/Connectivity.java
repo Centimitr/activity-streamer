@@ -112,7 +112,6 @@ public class Connectivity extends Thread {
         return false;
     }
 
-
     // todo: check if only close in stream is necessary
     public void closeIn() {
         if (open) {

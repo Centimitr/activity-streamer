@@ -32,6 +32,8 @@ public class Client extends Thread {
         // todo: add protocol logic
         router
                 .registerHandler(MessageCommands.INVALID_MESSAGE, context -> {
+                })
+                .registerHandler(MessageCommands.AUTHENTICATE, context -> {
 
                 })
                 .registerErrorHandler(context -> {
@@ -54,8 +56,8 @@ public class Client extends Thread {
 
     public void run() {
         try {
-            connectivity = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort(), this::handleTestREPL);
-//            connectivity = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort(), this::handleConnection);
+//            connectivity = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort(), this::handleTestREPL);
+            connectivity = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort(), this::handleConnection);
         } catch (IOException e) {
             e.printStackTrace();
         }

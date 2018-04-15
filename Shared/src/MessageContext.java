@@ -64,6 +64,10 @@ class MessageContext {
         this.reply = reply;
     }
 
+    public void write(Object obj) {
+        write(g.toJson(obj));
+    }
+
     public void close() {
         willClose = true;
     }

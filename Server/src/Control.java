@@ -9,11 +9,11 @@ import org.apache.logging.log4j.Logger;
 @SuppressWarnings("WeakerAccess")
 public class Control extends Thread {
     private static final Logger log = LogManager.getLogger();
-    private static Gson g = new Gson();
 
     private MessageRouter clientMessageRouter = new MessageRouter();
     private MessageRouter serverMessageRouter = new MessageRouter();
     private ArrayList<Connectivity> clientConns = new ArrayList<>();
+    private ArrayList<Connectivity> serverConns = new ArrayList<>();
     private Connectivity serverConn;
     private Listener listener;
     private boolean term = false;
