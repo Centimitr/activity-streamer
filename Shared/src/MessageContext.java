@@ -9,10 +9,10 @@ class MessageContext {
     private static final Gson g = new Gson();
     private JsonObject j;
     public String command;
+    public String lastCommand;
     private boolean willClose;
     private MessageRouter router;
     private String reply;
-    private String lastCommand;
 
     MessageContext(MessageRouter router) {
         this.router = router;
