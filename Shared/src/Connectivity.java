@@ -19,6 +19,7 @@ public class Connectivity extends Thread {
     private boolean open;
     private Socket socket;
     private Consumer<Connectivity> fn;
+    private MessageContext context;
 
     Connectivity(String hostname, int port, Consumer<Connectivity> fn) throws IOException {
         this(new Socket(hostname, port), fn);
@@ -110,6 +111,15 @@ public class Connectivity extends Thread {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public void bind(MessageRouter router) {
+        context = new MessageContext(router);
+    }
+
+    public boolean redirect(MessageRouter router) {
+        bind(router);
+        return redirect((conn, msg) -> context.process(conn, msg));
     }
 
     // todo: check if only close in stream is necessary

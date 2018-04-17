@@ -53,7 +53,7 @@ class MessageContext {
 
 
     /*
-     * Internal Methods
+     * Handler Methods
      */
 
     public <T> T read(Class<T> classOfT) {
