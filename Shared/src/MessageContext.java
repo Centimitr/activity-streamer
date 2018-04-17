@@ -12,6 +12,7 @@ class MessageContext {
     private boolean willClose;
     private MessageRouter router;
     private String reply;
+    private String lastCommand;
 
     MessageContext(MessageRouter router) {
         this.router = router;
@@ -45,16 +46,20 @@ class MessageContext {
                 router.getHandler(command) :
                 router.getErrorHandler();
         handler.accept(this);
+        lastCommand = command;
     }
 
     public boolean needClose() {
         return willClose;
     }
 
-
     /*
      * Handler Methods
      */
+
+    public boolean after(String cmd) {
+        return lastCommand.equals(cmd);
+    }
 
     public <T> T read(Class<T> classOfT) {
         return g.fromJson(j, classOfT);
