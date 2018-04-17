@@ -57,8 +57,11 @@ class MessageContext {
      * Handler Methods
      */
 
-    public boolean after(String cmd) {
-        return lastCommand.equals(cmd);
+    public MessageContext after(String cmd, Consumer<String> callback) {
+        if (lastCommand.equals(cmd)) {
+            callback.accept(lastCommand);
+        }
+        return this;
     }
 
     public <T> T read(Class<T> classOfT) {
