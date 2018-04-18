@@ -12,10 +12,12 @@ class MessageContext {
     private JsonObject j;
     public String command;
     public String lastCommand;
+    public Connectivity connectivity;
     private boolean willClose;
     private MessageRouter router;
     private String reply;
     private Map<String, String> states = new HashMap<>();
+
 
     MessageContext(MessageRouter router) {
         this.router = router;
@@ -35,6 +37,7 @@ class MessageContext {
 
     public boolean process(Connectivity c, String msg) {
         boolean valid = parse(msg);
+        connectivity = c;
         handle(valid);
         if (reply != null) {
             c.sendln(reply);
@@ -74,6 +77,8 @@ class MessageContext {
         }
         return this;
     }
+
+    public JsonObject read() { return j; }
 
     public <T> T read(Class<T> classOfT) {
         return g.fromJson(j, classOfT);

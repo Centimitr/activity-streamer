@@ -10,16 +10,21 @@ public class Client extends Thread {
     private static final Logger log = LogManager.getLogger();
     private static Client clientSolution;
 
-    private MessageRouter router = new MessageRouter();
-    private Connectivity connectivity;
-    private TextFrame textFrame;
-
     public static Client getInstance() {
         if (clientSolution == null) {
             clientSolution = new Client();
         }
         return clientSolution;
     }
+
+    public static ClientAgent getAgent() {
+        return getInstance().agent;
+    }
+
+    private MessageRouter router = new MessageRouter();
+    private ClientAgent agent = new ClientAgent();
+    private Connectivity connectivity;
+    private TextFrame textFrame;
 
     public Client() {
         // todo: add gui features
@@ -41,13 +46,6 @@ public class Client extends Thread {
                 });
     }
 
-    @SuppressWarnings("unchecked")
-    public void sendActivityObject(JSONObject activityObj) {
-        if (connectivity != null) {
-            connectivity.sendln(activityObj);
-        }
-    }
-
     public void disconnect() {
         if (connectivity != null) {
             connectivity.close();
@@ -56,8 +54,7 @@ public class Client extends Thread {
 
     public void run() {
         try {
-//            connectivity = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort(), this::handleTestREPL);
-            connectivity = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort(), this::handleConnection);
+            connectivity = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort(), this::handleTestREPL);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -65,7 +62,7 @@ public class Client extends Thread {
 
     // todo: authentication: register, login
     private void handleConnection(Connectivity c) {
-//        boolean ok = c.redirect((conn, msg) -> (new MessageContext(router)).process(conn, msg));
+        agent.bind(c);
         boolean ok = c.redirect(router);
         // todo: close the connection
     }
