@@ -34,7 +34,6 @@ public class Control extends Thread {
         start();
     }
 
-
     private void startListen() {
         try {
             listener = new Listener(Settings.getLocalPort(), this::handleIncomingConn);
@@ -87,7 +86,8 @@ public class Control extends Thread {
         ok = c.sendln(new MessageSecret(MessageCommands.AUTHENTICATE.name(), Settings.getSecret()));
         log.info("Authentication: " + ok);
 //        ok = c.redirect(this::handleServerMessage);
-        ok = c.redirect((conn, msg) -> (new MessageContext(serverMessageRouter)).process(conn, msg));
+//        ok = c.redirect((conn, msg) -> (new MessageContext(serverMessageRouter)).process(conn, msg));
+        ok = c.redirect(serverMessageRouter);
         // todo: if error happens in the S/S process, maybe disconnect?
     }
 
@@ -95,6 +95,7 @@ public class Control extends Thread {
         try {
             Connectivity c = new Connectivity(s, con -> {
 //                boolean ok = conn.redirect(this::handleClientMessage);
+                MessageContext ctx = new MessageContext(clientMessageRouter);
                 boolean ok = con.redirect((conn, msg) -> {
                     // todo: remove this debug use code
                     if (!msg.startsWith("{")) {
@@ -102,7 +103,7 @@ public class Control extends Thread {
                         conn.sendln("R: " + msg);
                         return false;
                     }
-                    return (new MessageContext(clientMessageRouter)).process(conn, msg);
+                    return ctx.process(conn, msg);
                 });
                 if (!ok) {
                     log.debug("connection closed to " + Settings.socketAddress(s));
@@ -134,7 +135,6 @@ public class Control extends Thread {
 //    private synchronized boolean handleServerMessage(Connectivity c, String msg) {
 //        return (new MessageContext(serverMessageRouter)).process(c, msg);
 //    }
-
 
     @Override
     public void run() {

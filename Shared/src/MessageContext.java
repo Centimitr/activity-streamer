@@ -9,6 +9,7 @@ class MessageContext {
     private static final Gson g = new Gson();
     private JsonObject j;
     public String command;
+    public String lastCommand;
     private boolean willClose;
     private MessageRouter router;
     private String reply;
@@ -45,16 +46,23 @@ class MessageContext {
                 router.getHandler(command) :
                 router.getErrorHandler();
         handler.accept(this);
+        lastCommand = command;
     }
 
     public boolean needClose() {
         return willClose;
     }
 
-
     /*
-     * Internal Methods
+     * Handler Methods
      */
+
+    public MessageContext after(String cmd, Consumer<String> callback) {
+        if (lastCommand.equals(cmd)) {
+            callback.accept(lastCommand);
+        }
+        return this;
+    }
 
     public <T> T read(Class<T> classOfT) {
         return g.fromJson(j, classOfT);

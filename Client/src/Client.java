@@ -65,7 +65,8 @@ public class Client extends Thread {
 
     // todo: authentication: register, login
     private void handleConnection(Connectivity c) {
-        boolean ok = c.redirect((conn, msg) -> (new MessageContext(router)).process(conn, msg));
+//        boolean ok = c.redirect((conn, msg) -> (new MessageContext(router)).process(conn, msg));
+        boolean ok = c.redirect(router);
         // todo: close the connection
     }
 
