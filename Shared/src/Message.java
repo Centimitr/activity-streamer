@@ -44,9 +44,9 @@ class MessageActivity extends MessageUser {
 
 class MessageServer extends Message {
     String hostname;
-    String port;
+    Integer port;
 
-    MessageServer(String command, String hostname, String port) {
+    MessageServer(String command, String hostname, Integer port) {
         super(command);
         this.hostname = hostname;
         this.port = port;
@@ -57,7 +57,7 @@ class MessageServerAnnounce extends MessageServer {
     String id;
     Integer load;
 
-    MessageServerAnnounce(String command, String hostname, String port, String id, Integer load) {
+    MessageServerAnnounce(String command, String hostname, Integer port, String id, Integer load) {
         super(command, hostname, port);
         this.id = id;
         this.load = load;

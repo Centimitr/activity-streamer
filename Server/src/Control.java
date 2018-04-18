@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import com.google.gson.Gson;
@@ -14,6 +15,7 @@ public class Control extends Thread {
     private static final Logger log = LogManager.getLogger();
     private static final Gson g = new Gson();
 
+    private String uuid = UUID.randomUUID().toString();
     private MessageRouter clientMessageRouter = new MessageRouter();
     private MessageRouter serverMessageRouter = new MessageRouter();
     private ArrayList<Connectivity> clientConns = new ArrayList<>();
@@ -115,6 +117,10 @@ public class Control extends Thread {
                     );
                     serverConnsForEach(conn -> conn.sendln(broadcast));
                 })
+                .registerErrorHandler(c -> {
+
+                });
+        serverMessageRouter
                 .registerHandler(MessageCommands.ACTIVITY_BROADCAST, context -> {
                     // todo: INVALID_MESSAGE, incorrect in anyway
                     // todo: received from an unauthenticated server
@@ -126,10 +132,12 @@ public class Control extends Thread {
                     serverConnsForEachExclude(context.connectivity, conn -> conn.sendln(m));
                     clientConns.forEach(conn -> conn.sendln(m));
                 })
-                .registerErrorHandler(c -> {
-
-                });
-        serverMessageRouter
+                .registerHandler(MessageCommands.SERVER_ANNOUNCE, context -> {
+                    // todo: new function to wrap the broadcast
+                    JsonObject m = context.read();
+                    serverConnsForEachExclude(context.connectivity, conn -> conn.sendln(m));
+                    clientConns.forEach(conn -> conn.sendln(m));
+                })
                 .registerHandler(MessageCommands.AUTHTENTICATION_FAIL, context -> {
                 })
                 .registerHandler(MessageCommands.INVALID_MESSAGE, context -> {
@@ -224,7 +232,20 @@ public class Control extends Thread {
 
     public boolean doActivity() {
         System.out.println("DoActivity!");
+        doServerAnnounce();
         return false;
+    }
+
+    private void doServerAnnounce() {
+        Integer load = clientConns.size();
+        MessageServerAnnounce m = new MessageServerAnnounce(
+                MessageCommands.SERVER_ANNOUNCE.name(),
+                Settings.getLocalHostname(),
+                Settings.getLocalPort(),
+                uuid,
+                load
+        );
+        serverConnsForEach(conn -> conn.sendln(m));
     }
 
     public final void terminate() {
