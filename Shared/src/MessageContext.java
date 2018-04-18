@@ -2,6 +2,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 
 @SuppressWarnings("WeakerAccess")
@@ -13,6 +15,7 @@ class MessageContext {
     private boolean willClose;
     private MessageRouter router;
     private String reply;
+    private Map<String, String> states = new HashMap<>();
 
     MessageContext(MessageRouter router) {
         this.router = router;
@@ -56,6 +59,14 @@ class MessageContext {
     /*
      * Handler Methods
      */
+
+    public String get(String key) {
+        return states.get(key);
+    }
+
+    public String set(String key, String value) {
+        return states.put(key, value);
+    }
 
     public MessageContext after(String cmd, Consumer<String> callback) {
         if (lastCommand.equals(cmd)) {
