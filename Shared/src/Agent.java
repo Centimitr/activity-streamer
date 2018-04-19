@@ -1,11 +1,18 @@
 abstract class Agent {
-    Connectivity connectivity;
+    private Connectivity connectivity;
 
     void bind(Connectivity c) {
-        this.connectivity = c;
+        connectivity = c;
     }
 
-    public boolean sendln(Object src) {
+    void unbind() {
+        connectivity = null;
+    }
+
+    boolean sendln(Object src) {
+        if (connectivity == null) {
+            return false;
+        }
         return connectivity.sendln(src);
     }
 }

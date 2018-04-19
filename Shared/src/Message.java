@@ -1,3 +1,5 @@
+import com.google.gson.JsonObject;
+
 class Message {
     String command;
 
@@ -34,9 +36,9 @@ class MessageUser extends MessageSecret {
 }
 
 class MessageActivity extends MessageUser {
-    String activity;
+    Object activity;
 
-    MessageActivity(String command, String secret, String username, String activity) {
+    MessageActivity(String command, String secret, String username, Object activity) {
         super(command, secret, username);
         this.activity = activity;
     }
@@ -65,9 +67,9 @@ class MessageServerAnnounce extends MessageServer {
 }
 
 class MessageActivityBroadcast extends Message {
-    String activity;
+    JsonObject activity;
 
-    MessageActivityBroadcast(String command, String activity) {
+    MessageActivityBroadcast(String command, JsonObject activity) {
         super(command);
         this.activity = activity;
     }

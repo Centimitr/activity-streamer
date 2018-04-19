@@ -17,11 +17,11 @@ class ConnectivitySet implements MutableConnectivitySet {
     private ArrayList<Connectivity> conns = new ArrayList<>();
 
     @SuppressWarnings({"WeakerAccess", "UnusedReturnValue"})
-    boolean add(Connectivity c) {
+    public boolean add(Connectivity c) {
         return conns.add(c);
     }
 
-    boolean remove(Connectivity c) {
+    public boolean remove(Connectivity c) {
         return conns.remove(c);
     }
 

@@ -12,16 +12,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.Border;
 
+import com.google.gson.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 
 @SuppressWarnings("serial")
 public class TextFrame extends JFrame implements ActionListener {
@@ -88,13 +84,14 @@ public class TextFrame extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == sendButton) {
             String msg = inputText.getText().trim().replaceAll("\r", "").replaceAll("\n", "").replaceAll("\t", "");
-            JSONObject obj;
-            try {
-                obj = (JSONObject) parser.parse(msg);
-                Client.getAgent().sendActivityObject(obj);
-            } catch (ParseException e1) {
-                log.error("invalid JSON object entered into input text field, data not sent");
-            }
+            JsonObject obj;
+//            try {
+            // todo: may throw
+            obj = new JsonParser().parse(msg).getAsJsonObject();
+            Client.getAgent().sendActivityObject(obj);
+//            } catch (ParseException e1) {
+//                log.error("invalid JSON object entered into input text field, data not sent");
+//            }
 
         } else if (e.getSource() == disconnectButton) {
             Client.getInstance().disconnect();
