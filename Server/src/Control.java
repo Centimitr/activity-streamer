@@ -75,6 +75,22 @@ public class Control extends Thread {
         });
     }
 
+    private void broadcastToServers(Object msg) {
+        serverConnsForEach(conn -> conn.sendln(msg));
+    }
+
+    private void broadcastToServers(Object msg, Connectivity toExclude) {
+        serverConnsForEachExclude(toExclude, conn -> conn.sendln(msg));
+    }
+
+    private void broadcastToServers(Object msg, MessageContext toExclude) {
+        serverConnsForEachExclude(toExclude.connectivity, conn -> conn.sendln(msg));
+    }
+
+    private void broadcastToClients(Object msg) {
+        clientConns.forEach(conn -> conn.sendln(msg));
+    }
+
     private void setMessageHandlers() {
         clientMessageRouter
                 .registerHandler(MessageCommands.LOGOUT, context -> {
@@ -115,7 +131,7 @@ public class Control extends Thread {
                             MessageCommands.ACTIVITY_BROADCAST.name(),
                             g.toJson(activity)
                     );
-                    serverConnsForEach(conn -> conn.sendln(broadcast));
+                    broadcastToServers(broadcast);
                 })
                 .registerErrorHandler(c -> {
 
@@ -129,14 +145,13 @@ public class Control extends Thread {
                         return;
                     }
                     JsonObject m = context.read();
-                    serverConnsForEachExclude(context.connectivity, conn -> conn.sendln(m));
-                    clientConns.forEach(conn -> conn.sendln(m));
+                    broadcastToServers(m, context);
+                    broadcastToClients(m);
                 })
                 .registerHandler(MessageCommands.SERVER_ANNOUNCE, context -> {
                     // todo: new function to wrap the broadcast
                     JsonObject m = context.read();
-                    serverConnsForEachExclude(context.connectivity, conn -> conn.sendln(m));
-                    clientConns.forEach(conn -> conn.sendln(m));
+                    broadcastToServers(m, context);
                 })
                 .registerHandler(MessageCommands.AUTHTENTICATION_FAIL, context -> {
                 })
