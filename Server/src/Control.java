@@ -1,15 +1,24 @@
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.UUID;
+import java.util.function.Consumer;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.Message;
 
 @SuppressWarnings("WeakerAccess")
 public class Control extends Thread {
     private static final Logger log = LogManager.getLogger();
+    private static final Gson g = new Gson();
 
+    private String uuid = UUID.randomUUID().toString();
+    private ConnectivityManager manager = new ConnectivityManager();
+    private MessageRouter tempMessageRouter = new MessageRouter();
     private MessageRouter clientMessageRouter = new MessageRouter();
     private MessageRouter serverMessageRouter = new MessageRouter();
     private ArrayList<Connectivity> clientConns = new ArrayList<>();
@@ -54,7 +63,42 @@ public class Control extends Thread {
         }
     }
 
+    private void serverConnsForEach(Consumer<Connectivity> fn) {
+        if (serverConn != null) {
+            fn.accept(serverConn);
+        }
+        serverConns.forEach(fn);
+    }
+
+    private void serverConnsForEachExclude(Connectivity toExclude, Consumer<Connectivity> fn) {
+        serverConnsForEach(conn -> {
+            if (!conn.equals(toExclude)) {
+                fn.accept(conn);
+            }
+        });
+    }
+
+    private void broadcastToServers(Object msg) {
+        serverConnsForEach(conn -> conn.sendln(msg));
+    }
+
+    private void broadcastToServers(Object msg, Connectivity toExclude) {
+        serverConnsForEachExclude(toExclude, conn -> conn.sendln(msg));
+    }
+
+    private void broadcastToServers(Object msg, MessageContext toExclude) {
+        serverConnsForEachExclude(toExclude.connectivity, conn -> conn.sendln(msg));
+    }
+
+    private void broadcastToClients(Object msg) {
+        clientConns.forEach(conn -> conn.sendln(msg));
+    }
+
     private void setMessageHandlers() {
+        tempMessageRouter
+                .registerHandler(MessageCommands.LOGIN, context -> {
+                    manager.temp().transfer(context.connectivity, manager.clients());
+                });
         clientMessageRouter
                 .registerHandler(MessageCommands.LOGOUT, context -> {
                     Message m = context.read(Message.class);
@@ -65,12 +109,56 @@ public class Control extends Thread {
                 .registerHandler(MessageCommands.INVALID_MESSAGE, context -> {
                     MessageInfo m = context.read(MessageInfo.class);
                     // {"command":"INVALID_MESSAGE", "info":"this is info"}
+
                     log.info("@INVALID_MESSAGE: " + m.info);
+                })
+                .registerHandler(MessageCommands.ACTIVITY_MESSAGE, context -> {
+                    MessageActivity m = context.read(MessageActivity.class);
+                    boolean anonymous = m.username.equals("anonymous");
+                    boolean match = m.username.equals(context.get("username")) && m.secret.equals(context.get("secret"));
+                    boolean loggedIn = context.get("username") != null;
+                    if (!anonymous || !match || !loggedIn) {
+                        String info = "";
+                        if (!anonymous || !loggedIn) {
+                            info = "username is not anonymous or no user logged in.";
+                        }
+                        if (!match) {
+                            info = "the supplied secret is incorrect: " + m.secret;
+                        }
+                        MessageInfo res = new MessageInfo(MessageCommands.AUTHTENTICATION_FAIL.name(), info);
+                        context.write(res);
+                        context.close();
+                        return;
+                    }
+                    // todo: INVALID_MESSAGE, incorrect in anyway
+                    JsonObject activity = new JsonParser().parse(m.activity).getAsJsonObject();
+                    // todo: need check if the activity(JsonObject) can be marshaled correctly
+                    activity.addProperty("authenticated_user", context.get("username"));
+                    MessageActivityBroadcast broadcast = new MessageActivityBroadcast(
+                            MessageCommands.ACTIVITY_BROADCAST.name(),
+                            g.toJson(activity)
+                    );
+                    broadcastToServers(broadcast);
                 })
                 .registerErrorHandler(c -> {
 
                 });
         serverMessageRouter
+                .registerHandler(MessageCommands.ACTIVITY_BROADCAST, context -> {
+                    // todo: INVALID_MESSAGE, incorrect in anyway
+                    // todo: received from an unauthenticated server
+                    if (false) {
+                        context.close();
+                        return;
+                    }
+                    JsonObject m = context.read();
+                    broadcastToServers(m, context);
+                    broadcastToClients(m);
+                })
+                .registerHandler(MessageCommands.SERVER_ANNOUNCE, context -> {
+                    JsonObject m = context.read();
+                    broadcastToServers(m, context);
+                })
                 .registerHandler(MessageCommands.AUTHTENTICATION_FAIL, context -> {
                 })
                 .registerHandler(MessageCommands.INVALID_MESSAGE, context -> {
@@ -95,7 +183,7 @@ public class Control extends Thread {
         try {
             Connectivity c = new Connectivity(s, con -> {
 //                boolean ok = conn.redirect(this::handleClientMessage);
-                MessageContext ctx = new MessageContext(clientMessageRouter);
+                MessageContext ctx = new MessageContext(tempMessageRouter);
                 boolean ok = con.redirect((conn, msg) -> {
                     // todo: remove this debug use code
                     if (!msg.startsWith("{")) {
@@ -165,7 +253,20 @@ public class Control extends Thread {
 
     public boolean doActivity() {
         System.out.println("DoActivity!");
+        doServerAnnounce();
         return false;
+    }
+
+    private void doServerAnnounce() {
+        Integer load = clientConns.size();
+        MessageServerAnnounce m = new MessageServerAnnounce(
+                MessageCommands.SERVER_ANNOUNCE.name(),
+                Settings.getLocalHostname(),
+                Settings.getLocalPort(),
+                uuid,
+                load
+        );
+        serverConnsForEach(conn -> conn.sendln(m));
     }
 
     public final void terminate() {
