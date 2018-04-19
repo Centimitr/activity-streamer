@@ -9,6 +9,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.Message;
 
 @SuppressWarnings("WeakerAccess")
 public class Control extends Thread {
@@ -16,6 +17,8 @@ public class Control extends Thread {
     private static final Gson g = new Gson();
 
     private String uuid = UUID.randomUUID().toString();
+    private ConnectivityManager manager = new ConnectivityManager();
+    private MessageRouter tempMessageRouter = new MessageRouter();
     private MessageRouter clientMessageRouter = new MessageRouter();
     private MessageRouter serverMessageRouter = new MessageRouter();
     private ArrayList<Connectivity> clientConns = new ArrayList<>();
@@ -92,6 +95,10 @@ public class Control extends Thread {
     }
 
     private void setMessageHandlers() {
+        tempMessageRouter
+                .registerHandler(MessageCommands.LOGIN, context -> {
+                    manager.temp().transfer(context.connectivity, manager.clients());
+                });
         clientMessageRouter
                 .registerHandler(MessageCommands.LOGOUT, context -> {
                     Message m = context.read(Message.class);
@@ -107,7 +114,7 @@ public class Control extends Thread {
                 })
                 .registerHandler(MessageCommands.ACTIVITY_MESSAGE, context -> {
                     MessageActivity m = context.read(MessageActivity.class);
-                    boolean anonymous = !m.username.equals("anonymous");
+                    boolean anonymous = m.username.equals("anonymous");
                     boolean match = m.username.equals(context.get("username")) && m.secret.equals(context.get("secret"));
                     boolean loggedIn = context.get("username") != null;
                     if (!anonymous || !match || !loggedIn) {
@@ -149,7 +156,6 @@ public class Control extends Thread {
                     broadcastToClients(m);
                 })
                 .registerHandler(MessageCommands.SERVER_ANNOUNCE, context -> {
-                    // todo: new function to wrap the broadcast
                     JsonObject m = context.read();
                     broadcastToServers(m, context);
                 })
@@ -177,7 +183,7 @@ public class Control extends Thread {
         try {
             Connectivity c = new Connectivity(s, con -> {
 //                boolean ok = conn.redirect(this::handleClientMessage);
-                MessageContext ctx = new MessageContext(clientMessageRouter);
+                MessageContext ctx = new MessageContext(tempMessageRouter);
                 boolean ok = con.redirect((conn, msg) -> {
                     // todo: remove this debug use code
                     if (!msg.startsWith("{")) {
