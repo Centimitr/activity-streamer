@@ -1,6 +1,7 @@
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -12,14 +13,15 @@ import java.util.function.Consumer;
 class MessageContext {
     private static final Logger log = LogManager.getLogger();
     private static final Gson g = new Gson();
-    private JsonObject j;
+    public Connectivity connectivity;
+    private MessageRouter router;
+    private Map<String, String> states = new HashMap<>();
+    // states
     public String command;
     public String lastCommand;
-    public Connectivity connectivity;
-    private boolean willClose;
-    private MessageRouter router;
+    private JsonObject j;
     private String reply;
-    private Map<String, String> states = new HashMap<>();
+    private boolean willClose;
 
 
     MessageContext(MessageRouter router) {
@@ -31,26 +33,42 @@ class MessageContext {
     }
 
     public boolean parse(String msg) {
-        j = new JsonParser().parse(msg).getAsJsonObject();
+        try {
+            j = new JsonParser().parse(msg).getAsJsonObject();
+        } catch (JsonSyntaxException e) {
+            e.printStackTrace();
+            return false;
+        }
         command = j.get("command").getAsString();
-        willClose = false;
-        reply = null;
         return router.supportCommand(command);
     }
 
-    public boolean process(Connectivity c, String msg) {
-        System.out.println("Msg: " + msg);
-        boolean valid = parse(msg);
-        connectivity = c;
-//        System.out.println("Valid: " + valid);
-        handle(valid);
-        if (reply != null) {
-            c.sendln(reply);
-        }
+    private void clearState() {
+        willClose = false;
         reply = null;
-        // todo: remove this debug print
-//        c.sendln("RJ: " + msg);
-        return needClose();
+    }
+
+    private void handleStateChange() {
+        lastCommand = command;
+        if (reply != null) {
+            connectivity.sendln(reply);
+        }
+    }
+
+    public synchronized boolean process(Connectivity c, String msg) {
+        {
+            System.out.println("Msg: " + msg);
+        }
+        clearState();
+        connectivity = c;
+        boolean valid = parse(msg);
+        handle(valid);
+        handleStateChange();
+        {
+            // todo: remove this debug print
+            // c.sendln("RJ: " + msg);
+        }
+        return willClose;
     }
 
     public void handle(boolean valid) {
@@ -62,12 +80,11 @@ class MessageContext {
             return;
         }
         handler.accept(this);
-        lastCommand = command;
     }
 
-    public boolean needClose() {
-        return willClose;
-    }
+//    public boolean needClose() {
+//        return willClose;
+//    }
 
     /*
      * Handler Methods
