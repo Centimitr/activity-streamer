@@ -2,7 +2,7 @@ enum MessageCommands {
     LOGOUT,
     // info
     INVALID_MESSAGE,
-    AUTHTENTICATION_FAIL,
+    AUTHENTICATION_FAIL,
     LOGIN_SUCCESS,
     LOGIN_FAILED,
     REGISTER_FAILED,

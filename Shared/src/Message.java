@@ -1,76 +1,85 @@
 import com.google.gson.JsonObject;
 
-class Message {
-    String command;
+class TestMessage {
+    String msg;
 
-    Message(String command) {
+    TestMessage(String msg) {
+        this.msg = msg;
+    }
+}
+
+abstract class Message {
+    MessageCommands command;
+
+    Message(MessageCommands command) {
         this.command = command;
     }
 }
 
-class MessageSecret extends Message {
+abstract class MessageSecret extends Message {
     String secret;
 
-    MessageSecret(String command, String secret) {
+    MessageSecret(MessageCommands command, String secret) {
         super(command);
         this.secret = secret;
     }
 }
 
-class MessageInfo extends Message {
+abstract class MessageInfo extends Message {
     String info;
 
-    MessageInfo(String command, String info) {
+    MessageInfo(MessageCommands command, String info) {
         super(command);
         this.info = info;
     }
 }
 
-class MessageUser extends MessageSecret {
+abstract class MessageUser extends MessageSecret {
     String username;
 
-    MessageUser(String command, String secret, String username) {
+    MessageUser(MessageCommands command, String secret, String username) {
         super(command, secret);
         this.username = username;
     }
 }
 
-class MessageActivity extends MessageUser {
-    Object activity;
+abstract class MessageActivity extends MessageUser {
+    JsonObject activity;
 
-    MessageActivity(String command, String secret, String username, Object activity) {
+    MessageActivity(MessageCommands command, String secret, String username, JsonObject activity) {
         super(command, secret, username);
         this.activity = activity;
     }
 }
 
-class MessageServer extends Message {
+abstract class MessageServer extends Message {
     String hostname;
     Integer port;
 
-    MessageServer(String command, String hostname, Integer port) {
+    MessageServer(MessageCommands command, String hostname, Integer port) {
         super(command);
         this.hostname = hostname;
         this.port = port;
     }
 }
 
-class MessageServerAnnounce extends MessageServer {
+abstract class MessageServerAnnounce extends MessageServer {
     String id;
     Integer load;
 
-    MessageServerAnnounce(String command, String hostname, Integer port, String id, Integer load) {
+    MessageServerAnnounce(MessageCommands command, String hostname, Integer port, String id, Integer load) {
         super(command, hostname, port);
         this.id = id;
         this.load = load;
     }
 }
 
-class MessageActivityBroadcast extends Message {
+abstract class MessageActivityBroadcast extends Message {
     JsonObject activity;
 
-    MessageActivityBroadcast(String command, JsonObject activity) {
+    MessageActivityBroadcast(MessageCommands command, JsonObject activity) {
         super(command);
         this.activity = activity;
     }
 }
+

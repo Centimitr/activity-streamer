@@ -1,7 +1,7 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,9 +11,9 @@ public class Listener extends Thread {
     private ServerSocket serverSocket;
     private boolean term = false;
     private int port;
-    private BiConsumer<Listener, Socket> fn;
+    private Consumer<Socket> fn;
 
-    Listener(int port, BiConsumer<Listener, Socket> fn) throws IOException {
+    Listener(int port, Consumer<Socket> fn) throws IOException {
         this.port = port;
         this.fn = fn;
         serverSocket = new ServerSocket(port);
@@ -27,7 +27,7 @@ public class Listener extends Thread {
             Socket clientSocket;
             try {
                 clientSocket = serverSocket.accept();
-                (new Thread(() -> fn.accept(this, clientSocket))).start();
+                (new Thread(() -> fn.accept(clientSocket))).start();
             } catch (IOException e) {
                 log.info("received exception, shutting down");
                 term = true;

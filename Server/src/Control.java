@@ -6,7 +6,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.message.Message;
+
+// todo: exception when sending data vai a closed connection
 
 @SuppressWarnings("WeakerAccess")
 public class Control extends Thread {
@@ -61,26 +62,29 @@ public class Control extends Thread {
         }
     }
 
+    @SuppressWarnings("CodeBlock2Expr")
     private void setMessageHandlers() {
         manager.temp().router()
+                .registerHandler(MessageCommands.AUTHENTICATE, context -> {
+                })
                 .registerHandler(MessageCommands.LOGIN, context -> {
                     manager.temp().transfer(context.connectivity, manager.clients());
                 });
         manager.clients().router()
                 .registerHandler(MessageCommands.LOGOUT, context -> {
-                    Message m = context.read(Message.class);
+                    MsgLogout m = context.read(MsgLogout.class);
                     // {"command":"LOGOUT"}
                     log.info("@LOGOUT");
                     context.close();
                 })
                 .registerHandler(MessageCommands.INVALID_MESSAGE, context -> {
-                    MessageInfo m = context.read(MessageInfo.class);
+                    MsgInvalidMessage m = context.read(MsgInvalidMessage.class);
                     // {"command":"INVALID_MESSAGE", "info":"this is info"}
 
                     log.info("@INVALID_MESSAGE: " + m.info);
                 })
                 .registerHandler(MessageCommands.ACTIVITY_MESSAGE, context -> {
-                    MessageActivity m = context.read(MessageActivity.class);
+                    MsgActivityMessage m = context.read(MsgActivityMessage.class);
                     boolean anonymous = m.username.equals("anonymous");
                     boolean match = m.username.equals(context.get("username")) && m.secret.equals(context.get("secret"));
                     boolean loggedIn = context.get("username") != null;
@@ -92,21 +96,18 @@ public class Control extends Thread {
                         if (!match) {
                             info = "the supplied secret is incorrect: " + m.secret;
                         }
-                        MessageInfo res = new MessageInfo(MessageCommands.AUTHTENTICATION_FAIL.name(), info);
+                        MessageInfo res = new MsgAuthenticationFail(info);
                         context.write(res);
                         context.close();
                         return;
                     }
-                    // todo: refactor
                     // todo: INVALID_MESSAGE, incorrect in anyway
-//                    JsonObject activity = new JsonParser().parse(m.activity).getAsJsonObject();
-//                     todo: need check if the activity(JsonObject) can be marshaled correctly
-//                    activity.addProperty("authenticated_user", context.get("username"));
-//                    MessageActivityBroadcast broadcast = new MessageActivityBroadcast(
-//                            MessageCommands.ACTIVITY_BROADCAST.name(),
-//                            g.toJson(activity)
-//                    );
-//                    broadcastToServers(broadcast);
+                    // todo: need check if the activity(JsonObject) can be marshaled correctly
+                    m.activity.addProperty("authenticated_user", context.get("username"));
+                    MsgActivityBroadcast broadcast = new MsgActivityBroadcast(
+                            g.toJson(m.activity)
+                    );
+                    manager.servers().broadcast(broadcast);
                 })
                 .registerErrorHandler(c -> {
 
@@ -126,7 +127,7 @@ public class Control extends Thread {
                     JsonObject m = context.read();
                     manager.servers().exclude(context.connectivity).broadcast(m);
                 })
-                .registerHandler(MessageCommands.AUTHTENTICATION_FAIL, context -> {
+                .registerHandler(MessageCommands.AUTHENTICATION_FAIL, context -> {
                 })
                 .registerHandler(MessageCommands.INVALID_MESSAGE, context -> {
                 })
@@ -137,13 +138,11 @@ public class Control extends Thread {
 
     // todo: check if synchronized is appropriate
     private synchronized void startAuthentication(Connectivity c) {
-        boolean ok;
-        ok = c.sendln(new MessageSecret(MessageCommands.AUTHENTICATE.name(), Settings.getSecret()));
-        log.info("Authentication: " + ok);
-        // todo: if error happens in the S/S process, maybe disconnect?
+        c.sendln(new MsgAuthenticate(Settings.getSecret()));
+        log.info("Start Authentication!");
     }
 
-    private void handleIncomingConn(Listener l, Socket s) {
+    private void handleIncomingConn(Socket s) {
         try {
             Connectivity c = new Connectivity(s, con -> {
                 MessageContext ctx = new MessageContext(manager.temp().router());
@@ -210,11 +209,10 @@ public class Control extends Thread {
 
     private void doServerAnnounce() {
         Integer load = manager.clients().size();
-        MessageServerAnnounce m = new MessageServerAnnounce(
-                MessageCommands.SERVER_ANNOUNCE.name(),
+        MsgServerAnnounce m = new MsgServerAnnounce(
+                uuid,
                 Settings.getLocalHostname(),
                 Settings.getLocalPort(),
-                uuid,
                 load
         );
         manager.servers().broadcast(m);
