@@ -60,9 +60,6 @@ public class Client extends Thread {
                     System.out.println(g.toJson(m.activity));
                     // todo: may need to apply filter of sending activity objects
                 })
-//                .registerHandler(MessageCommands.ACTIVITY_BROADCAST, context -> {
-//                    log.info("?? RCV: ACTIVITY_BROADCAST");
-//                })
                 .registerErrorHandler(context -> {
 
                 });

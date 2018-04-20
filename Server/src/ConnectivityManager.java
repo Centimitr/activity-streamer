@@ -7,27 +7,27 @@ class ConnectivityManager {
     private ConnectivitySetGroup allServers = new ConnectivitySetGroup(servers, server);
     private ConnectivitySetGroup all = new ConnectivitySetGroup(servers, clients, server);
 
-    MutableConnectivitySet temp() {
+    ConnectivitySet temp() {
         return temp;
     }
 
-    MutableConnectivitySet clients() {
+    ConnectivitySet clients() {
         return clients;
     }
 
-    MutableConnectivitySet parent() {
+    SingleConnectivitySet parent() {
         return server;
     }
 
-    MutableConnectivitySet children() {
+    ConnectivitySet children() {
         return servers;
     }
 
-    ImmutableConnectivitySet servers() {
+    ConnectivitySetGroup servers() {
         return allServers;
     }
 
-    ImmutableConnectivitySet all() {
+    ConnectivitySetGroup all() {
         return all;
     }
 }

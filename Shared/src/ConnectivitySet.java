@@ -1,34 +1,67 @@
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
-interface ImmutableConnectivitySet {
+interface IForEach {
     void forEach(Consumer<Connectivity> fn);
-
-    void broadcast(Object obj);
 }
+//interface ImmutableConnectivitySet {
+//    void forEach(Consumer<Connectivity> fn);
+//
+//    void broadcast(Object obj);
+//}
+//
+//interface MutableConnectivitySet extends ImmutableConnectivitySet {
+//    boolean add(Connectivity c);
+//
+//    boolean remove(Connectivity c);
+//
+//    ConnectivitySet exclude(Connectivity toExclude);
+//
+//    ConnectivitySet exclude(MessageContext toExclude);
+//
+//    void transfer(Connectivity c, MutableConnectivitySet target);
+//}
+//
+//interface MutableSingleConnectivitySet extends MutableConnectivitySet {
+//
+//}
 
-interface MutableConnectivitySet extends ImmutableConnectivitySet {
-    boolean add(Connectivity c);
 
-    boolean remove(Connectivity c);
+class ConnectivitySet implements IForEach {
+    //    class ConnectivitySet implements MutableConnectivitySet {
+    static ConnectivitySet exclude(IForEach setOrGroup, Connectivity toExclude) {
+        ConnectivitySet set = new ConnectivitySet();
+        setOrGroup.forEach(conn -> {
+            if (!conn.equals(toExclude)) {
+                set.add(conn);
+            }
+        });
+        return set;
+    }
 
-    ConnectivitySet exclude(Connectivity toExclude);
-
-    ConnectivitySet exclude(MessageContext toExclude);
-
-    void transfer(Connectivity c, MutableConnectivitySet target);
-}
-
-class ConnectivitySet implements MutableConnectivitySet {
     private ArrayList<Connectivity> conns = new ArrayList<>();
 
-    @SuppressWarnings({"WeakerAccess", "UnusedReturnValue"})
+    Integer size() {
+        return conns.size();
+    }
+
     public boolean add(Connectivity c) {
         return conns.add(c);
     }
 
-    public boolean remove(Connectivity c) {
-        return conns.remove(c);
+    boolean contains(Connectivity c) {
+        return conns.contains(c);
+    }
+
+    void remove(Connectivity c) {
+        conns.remove(c);
+    }
+
+    void closeAll() {
+        forEach(conn -> {
+            conn.close();
+            remove(conn);
+        });
     }
 
 //    ArrayList<Connectivity> get() {
@@ -39,7 +72,7 @@ class ConnectivitySet implements MutableConnectivitySet {
         conns.forEach(fn);
     }
 
-    public void broadcast(Object obj) {
+    void broadcast(Object obj) {
         conns.forEach(conn -> conn.sendln(obj));
     }
 
@@ -50,38 +83,26 @@ class ConnectivitySet implements MutableConnectivitySet {
 //        return set;
 //    }
 
-    @SuppressWarnings("WeakerAccess")
     public ConnectivitySet exclude(Connectivity toExclude) {
-        if (toExclude != null) {
-            ConnectivitySet set = new ConnectivitySet();
-            conns.forEach(conn -> {
-                if (!conn.equals(toExclude)) {
-                    set.add(conn);
-                }
-            });
-            return set;
-        }
-        return this;
+        return ConnectivitySet.exclude(this, toExclude);
     }
 
-    public ConnectivitySet exclude(MessageContext toExclude) {
-        if (toExclude != null) {
-            return exclude(toExclude.connectivity);
-        }
-        return this;
-    }
-
-    public void transfer(Connectivity c, MutableConnectivitySet target) {
+    void transfer(Connectivity c, ConnectivitySet target) {
+//        public void transfer(Connectivity c, MutableConnectivitySet target) {
         remove(c);
         target.add(c);
     }
 }
 
-class SingleConnectivitySet extends ConnectivitySet {
+class SingleConnectivitySet extends ConnectivitySet implements {
+    void set(Connectivity c) {
+        add(c);
+    }
 }
 
 
-class ConnectivitySetGroup implements ImmutableConnectivitySet {
+class ConnectivitySetGroup implements IForEach {
+    //    class ConnectivitySetGroup implements ImmutableConnectivitySet {
     private ArrayList<ConnectivitySet> group = new ArrayList<>();
 
     ConnectivitySetGroup(ConnectivitySet a, ConnectivitySet b) {
@@ -94,11 +115,28 @@ class ConnectivitySetGroup implements ImmutableConnectivitySet {
         group.add(c);
     }
 
+    public ArrayList<ConnectivitySet> sets() {
+        return group;
+    }
+
     public void forEach(Consumer<Connectivity> fn) {
         group.forEach(set -> set.forEach(fn));
     }
 
     public void broadcast(Object obj) {
         group.forEach(set -> set.broadcast(obj));
+    }
+
+    ConnectivitySet owner(Connectivity c) {
+        for (ConnectivitySet set : group) {
+            if (set.contains(c)) {
+                return set;
+            }
+        }
+        return null;
+    }
+
+    ConnectivitySet exclude(Connectivity toExclude) {
+        return ConnectivitySet.exclude(this, toExclude);
     }
 }
