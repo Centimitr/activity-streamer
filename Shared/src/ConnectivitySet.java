@@ -56,7 +56,7 @@ class ConnectivitySet implements IForEach {
         return conns.size();
     }
 
-    public boolean add(Connectivity c) {
+    public synchronized boolean add(Connectivity c) {
         return conns.add(c);
     }
 
@@ -64,11 +64,11 @@ class ConnectivitySet implements IForEach {
         return conns.contains(c);
     }
 
-    void remove(Connectivity c) {
+    synchronized void remove(Connectivity c) {
         conns.remove(c);
     }
 
-    void closeAll() {
+    synchronized void closeAll() {
         forEach(conn -> {
             conn.close();
             remove(conn);
@@ -98,7 +98,7 @@ class ConnectivitySet implements IForEach {
         return ConnectivitySet.exclude(this, toExclude);
     }
 
-    void transfer(Connectivity c, ConnectivitySet target) {
+    synchronized void transfer(Connectivity c, ConnectivitySet target) {
 //        public void transfer(Connectivity c, MutableConnectivitySet target) {
         remove(c);
         target.add(c);

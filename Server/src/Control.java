@@ -143,7 +143,7 @@ public class Control extends Thread {
         // todo: if error happens in the S/S process, maybe disconnect?
     }
 
-    private synchronized void handleIncomingConn(Listener l, Socket s) {
+    private void handleIncomingConn(Listener l, Socket s) {
         try {
             Connectivity c = new Connectivity(s, con -> {
                 MessageContext ctx = new MessageContext(manager.temp().router());

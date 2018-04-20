@@ -27,7 +27,7 @@ public class Listener extends Thread {
             Socket clientSocket;
             try {
                 clientSocket = serverSocket.accept();
-                fn.accept(this, clientSocket);
+                (new Thread(() -> fn.accept(this, clientSocket))).start();
             } catch (IOException e) {
                 log.info("received exception, shutting down");
                 term = true;
