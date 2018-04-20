@@ -11,7 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @SuppressWarnings("Duplicates")
-public class Server {
+public class App {
     private static final Logger log = LogManager.getLogger();
 
     private static void help(Options options) {

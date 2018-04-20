@@ -16,6 +16,7 @@ public class Control extends Thread {
 
     private String uuid = UUID.randomUUID().toString();
     private ConnectivityManager manager = new ConnectivityManager();
+    private Users users = new Users();
     private Listener listener;
     private boolean term = false;
 
@@ -66,10 +67,33 @@ public class Control extends Thread {
     private void setMessageHandlers() {
         manager.temp().router()
                 .registerHandler(MessageCommands.AUTHENTICATE, context -> {
+                    MsgAuthenticate m = context.read(MsgAuthenticate.class);
+                    boolean success = m.secret.equals(Settings.getSecret());
+                    if (!success) {
+                        MsgAuthenticationFail res = new MsgAuthenticationFail("the supplied secret is incorrect:" + m.secret);
+                        context.write(res);
+                        context.close();
+                    }
                 })
                 .registerHandler(MessageCommands.LOGIN, context -> {
+                    MsgLogin m = context.read(MsgLogin.class);
+                    boolean match = users.match(m.username, m.secret);
+                    if (!match) {
+                        context.write(new MsgLoginFailed("attempt to login with wrong secret"));
+                        context.close();
+                        return;
+                    }
+                    context.write(new MsgLoginSuccess("logged in as user " + m.username));
                     manager.temp().transfer(context.connectivity, manager.clients());
-                });
+                    // todo: load balance: redirect
+
+                    if (needRedirect) {
+                        context.write(new MsgRedirect("logged in as user " + m.username));
+                    }
+                }).registerErrorHandler(context -> {
+                    context.write(new MsgInvalidMessage("INVALID MESSAGE?"));
+                }
+        );
         manager.clients().router()
                 .registerHandler(MessageCommands.LOGOUT, context -> {
                     MsgLogout m = context.read(MsgLogout.class);
