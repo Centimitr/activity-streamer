@@ -26,6 +26,7 @@ public class Connectivity extends Thread {
     }
 
     Connectivity(Socket socket, Consumer<Connectivity> fn) throws IOException {
+        socket.setSoTimeout(0);
         this.socket = socket;
         this.fn = fn;
         in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));

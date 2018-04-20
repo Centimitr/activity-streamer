@@ -26,24 +26,19 @@ class ClientAgent extends Agent {
      */
 
     void register(String username, String secret) {
-        MessageUser m = new MessageUser(MessageCommands.REGISTER.name(),
-                secret,
-                username);
+        MsgRegister m = new MsgRegister(username, secret);
         sendln(m);
     }
 
     void login(String username, String secret) {
-        MessageUser m = new MessageUser(MessageCommands.LOGIN.name(),
-                secret,
-                username);
+        MsgLogin m = new MsgLogin(username, secret);
         sendln(m);
     }
 
     void sendActivity(Object obj) {
-        MessageActivity m = new MessageActivity(
-                MessageCommands.ACTIVITY_MESSAGE.name(),
-                Settings.getSecret(),
+        MsgActivityMessage m = new MsgActivityMessage(
                 Settings.getUsername(),
+                Settings.getSecret(),
                 obj
         );
         sendln(m);

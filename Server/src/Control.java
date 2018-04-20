@@ -1,15 +1,13 @@
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.message.Message;
+
+// todo: exception when sending data vai a closed connection
 
 @SuppressWarnings("WeakerAccess")
 public class Control extends Thread {
@@ -18,12 +16,6 @@ public class Control extends Thread {
 
     private String uuid = UUID.randomUUID().toString();
     private ConnectivityManager manager = new ConnectivityManager();
-    private MessageRouter tempMessageRouter = new MessageRouter();
-    private MessageRouter clientMessageRouter = new MessageRouter();
-    private MessageRouter serverMessageRouter = new MessageRouter();
-    private ArrayList<Connectivity> clientConns = new ArrayList<>();
-    private ArrayList<Connectivity> serverConns = new ArrayList<>();
-    private Connectivity serverConn;
     private Listener listener;
     private boolean term = false;
 
@@ -38,7 +30,7 @@ public class Control extends Thread {
 
     public Control() {
         setMessageHandlers();
-        connectServerNode();
+        connectParent();
         startListen();
         start();
     }
@@ -52,10 +44,17 @@ public class Control extends Thread {
         }
     }
 
-    private void connectServerNode() {
+    private void connectParent() {
         if (Settings.getRemoteHostname() != null) {
             try {
-                serverConn = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort(), this::startAuthentication);
+                Connectivity conn = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort(), this::startAuthentication);
+                manager.parent().set(conn);
+                (new Thread(() -> {
+                    boolean closed = conn.redirect(manager.parent().router());
+                    if (closed) {
+                        log.info("Parent connection closed!");
+                    }
+                })).start();
             } catch (IOException e) {
                 log.error("failed to make connection to " + Settings.getRemoteHostname() + ":" + Settings.getRemotePort() + " :" + e);
                 System.exit(-1);
@@ -63,57 +62,29 @@ public class Control extends Thread {
         }
     }
 
-    private void serverConnsForEach(Consumer<Connectivity> fn) {
-        if (serverConn != null) {
-            fn.accept(serverConn);
-        }
-        serverConns.forEach(fn);
-    }
-
-    private void serverConnsForEachExclude(Connectivity toExclude, Consumer<Connectivity> fn) {
-        serverConnsForEach(conn -> {
-            if (!conn.equals(toExclude)) {
-                fn.accept(conn);
-            }
-        });
-    }
-
-    private void broadcastToServers(Object msg) {
-        serverConnsForEach(conn -> conn.sendln(msg));
-    }
-
-    private void broadcastToServers(Object msg, Connectivity toExclude) {
-        serverConnsForEachExclude(toExclude, conn -> conn.sendln(msg));
-    }
-
-    private void broadcastToServers(Object msg, MessageContext toExclude) {
-        serverConnsForEachExclude(toExclude.connectivity, conn -> conn.sendln(msg));
-    }
-
-    private void broadcastToClients(Object msg) {
-        clientConns.forEach(conn -> conn.sendln(msg));
-    }
-
+    @SuppressWarnings("CodeBlock2Expr")
     private void setMessageHandlers() {
-        tempMessageRouter
+        manager.temp().router()
+                .registerHandler(MessageCommands.AUTHENTICATE, context -> {
+                })
                 .registerHandler(MessageCommands.LOGIN, context -> {
                     manager.temp().transfer(context.connectivity, manager.clients());
                 });
-        clientMessageRouter
+        manager.clients().router()
                 .registerHandler(MessageCommands.LOGOUT, context -> {
-                    Message m = context.read(Message.class);
+                    MsgLogout m = context.read(MsgLogout.class);
                     // {"command":"LOGOUT"}
                     log.info("@LOGOUT");
                     context.close();
                 })
                 .registerHandler(MessageCommands.INVALID_MESSAGE, context -> {
-                    MessageInfo m = context.read(MessageInfo.class);
+                    MsgInvalidMessage m = context.read(MsgInvalidMessage.class);
                     // {"command":"INVALID_MESSAGE", "info":"this is info"}
 
                     log.info("@INVALID_MESSAGE: " + m.info);
                 })
                 .registerHandler(MessageCommands.ACTIVITY_MESSAGE, context -> {
-                    MessageActivity m = context.read(MessageActivity.class);
+                    MsgActivityMessage m = context.read(MsgActivityMessage.class);
                     boolean anonymous = m.username.equals("anonymous");
                     boolean match = m.username.equals(context.get("username")) && m.secret.equals(context.get("secret"));
                     boolean loggedIn = context.get("username") != null;
@@ -125,25 +96,23 @@ public class Control extends Thread {
                         if (!match) {
                             info = "the supplied secret is incorrect: " + m.secret;
                         }
-                        MessageInfo res = new MessageInfo(MessageCommands.AUTHTENTICATION_FAIL.name(), info);
+                        MessageInfo res = new MsgAuthenticationFail(info);
                         context.write(res);
                         context.close();
                         return;
                     }
                     // todo: INVALID_MESSAGE, incorrect in anyway
-                    JsonObject activity = new JsonParser().parse(m.activity).getAsJsonObject();
                     // todo: need check if the activity(JsonObject) can be marshaled correctly
-                    activity.addProperty("authenticated_user", context.get("username"));
-                    MessageActivityBroadcast broadcast = new MessageActivityBroadcast(
-                            MessageCommands.ACTIVITY_BROADCAST.name(),
-                            g.toJson(activity)
+                    m.activity.addProperty("authenticated_user", context.get("username"));
+                    MsgActivityBroadcast broadcast = new MsgActivityBroadcast(
+                            g.toJson(m.activity)
                     );
-                    broadcastToServers(broadcast);
+                    manager.servers().broadcast(broadcast);
                 })
                 .registerErrorHandler(c -> {
 
                 });
-        serverMessageRouter
+        manager.children().router()
                 .registerHandler(MessageCommands.ACTIVITY_BROADCAST, context -> {
                     // todo: INVALID_MESSAGE, incorrect in anyway
                     // todo: received from an unauthenticated server
@@ -152,14 +121,13 @@ public class Control extends Thread {
                         return;
                     }
                     JsonObject m = context.read();
-                    broadcastToServers(m, context);
-                    broadcastToClients(m);
+                    manager.all().exclude(context.connectivity).broadcast(m);
                 })
                 .registerHandler(MessageCommands.SERVER_ANNOUNCE, context -> {
                     JsonObject m = context.read();
-                    broadcastToServers(m, context);
+                    manager.servers().exclude(context.connectivity).broadcast(m);
                 })
-                .registerHandler(MessageCommands.AUTHTENTICATION_FAIL, context -> {
+                .registerHandler(MessageCommands.AUTHENTICATION_FAIL, context -> {
                 })
                 .registerHandler(MessageCommands.INVALID_MESSAGE, context -> {
                 })
@@ -170,20 +138,14 @@ public class Control extends Thread {
 
     // todo: check if synchronized is appropriate
     private synchronized void startAuthentication(Connectivity c) {
-        boolean ok;
-        ok = c.sendln(new MessageSecret(MessageCommands.AUTHENTICATE.name(), Settings.getSecret()));
-        log.info("Authentication: " + ok);
-//        ok = c.redirect(this::handleServerMessage);
-//        ok = c.redirect((conn, msg) -> (new MessageContext(serverMessageRouter)).process(conn, msg));
-        ok = c.redirect(serverMessageRouter);
-        // todo: if error happens in the S/S process, maybe disconnect?
+        c.sendln(new MsgAuthenticate(Settings.getSecret()));
+        log.info("Start Authentication!");
     }
 
-    private synchronized void handleIncomingConn(Listener l, Socket s) {
+    private void handleIncomingConn(Socket s) {
         try {
             Connectivity c = new Connectivity(s, con -> {
-//                boolean ok = conn.redirect(this::handleClientMessage);
-                MessageContext ctx = new MessageContext(tempMessageRouter);
+                MessageContext ctx = new MessageContext(manager.temp().router());
                 boolean ok = con.redirect((conn, msg) -> {
                     // todo: remove this debug use code
                     if (!msg.startsWith("{")) {
@@ -200,29 +162,20 @@ public class Control extends Thread {
                     // conn.in.close();
                 }
             });
-            clientConns.add(c);
+            manager.temp().add(c);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private synchronized void handleClosedConn(Connectivity c) {
-        if (!term) clientConns.remove(c);
+    private void handleClosedConn(Connectivity c) {
+        if (!term) {
+            ConnectivitySet ownerSet = manager.all().owner(c);
+            if (ownerSet != null) {
+                ownerSet.remove(c);
+            }
+        }
     }
-
-//    private synchronized boolean handleClientMessage(Connectivity c, String msg) {
-//        // todo: remove this debug use code
-//        if (!msg.startsWith("{")) {
-//            System.out.println("RCV: " + msg);
-//            c.sendln("R: " + msg);
-//            return false;
-//        }
-//        return (new MessageContext(clientMessageRouter)).process(c, msg);
-//    }
-//
-//    private synchronized boolean handleServerMessage(Connectivity c, String msg) {
-//        return (new MessageContext(serverMessageRouter)).process(c, msg);
-//    }
 
     @Override
     public void run() {
@@ -240,14 +193,11 @@ public class Control extends Thread {
                 term = doActivity();
             }
         }
-        log.info("closing " + clientConns.size() + " connections");
+        log.info("closing " + manager.clients().size() + " client connections.");
+        log.info("closing " + manager.children().size() + " server connections.");
         // clean up
-        for (Connectivity c : clientConns) {
-            c.close();
-        }
-        if (serverConn != null) {
-            serverConn.close();
-        }
+        manager.all().sets().forEach(ConnectivitySet::closeAll);
+        log.info("closing parent server connection.");
         listener.terminate();
     }
 
@@ -258,22 +208,17 @@ public class Control extends Thread {
     }
 
     private void doServerAnnounce() {
-        Integer load = clientConns.size();
-        MessageServerAnnounce m = new MessageServerAnnounce(
-                MessageCommands.SERVER_ANNOUNCE.name(),
+        Integer load = manager.clients().size();
+        MsgServerAnnounce m = new MsgServerAnnounce(
+                uuid,
                 Settings.getLocalHostname(),
                 Settings.getLocalPort(),
-                uuid,
                 load
         );
-        serverConnsForEach(conn -> conn.sendln(m));
+        manager.servers().broadcast(m);
     }
 
     public final void terminate() {
         term = true;
     }
-
-//    public final ArrayList<Connection> getConnections() {
-//        return connections;
-//    }
 }

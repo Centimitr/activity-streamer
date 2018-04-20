@@ -40,7 +40,7 @@ public class Client extends Thread {
         // todo: add protocol logic
         router
                 .registerHandler(MessageCommands.REDIRECT, context -> {
-                    MessageServer m = context.read(MessageServer.class);
+                    MsgRedirect m = context.read(MsgRedirect.class);
                     log.info("Will Redirect: " + m.hostname + " " + m.port);
                     agent.reconnect(m.hostname, m.port);
                     context.close();
@@ -55,14 +55,11 @@ public class Client extends Thread {
                     log.info("Register Failed!");
                 })
                 .registerHandler(MessageCommands.ACTIVITY_BROADCAST, context -> {
-                    MessageActivityBroadcast m = context.read(MessageActivityBroadcast.class);
+                    MsgActivityBroadcast m = context.read(MsgActivityBroadcast.class);
                     log.info("AM: " + g.toJson(m.activity));
                     System.out.println(g.toJson(m.activity));
                     // todo: may need to apply filter of sending activity objects
                 })
-//                .registerHandler(MessageCommands.ACTIVITY_BROADCAST, context -> {
-//                    log.info("?? RCV: ACTIVITY_BROADCAST");
-//                })
                 .registerErrorHandler(context -> {
 
                 });
@@ -83,7 +80,7 @@ public class Client extends Thread {
         try {
             connectivity = new Connectivity(hostname, port, c -> agent.bind(c));
             agent.login("xiaoming1", "fjskl");
-            agent.sendActivity(new Message("Never Gonna Give You Up"));
+            agent.sendActivity(new TestMessage("Never Gonna Give You Up"));
             (new Thread(() -> {
                 boolean closed = connectivity.redirect(router);
                 if (closed) {

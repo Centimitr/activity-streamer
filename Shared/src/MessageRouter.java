@@ -25,6 +25,7 @@ class MessageRouter {
         return this;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     MessageRouter registerErrorHandler(Consumer<MessageContext> handler) {
         errorHandler = handler;
         return this;
@@ -38,6 +39,9 @@ class MessageRouter {
     }
 
     Consumer<MessageContext> getErrorHandler() {
+        if (errorHandler == null) {
+            log.error("No error handler is set, error will be dismissed.");
+        }
         return errorHandler;
     }
 

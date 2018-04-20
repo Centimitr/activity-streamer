@@ -1,73 +1,119 @@
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
-
-interface ImmutableConnectivitySet {
-
+interface IForEach {
+    void forEach(Consumer<Connectivity> fn);
 }
+//interface ImmutableConnectivitySet {
+//    void forEach(Consumer<Connectivity> fn);
+//
+//    void broadcast(Object obj);
+//}
+//
+//interface MutableConnectivitySet extends ImmutableConnectivitySet {
+//    boolean add(Connectivity c);
+//
+//    boolean remove(Connectivity c);
+//
+//    ConnectivitySet exclude(Connectivity toExclude);
+//
+//    ConnectivitySet exclude(MessageContext toExclude);
+//
+//    void transfer(Connectivity c, MutableConnectivitySet target);
+//}
+//
+//interface MutableSingleConnectivitySet extends MutableConnectivitySet {
+//
+//}
 
-interface MutableConnectivitySet extends ImmutableConnectivitySet {
-    boolean add(Connectivity c);
 
-    boolean remove(Connectivity c);
+class ConnectivitySet implements IForEach {
 
-    void transfer(Connectivity c, MutableConnectivitySet target);
-}
+    private MessageRouter router;
 
-class ConnectivitySet implements MutableConnectivitySet {
-    private ArrayList<Connectivity> conns = new ArrayList<>();
-
-    @SuppressWarnings({"WeakerAccess", "UnusedReturnValue"})
-    public boolean add(Connectivity c) {
-        return conns.add(c);
+    MessageRouter router() {
+        return router;
     }
 
-    public boolean remove(Connectivity c) {
-        return conns.remove(c);
+    void bind(MessageRouter router) {
+        this.router = router;
     }
 
-    ArrayList<Connectivity> get() {
-        return conns;
-    }
-
-    ConnectivitySet concat(ConnectivitySet src) {
+    //    class ConnectivitySet implements MutableConnectivitySet {
+    static ConnectivitySet exclude(IForEach setOrGroup, Connectivity toExclude) {
         ConnectivitySet set = new ConnectivitySet();
-        conns.forEach(set::add);
-        src.conns.forEach(src::add);
+        setOrGroup.forEach(conn -> {
+            if (!conn.equals(toExclude)) {
+                set.add(conn);
+            }
+        });
         return set;
     }
 
-    @SuppressWarnings("WeakerAccess")
-    ConnectivitySet exclude(Connectivity toExclude) {
-        if (toExclude != null) {
-            ConnectivitySet set = new ConnectivitySet();
-            conns.forEach(conn -> {
-                if (!conn.equals(toExclude)) {
-                    set.add(conn);
-                }
-            });
-            return set;
-        }
-        return this;
+    private ArrayList<Connectivity> conns = new ArrayList<>();
+
+    Integer size() {
+        return conns.size();
     }
 
-    ConnectivitySet exclude(MessageContext toExclude) {
-        if (toExclude != null) {
-            return exclude(toExclude.connectivity);
-        }
-        return this;
+    public synchronized boolean add(Connectivity c) {
+        return conns.add(c);
     }
 
-    public void transfer(Connectivity c, MutableConnectivitySet target) {
+    boolean contains(Connectivity c) {
+        return conns.contains(c);
+    }
+
+    synchronized void remove(Connectivity c) {
+        conns.remove(c);
+    }
+
+    synchronized void closeAll() {
+        forEach(conn -> {
+            conn.close();
+            remove(conn);
+        });
+    }
+
+//    ArrayList<Connectivity> get() {
+//        return conns;
+//    }
+
+    public void forEach(Consumer<Connectivity> fn) {
+        conns.forEach(fn);
+    }
+
+    void broadcast(Object obj) {
+        conns.forEach(conn -> conn.sendln(obj));
+    }
+
+//    ConnectivitySet concat(ConnectivitySet src) {
+//        ConnectivitySet set = new ConnectivitySet();
+//        conns.forEach(set::add);
+//        src.conns.forEach(src::add);
+//        return set;
+//    }
+
+    public ConnectivitySet exclude(Connectivity toExclude) {
+        return ConnectivitySet.exclude(this, toExclude);
+    }
+
+    synchronized void transfer(Connectivity c, ConnectivitySet target) {
+//        public void transfer(Connectivity c, MutableConnectivitySet target) {
         remove(c);
         target.add(c);
     }
 }
 
 class SingleConnectivitySet extends ConnectivitySet {
+    void set(Connectivity c) {
+        add(c);
+    }
 }
 
 
-class ConnectivitySetGroup implements ImmutableConnectivitySet {
+class ConnectivitySetGroup implements IForEach {
+    //    class ConnectivitySetGroup implements ImmutableConnectivitySet {
     private ArrayList<ConnectivitySet> group = new ArrayList<>();
 
     ConnectivitySetGroup(ConnectivitySet a, ConnectivitySet b) {
@@ -76,8 +122,32 @@ class ConnectivitySetGroup implements ImmutableConnectivitySet {
     }
 
     ConnectivitySetGroup(ConnectivitySet a, ConnectivitySet b, ConnectivitySet c) {
-        group.add(a);
-        group.add(b);
+        this(a, b);
         group.add(c);
+    }
+
+    public ArrayList<ConnectivitySet> sets() {
+        return group;
+    }
+
+    public void forEach(Consumer<Connectivity> fn) {
+        group.forEach(set -> set.forEach(fn));
+    }
+
+    public void broadcast(Object obj) {
+        group.forEach(set -> set.broadcast(obj));
+    }
+
+    ConnectivitySet owner(Connectivity c) {
+        for (ConnectivitySet set : group) {
+            if (set.contains(c)) {
+                return set;
+            }
+        }
+        return null;
+    }
+
+    ConnectivitySet exclude(Connectivity toExclude) {
+        return ConnectivitySet.exclude(this, toExclude);
     }
 }
