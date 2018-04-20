@@ -28,6 +28,17 @@ interface IForEach {
 
 
 class ConnectivitySet implements IForEach {
+
+    private MessageRouter router;
+
+    MessageRouter router() {
+        return router;
+    }
+
+    void bind(MessageRouter router) {
+        this.router = router;
+    }
+
     //    class ConnectivitySet implements MutableConnectivitySet {
     static ConnectivitySet exclude(IForEach setOrGroup, Connectivity toExclude) {
         ConnectivitySet set = new ConnectivitySet();
@@ -94,7 +105,7 @@ class ConnectivitySet implements IForEach {
     }
 }
 
-class SingleConnectivitySet extends ConnectivitySet implements {
+class SingleConnectivitySet extends ConnectivitySet {
     void set(Connectivity c) {
         add(c);
     }

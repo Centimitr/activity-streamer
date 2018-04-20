@@ -15,9 +15,6 @@ public class Control extends Thread {
 
     private String uuid = UUID.randomUUID().toString();
     private ConnectivityManager manager = new ConnectivityManager();
-    private MessageRouter tempMessageRouter = new MessageRouter();
-    private MessageRouter clientMessageRouter = new MessageRouter();
-    private MessageRouter serverMessageRouter = new MessageRouter();
     private Listener listener;
     private boolean term = false;
 
@@ -52,7 +49,7 @@ public class Control extends Thread {
                 Connectivity conn = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort(), this::startAuthentication);
                 manager.parent().set(conn);
                 (new Thread(() -> {
-                    boolean closed = conn.redirect(serverMessageRouter);
+                    boolean closed = conn.redirect(manager.parent().router());
                     if (closed) {
                         log.info("Parent connection closed!");
                     }
@@ -65,11 +62,11 @@ public class Control extends Thread {
     }
 
     private void setMessageHandlers() {
-        tempMessageRouter
+        manager.temp().router()
                 .registerHandler(MessageCommands.LOGIN, context -> {
                     manager.temp().transfer(context.connectivity, manager.clients());
                 });
-        clientMessageRouter
+        manager.clients().router()
                 .registerHandler(MessageCommands.LOGOUT, context -> {
                     Message m = context.read(Message.class);
                     // {"command":"LOGOUT"}
@@ -114,7 +111,7 @@ public class Control extends Thread {
                 .registerErrorHandler(c -> {
 
                 });
-        serverMessageRouter
+        manager.children().router()
                 .registerHandler(MessageCommands.ACTIVITY_BROADCAST, context -> {
                     // todo: INVALID_MESSAGE, incorrect in anyway
                     // todo: received from an unauthenticated server
@@ -149,7 +146,7 @@ public class Control extends Thread {
     private synchronized void handleIncomingConn(Listener l, Socket s) {
         try {
             Connectivity c = new Connectivity(s, con -> {
-                MessageContext ctx = new MessageContext(tempMessageRouter);
+                MessageContext ctx = new MessageContext(manager.temp().router());
                 boolean ok = con.redirect((conn, msg) -> {
                     // todo: remove this debug use code
                     if (!msg.startsWith("{")) {
