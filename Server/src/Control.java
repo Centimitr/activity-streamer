@@ -17,6 +17,7 @@ public class Control extends Thread {
     private String uuid = UUID.randomUUID().toString();
     private ConnectivityManager manager = new ConnectivityManager();
     private Users users = new Users();
+    private LockResponses response = new LockResponses();
     private Listener listener;
     private boolean term = false;
 
@@ -133,6 +134,35 @@ public class Control extends Thread {
                     );
                     manager.servers().broadcast(broadcast);
                 })
+                .registerHandler(MessageCommands.REGISTER, context -> {
+                    MsgRegister msg = context.read(MsgRegister.class);
+                    boolean match = users.match(msg.username, msg.secret);
+                    if (match) {
+                        String info = msg.username + " is already registered with the system.";
+                        MsgRegisterFailed res = new MsgRegisterFailed(info);
+                        context.write(res);
+                        context.close();
+                    }else{
+                        //broadcast lock request to all other servers, and wait for responds
+                        MsgLockRequest req = new MsgLockRequest(msg.username, msg.secret);
+                        manager.servers().exclude(context.connectivity).broadcast(req);
+                        response.update(manager.servers().exclude(context.connectivity));
+                        //todo: how to wait for all response, a new thread?
+                        if (response.allAnswered()){
+                            if (response.allAllowed()){
+                                String info = "register success for " + msg.username;
+                                MsgRegisterSuccess res = new MsgRegisterSuccess(info);
+                                context.write(res);
+                            }else{
+                                String info = msg.username + " is already registered with the system.";
+                                MsgRegisterFailed res = new MsgRegisterFailed(info);
+                                context.write(res);
+                                context.close();
+                            }
+                        }
+
+                    }
+                })
                 .registerErrorHandler(c -> {
 
                 });
@@ -152,6 +182,29 @@ public class Control extends Thread {
                     manager.servers().exclude(context.connectivity).broadcast(m);
                 })
                 .registerHandler(MessageCommands.AUTHENTICATION_FAIL, context -> {
+                })
+                .registerHandler(MessageCommands.LOCK_REQUEST, context -> {
+                    MsgLockRequest req = context.read(MsgLockRequest.class);
+                    boolean match = users.match(req.username, req.secret);
+                    if (!match){
+                        //broadcast a lock-denied to all other servers
+                        MsgLockDenied res = new MsgLockDenied(req.username, req.secret);
+                        manager.servers().exclude(context.connectivity).broadcast(res);
+                    }else if (!users.has(req.username)){
+                        MsgLockAllowed res = new MsgLockAllowed(req.username, req.secret);
+                        manager.servers().exclude(context.connectivity).broadcast(res);
+                        users.add(req.username, req.secret);
+                    }
+                })
+                .registerHandler(MessageCommands.LOCK_ALLOWED, context -> {
+                    MsgLockAllowed req = context.read(MsgLockAllowed.class);
+                    //todo: what actions to be considered
+                    response.add(context.connectivity, req);
+                })
+                .registerHandler(MessageCommands.LOCK_DENIED, context -> {
+                    MsgLockDenied req = context.read(MsgLockDenied.class);
+                    users.delete(req.username, req.secret);
+                    response.add(context.connectivity, req);
                 })
                 .registerHandler(MessageCommands.INVALID_MESSAGE, context -> {
                 })
