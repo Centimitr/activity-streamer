@@ -19,7 +19,6 @@ public class Control extends Thread {
     private RegisterManager rm = new RegisterManager();
     private Servers servers = new Servers(cm.servers());
     private Users users = new Users();
-    //    private LockResponses response = new LockResponses();
     private Listener listener;
     private boolean term = false;
 
@@ -101,12 +100,6 @@ public class Control extends Thread {
         cm.clients().router()
                 .registerHandler(MessageCommands.LOGOUT, context -> {
                     context.close();
-                })
-                .registerHandler(MessageCommands.INVALID_MESSAGE, context -> {
-                    MsgInvalidMessage m = context.read(MsgInvalidMessage.class);
-                    // {"command":"INVALID_MESSAGE", "info":"this is info"}
-
-                    log.info("@INVALID_MESSAGE: " + m.info);
                 })
                 .registerHandler(MessageCommands.ACTIVITY_MESSAGE, context -> {
                     MsgActivityMessage m = context.read(MsgActivityMessage.class);

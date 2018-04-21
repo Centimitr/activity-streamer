@@ -7,7 +7,7 @@ class ServerRecord {
     Integer port;
     Integer load;
 
-    Record(String id, String hostname, Integer port, Integer load) {
+    ServerRecord(String id, String hostname, Integer port, Integer load) {
         this.id = id;
         update(hostname, port, load);
     }
@@ -46,7 +46,7 @@ class ServerRecordSet {
 }
 
 
-public class ServiceBalancer {
+class ServiceBalancer {
     static int calcAvailableLoad(int load) {
         return load - 2;
     }
@@ -100,11 +100,11 @@ public class Servers {
         return balancer;
     }
 
-    public ServerRecordSet records() {
+    ServerRecordSet records() {
         return records;
     }
 
-    public Integer num() {
+    int num() {
         HashMap<String, Boolean> addresses = new HashMap<>();
         records.forEach((id, record) -> {
             String address = record.hostname + ":" + record.port;
@@ -113,7 +113,7 @@ public class Servers {
         connectedServers.forEach(conn -> {
             // todo: might not be the correct address
             String ip = conn.socket().getInetAddress().getHostAddress();
-            Integer port = conn.socket().getPort();
+            int port = conn.socket().getPort();
             String address = ip + ":" + port;
             addresses.put(address, true);
         });
