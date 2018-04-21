@@ -15,4 +15,8 @@ abstract class Agent {
         }
         return connectivity.sendln(src);
     }
+
+    void close() {
+        connectivity.close();
+    }
 }

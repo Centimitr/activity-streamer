@@ -20,10 +20,10 @@ public class LockResponses {
 
     void update(ConnectivitySet servers){
         //todo: exception
-        for (Connectivity c : servers) {
+        servers.forEach(c -> {
             Response res = new Response(c,null);
             responseList.put(c, res);
-        }
+        });
     }
 
     void add (Connectivity c, MsgLockDenied res){

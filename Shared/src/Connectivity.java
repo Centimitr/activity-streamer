@@ -14,8 +14,8 @@ public class Connectivity extends Thread {
 
     private static final Logger log = LogManager.getLogger();
     private Gson g = new Gson();
-    public BufferedReader in;
-    public BufferedWriter out;
+    private BufferedReader in;
+    private BufferedWriter out;
     private boolean open;
     private Socket socket;
     private Consumer<Connectivity> fn;
@@ -34,6 +34,10 @@ public class Connectivity extends Thread {
         open = true;
         log.info("Connection established");
         start();
+    }
+
+    public Socket socket() {
+        return socket;
     }
 
     public void run() {
@@ -121,6 +125,10 @@ public class Connectivity extends Thread {
     public boolean redirect(MessageRouter router) {
         bind(router);
         return redirect((conn, msg) -> context.process(conn, msg));
+    }
+
+    public boolean isClosed() {
+        return socket.isClosed();
     }
 
     // todo: check if only close in stream is necessary

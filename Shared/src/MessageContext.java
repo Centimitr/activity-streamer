@@ -59,6 +59,9 @@ class MessageContext {
         {
             System.out.println("Msg: " + msg);
         }
+        if (connectivity.isClosed()) {
+            return true;
+        }
         clearState();
         connectivity = c;
         boolean valid = parse(msg);

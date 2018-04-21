@@ -15,9 +15,11 @@ public class Control extends Thread {
     private static final Gson g = new Gson();
 
     private String uuid = UUID.randomUUID().toString();
-    private ConnectivityManager manager = new ConnectivityManager();
+    private ConnectivityManager cm = new ConnectivityManager();
+    private RegisterManager rm = new RegisterManager();
+    private Servers servers = new Servers(cm.servers());
     private Users users = new Users();
-    private LockResponses response = new LockResponses();
+    //    private LockResponses response = new LockResponses();
     private Listener listener;
     private boolean term = false;
 
@@ -50,9 +52,9 @@ public class Control extends Thread {
         if (Settings.getRemoteHostname() != null) {
             try {
                 Connectivity conn = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort(), this::startAuthentication);
-                manager.parent().set(conn);
+                cm.parent().set(conn);
                 (new Thread(() -> {
-                    boolean closed = conn.redirect(manager.parent().router());
+                    boolean closed = conn.redirect(cm.parent().router());
                     if (closed) {
                         log.info("Parent connection closed!");
                     }
@@ -64,9 +66,9 @@ public class Control extends Thread {
         }
     }
 
-    @SuppressWarnings("CodeBlock2Expr")
+    @SuppressWarnings({"CodeBlock2Expr", "Convert2MethodRef"})
     private void setMessageHandlers() {
-        manager.temp().router()
+        cm.temp().router()
                 .registerHandler(MessageCommands.AUTHENTICATE, context -> {
                     MsgAuthenticate m = context.read(MsgAuthenticate.class);
                     boolean success = m.secret.equals(Settings.getSecret());
@@ -85,21 +87,19 @@ public class Control extends Thread {
                         return;
                     }
                     context.write(new MsgLoginSuccess("logged in as user " + m.username));
-                    manager.temp().transfer(context.connectivity, manager.clients());
+                    cm.temp().transfer(context.connectivity, cm.clients());
                     // todo: load balance: redirect
-
+                    boolean needRedirect = false;
                     if (needRedirect) {
-                        context.write(new MsgRedirect("logged in as user " + m.username));
+//                        context.write(new MsgRedirect("logged in as user " + m.username));
+                        context.close();
                     }
                 }).registerErrorHandler(context -> {
                     context.write(new MsgInvalidMessage("INVALID MESSAGE?"));
                 }
         );
-        manager.clients().router()
+        cm.clients().router()
                 .registerHandler(MessageCommands.LOGOUT, context -> {
-                    MsgLogout m = context.read(MsgLogout.class);
-                    // {"command":"LOGOUT"}
-                    log.info("@LOGOUT");
                     context.close();
                 })
                 .registerHandler(MessageCommands.INVALID_MESSAGE, context -> {
@@ -132,41 +132,39 @@ public class Control extends Thread {
                     MsgActivityBroadcast broadcast = new MsgActivityBroadcast(
                             g.toJson(m.activity)
                     );
-                    manager.servers().broadcast(broadcast);
+                    cm.servers().broadcast(broadcast);
                 })
                 .registerHandler(MessageCommands.REGISTER, context -> {
-                    MsgRegister msg = context.read(MsgRegister.class);
-                    boolean match = users.match(msg.username, msg.secret);
-                    if (match) {
-                        String info = msg.username + " is already registered with the system.";
+                    MsgRegister m = context.read(MsgRegister.class);
+                    boolean registered = users.has(m.username);
+                    // todo：need test
+                    Runnable handleRegisteredRequest = () -> {
+                        String info = m.username + " is already registered with the system.";
                         MsgRegisterFailed res = new MsgRegisterFailed(info);
                         context.write(res);
                         context.close();
-                    }else{
-                        //broadcast lock request to all other servers, and wait for responds
-                        MsgLockRequest req = new MsgLockRequest(msg.username, msg.secret);
-                        manager.servers().exclude(context.connectivity).broadcast(req);
-                        response.update(manager.servers().exclude(context.connectivity));
-                        //todo: how to wait for all response, a new thread?
-                        if (response.allAnswered()){
-                            if (response.allAllowed()){
-                                String info = "register success for " + msg.username;
-                                MsgRegisterSuccess res = new MsgRegisterSuccess(info);
-                                context.write(res);
-                            }else{
-                                String info = msg.username + " is already registered with the system.";
-                                MsgRegisterFailed res = new MsgRegisterFailed(info);
-                                context.write(res);
-                                context.close();
-                            }
-                        }
-
+                    };
+                    if (registered) {
+                        handleRegisteredRequest.run();
+                        return;
                     }
+                    // ask other servers' options
+                    // broadcast lock request to all other servers, and wait for responds
+                    MsgLockRequest req = new MsgLockRequest(m.username, m.secret);
+                    cm.servers().broadcast(req);
+                    boolean possibleRegistered = rm.wait(m.username, m.secret, servers.num());
+                    if (!possibleRegistered) {
+                        handleRegisteredRequest.run();
+                        return;
+                    }
+                    String info = "register success for " + m.username;
+                    MsgRegisterSuccess res = new MsgRegisterSuccess(info);
+                    context.write(res);
                 })
                 .registerErrorHandler(c -> {
 
                 });
-        manager.children().router()
+        cm.children().router()
                 .registerHandler(MessageCommands.ACTIVITY_BROADCAST, context -> {
                     // todo: INVALID_MESSAGE, incorrect in anyway
                     // todo: received from an unauthenticated server
@@ -175,36 +173,38 @@ public class Control extends Thread {
                         return;
                     }
                     JsonObject m = context.read();
-                    manager.all().exclude(context.connectivity).broadcast(m);
+                    cm.all().exclude(context.connectivity).broadcast(m);
                 })
                 .registerHandler(MessageCommands.SERVER_ANNOUNCE, context -> {
-                    JsonObject m = context.read();
-                    manager.servers().exclude(context.connectivity).broadcast(m);
+                    MsgServerAnnounce m = context.read(MsgServerAnnounce.class);
+                    servers.records().put(m.id, m.hostname, m.port, m.load);
+                    cm.servers().exclude(context.connectivity).broadcast(m);
                 })
                 .registerHandler(MessageCommands.AUTHENTICATION_FAIL, context -> {
                 })
                 .registerHandler(MessageCommands.LOCK_REQUEST, context -> {
                     MsgLockRequest req = context.read(MsgLockRequest.class);
                     boolean match = users.match(req.username, req.secret);
-                    if (!match){
+                    if (!match) {
                         //broadcast a lock-denied to all other servers
                         MsgLockDenied res = new MsgLockDenied(req.username, req.secret);
-                        manager.servers().exclude(context.connectivity).broadcast(res);
-                    }else if (!users.has(req.username)){
+                        cm.servers().exclude(context.connectivity).broadcast(res);
+                    } else if (!users.has(req.username)) {
                         MsgLockAllowed res = new MsgLockAllowed(req.username, req.secret);
-                        manager.servers().exclude(context.connectivity).broadcast(res);
+                        cm.servers().exclude(context.connectivity).broadcast(res);
                         users.add(req.username, req.secret);
                     }
                 })
                 .registerHandler(MessageCommands.LOCK_ALLOWED, context -> {
                     MsgLockAllowed req = context.read(MsgLockAllowed.class);
                     //todo: what actions to be considered
-                    response.add(context.connectivity, req);
+//                    response.add(context.connectivity, req);
                 })
                 .registerHandler(MessageCommands.LOCK_DENIED, context -> {
                     MsgLockDenied req = context.read(MsgLockDenied.class);
+                    // todo:
                     users.delete(req.username, req.secret);
-                    response.add(context.connectivity, req);
+//                    response.add(context.connectivity, req);
                 })
                 .registerHandler(MessageCommands.INVALID_MESSAGE, context -> {
                 })
@@ -222,7 +222,7 @@ public class Control extends Thread {
     private void handleIncomingConn(Socket s) {
         try {
             Connectivity c = new Connectivity(s, con -> {
-                MessageContext ctx = new MessageContext(manager.temp().router());
+                MessageContext ctx = new MessageContext(cm.temp().router());
                 boolean ok = con.redirect((conn, msg) -> {
                     // todo: remove this debug use code
                     if (!msg.startsWith("{")) {
@@ -239,7 +239,7 @@ public class Control extends Thread {
                     // conn.in.close();
                 }
             });
-            manager.temp().add(c);
+            cm.temp().add(c);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -247,7 +247,7 @@ public class Control extends Thread {
 
     private void handleClosedConn(Connectivity c) {
         if (!term) {
-            ConnectivitySet ownerSet = manager.all().owner(c);
+            ConnectivitySet ownerSet = cm.all().owner(c);
             if (ownerSet != null) {
                 ownerSet.remove(c);
             }
@@ -258,22 +258,21 @@ public class Control extends Thread {
     public void run() {
         log.info("using activity interval of " + Settings.getActivityInterval() + " milliseconds");
         while (!term) {
-            // do something with 5 second intervals in between
-            try {
-                Thread.sleep(Settings.getActivityInterval());
-            } catch (InterruptedException e) {
-                log.info("received an interrupt, system is shutting down");
-                break;
-            }
+            log.debug("doing activity");
+            term = doActivity();
             if (!term) {
-                log.debug("doing activity");
-                term = doActivity();
+                try {
+                    Thread.sleep(Settings.getActivityInterval());
+                } catch (InterruptedException e) {
+                    log.info("received an interrupt, system is shutting down");
+                    break;
+                }
             }
         }
-        log.info("closing " + manager.clients().size() + " client connections.");
-        log.info("closing " + manager.children().size() + " server connections.");
+        log.info("closing " + cm.clients().size() + " client connections.");
+        log.info("closing " + cm.children().size() + " server connections.");
         // clean up
-        manager.all().sets().forEach(ConnectivitySet::closeAll);
+        cm.all().sets().forEach(ConnectivitySet::closeAll);
         log.info("closing parent server connection.");
         listener.terminate();
     }
@@ -285,14 +284,14 @@ public class Control extends Thread {
     }
 
     private void doServerAnnounce() {
-        Integer load = manager.clients().size();
+        Integer load = cm.clients().size();
         MsgServerAnnounce m = new MsgServerAnnounce(
                 uuid,
                 Settings.getLocalHostname(),
                 Settings.getLocalPort(),
                 load
         );
-        manager.servers().broadcast(m);
+        cm.servers().broadcast(m);
     }
 
     public final void terminate() {

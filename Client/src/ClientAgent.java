@@ -35,6 +35,12 @@ class ClientAgent extends Agent {
         sendln(m);
     }
 
+    void logout() {
+        MsgLogout m = new MsgLogout();
+        sendln(m);
+        close();
+    }
+
     void sendActivity(Object obj) {
         MsgActivityMessage m = new MsgActivityMessage(
                 Settings.getUsername(),
