@@ -66,38 +66,40 @@ public class Connectivity extends Thread {
         return in.readLine();
     }
 
-    //    // todo: used for test function
-//    public boolean fetch(String msg, Consumer<String> callback) {
-//        boolean ok = send(msg);
-//        if (!ok) {
-//            return false;
-//        }
-//        try {
-//            String reply = in.readLine();
-//            callback.accept(reply);
-//            return true;
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        return false;
-//    }
-//
-//    // todo: not useful now, may be removed
-//    public <T> boolean fetch(Object src, Class<T> classOfT, Consumer<T> callback) {
-//        boolean ok = sendln(src);
-//        if (!ok) {
-//            return false;
-//        }
-//        try {
-//            String reply = in.readLine();
-//            T result = g.fromJson(reply, classOfT);
-//            callback.accept(result);
-//            return true;
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        return false;
-//    }
+    // todo: used for test function
+    @SuppressWarnings("UnusedReturnValue")
+    public boolean fetch(String msg, Consumer<String> callback) {
+        boolean ok = send(msg);
+        if (!ok) {
+            return false;
+        }
+        try {
+            String reply = in.readLine();
+            callback.accept(reply);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // todo: not useful now, may be removed
+    @SuppressWarnings("unused")
+    public <T> boolean fetch(Object src, Class<T> classOfT, Consumer<T> callback) {
+        boolean ok = sendln(src);
+        if (!ok) {
+            return false;
+        }
+        try {
+            String reply = in.readLine();
+            T result = g.fromJson(reply, classOfT);
+            callback.accept(result);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
     // todo: improve process, maybe close in stream inside
     public boolean redirect(BiFunction<Connectivity, String, Boolean> process) {

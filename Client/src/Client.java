@@ -1,26 +1,11 @@
 import java.io.*;
 import java.util.Scanner;
 
-import com.google.gson.Gson;
-import javafx.application.Application;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.json.simple.JSONObject;
-
 @SuppressWarnings("WeakerAccess")
-public class Client extends Async {
-    private static final Logger log = LogManager.getLogger();
-    private static final Gson g = new Gson();
+public class Client extends Base {
     private static Client clientSolution;
-
-    private MessageRouter router = new MessageRouter();
-    private ClientAgent agent = new ClientAgent();
-    private Connectivity connectivity;
     private TextFrame gui = new TextFrame();
 
-    //    private View view = new View();
     public static Client getInstance() {
         if (clientSolution == null) {
             clientSolution = new Client();
@@ -33,40 +18,7 @@ public class Client extends Async {
     }
 
     public Client() {
-        setMessageHandlers();
         start();
-    }
-
-    private void setMessageHandlers() {
-        // todo: add protocol logic
-        router
-                .registerHandler(MessageCommands.REDIRECT, context -> {
-                    MsgRedirect m = context.read(MsgRedirect.class);
-                    log.info("Will Redirect: " + m.hostname + " " + m.port);
-                    agent.reconnect(m.hostname, m.port);
-                    context.close();
-                })
-                .registerHandler(MessageCommands.REGISTER_SUCCESS, context -> {
-                    agent.registerLock.unlock();
-                    log.info("Register successfully!");
-                })
-                .registerHandler(MessageCommands.LOGIN_SUCCESS, context -> {
-                    agent.loginLock.unlock();
-                    log.info("Login successfully!");
-                })
-                .registerHandler(MessageCommands.REGISTER_FAILED, context -> {
-                    log.info("Register Failed!");
-                    context.close();
-                })
-                .registerHandler(MessageCommands.ACTIVITY_BROADCAST, context -> {
-                    MsgActivityBroadcast m = context.read(MsgActivityBroadcast.class);
-                    log.info("AM: " + g.toJson(m.activity));
-                    System.out.println(g.toJson(m.activity));
-                    // todo: may need to apply filter of sending activity objects
-                })
-                .registerErrorHandler(context -> {
-
-                });
     }
 
     public void disconnect() {
@@ -114,6 +66,7 @@ public class Client extends Async {
     }
 
     // todo: used to test connectivity, to remove
+    @SuppressWarnings("unused")
     private void handleTestREPL(Connectivity c) {
         Scanner scanner = new Scanner(System.in);
         String inputStr;
