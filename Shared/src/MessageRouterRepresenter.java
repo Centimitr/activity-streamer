@@ -1,11 +1,11 @@
-public class MessageRouterRepresenter {
+abstract class MessageRouterRepresenter {
     private IMessageRouter representedRouter;
 
-    final public IMessageRouter router() {
+    final IMessageRouter router() {
         return representedRouter;
     }
 
-    final public void setRouter(IMessageRouter router) {
+    final void setRouter(IMessageRouter router) {
         representedRouter = router;
     }
 }

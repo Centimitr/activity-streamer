@@ -15,25 +15,6 @@ class ConnectivitySetGroup extends MessageRouterRepresenter implements IForEachC
         group.add(c);
     }
 
-    /*
-     *  Router
-     */
-
-    //    private IMessageRouter router;
-//
-//    IMessageRouter router() {
-//        return router;
-//    }
-//
-//    void bindRouter(IMessageRouter router) {
-////        this.router = router;
-//        sets().forEach(set -> set.bindRouter(router));
-//    }
-
-    /*
-     *  Sets
-     */
-
     ArrayList<ConnectivitySet> sets() {
         return group;
     }
@@ -60,12 +41,7 @@ class ConnectivitySetGroup extends MessageRouterRepresenter implements IForEachC
         return null;
     }
 
-    /*
-     *  Method
-     */
-
     void broadcast(Object obj) {
         group.forEach(set -> set.broadcast(obj));
     }
-
 }

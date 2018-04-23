@@ -35,6 +35,7 @@ class ConnectivitySet extends MessageRouterRepresenter implements IForEachConnec
         return conns.contains(c);
     }
 
+    @SuppressWarnings("WeakerAccess")
     synchronized void remove(Connectivity c) {
         conns.remove(c);
     }
