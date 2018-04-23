@@ -14,7 +14,7 @@ class MessageContext {
     private static final Logger log = LogManager.getLogger();
     private static final Gson g = new Gson();
     public Connectivity connectivity;
-    private MessageRouter router;
+    private IMessageRouter router;
     private Map<String, String> states = new HashMap<>();
     // states
     public String command;
@@ -23,11 +23,13 @@ class MessageContext {
     private String reply;
     private boolean willClose;
 
-
-    MessageContext(MessageRouter router) {
-        this.router = router;
+    MessageContext(IMessageRouter router) {
+        bindRouter(router);
     }
 
+    void bindRouter(IMessageRouter router) {
+        this.router = router;
+    }
     public boolean is(String cmd) {
         return command.equals(cmd);
     }
@@ -40,7 +42,7 @@ class MessageContext {
             return false;
         }
         command = j.get("command").getAsString();
-        return router.supportCommand(command);
+        return command != null;
     }
 
     private void clearState() {
@@ -59,7 +61,7 @@ class MessageContext {
         {
             System.out.println("Msg: " + msg);
         }
-        if (connectivity.isClosed()) {
+        if (c.isClosed()) {
             return true;
         }
         clearState();
@@ -67,17 +69,13 @@ class MessageContext {
         boolean valid = parse(msg);
         handle(valid);
         handleStateChange();
-        {
-            // todo: remove this debug print
-            // c.sendln("RJ: " + msg);
-        }
         return willClose;
     }
 
     public void handle(boolean valid) {
         Consumer<MessageContext> handler = valid ?
-                router.getHandler(command) :
-                router.getErrorHandler();
+                router.getHandler(connectivity, command) :
+                router.getErrorHandler(connectivity);
         if (handler == null) {
             log.warn("No handler for message:" + g.toJson(j));
             return;

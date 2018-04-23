@@ -1,5 +1,6 @@
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 class ServerRecord {
     String id;
@@ -43,51 +44,62 @@ class ServerRecordSet {
     void forEach(BiConsumer<String, ServerRecord> fn) {
         records.forEach(fn);
     }
+
+    ServerRecord getLoadLowerThan(int load) {
+        for (Map.Entry<String, ServerRecord> entry : records.entrySet()) {
+            ServerRecord record = entry.getValue();
+            if (record.load <= load) {
+                return record;
+            }
+        }
+        return null;
+    }
+
+    ServerRecord getLoadLeast(int load) {
+        ServerRecord r = null;
+        for (Map.Entry<String, ServerRecord> entry : records.entrySet()) {
+            ServerRecord record = entry.getValue();
+            if (r == null || record.load < r.load) {
+                r = record;
+            }
+        }
+        if (r != null && r.load <= load) {
+            return r;
+        }
+        return null;
+    }
 }
 
 
+@SuppressWarnings("WeakerAccess")
 class ServiceBalancer {
-    static int calcAvailableLoad(int load) {
-        return load - 2;
-    }
+
+    public static Function<Integer, Integer> CALC_AVAILABLE_LOAD = load -> (load - 2);
+    public static int CHOSEN_RULE = 0;
 
     private ServerRecordSet set;
-    public int rule = 0;
 
     ServiceBalancer(ServerRecordSet set) {
         this.set = set;
     }
 
-
-    ArrayList<ServerRecord> recordsWithLoadLowerThan(int num) {
-
-    }
-
-    ServerRecord recordWithLoadLowerThan(int num) {
-
-    }
-
-    ServerRecord recordWithLeastLoad(int num) {
-
-    }
-
-    ServerRecord available(int load) {
-        int targetLoad = calcAvailableLoad(load);
+    ServerRecord getAvailableServer(int load) {
+        int targetLoad = CALC_AVAILABLE_LOAD.apply(load);
         ServerRecord record;
-        switch (rule) {
+        switch (CHOSEN_RULE) {
             case 0:
-                record = recordWithLoadLowerThan(targetLoad);
+                record = set.getLoadLowerThan(targetLoad);
                 break;
             case 1:
             default:
-                record = recordWithLeastLoad(targetLoad);
+                record = set.getLoadLeast(targetLoad);
         }
         return record;
     }
 }
 
 
-public class Servers {
+class Servers {
     private ConnectivitySetGroup connectedServers;
     private ServerRecordSet records = new ServerRecordSet();
     private ServiceBalancer balancer = new ServiceBalancer(records);
@@ -96,7 +108,7 @@ public class Servers {
         this.connectedServers = servers;
     }
 
-    public ServiceBalancer balancer() {
+    ServiceBalancer balancer() {
         return balancer;
     }
 

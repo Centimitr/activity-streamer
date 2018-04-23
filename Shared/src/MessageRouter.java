@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-class MessageRouter {
+class MessageRouter implements IMessageRouter {
     private static final Logger log = LogManager.getLogger();
 
     MessageRouter() {
@@ -16,7 +16,8 @@ class MessageRouter {
         log.warn("No unknown handler configured but invoked.");
     };
 
-    boolean supportCommand(String command) {
+    @Override
+    public boolean support(String command) {
         return MessageCommands.contains(command);
     }
 
@@ -25,24 +26,23 @@ class MessageRouter {
         return this;
     }
 
-    @SuppressWarnings("UnusedReturnValue")
-    MessageRouter registerErrorHandler(Consumer<MessageContext> handler) {
+    void registerErrorHandler(Consumer<MessageContext> handler) {
         errorHandler = handler;
-        return this;
     }
 
-    Consumer<MessageContext> getHandler(String command) {
-        if (!supportCommand(command)) {
+    @Override
+    public Consumer<MessageContext> getHandler(Connectivity conn, String command) {
+        if (!support(command)) {
             log.warn("Protocol does not support command: " + command);
         }
         return handlers.get(command);
     }
 
-    Consumer<MessageContext> getErrorHandler() {
+    @Override
+    public Consumer<MessageContext> getErrorHandler(Connectivity conn) {
         if (errorHandler == null) {
             log.error("No error handler is set, error will be dismissed.");
         }
         return errorHandler;
     }
-
 }

@@ -67,6 +67,9 @@ public class TextFrame extends JFrame implements ActionListener {
         setLocationRelativeTo(null);
         setSize(1280, 768);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+
+    public void present() {
         setVisible(true);
     }
 

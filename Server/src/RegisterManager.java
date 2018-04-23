@@ -31,5 +31,6 @@ class RegisterManager {
                 return req;
             }
         }
+        return null;
     }
 }

@@ -4,6 +4,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -18,30 +19,26 @@ public class Connectivity extends Thread {
     private BufferedWriter out;
     private boolean open;
     private Socket socket;
-    private Consumer<Connectivity> fn;
     private MessageContext context;
+    private ArrayList<Runnable> whenClosedCallbacks = new ArrayList<>();
 
-    Connectivity(String hostname, int port, Consumer<Connectivity> fn) throws IOException {
-        this(new Socket(hostname, port), fn);
+    Connectivity(String hostname, int port) throws IOException {
+        this(new Socket(hostname, port));
     }
 
-    Connectivity(Socket socket, Consumer<Connectivity> fn) throws IOException {
+    Connectivity(Socket socket) throws IOException {
         socket.setSoTimeout(0);
         this.socket = socket;
-        this.fn = fn;
         in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
         out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
         open = true;
-        log.info("Connection established");
+        log.info("[Conn::Established] " + Settings.socketAddress(socket));
+        whenClosed(() -> log.info("[Conn::Closed] " + Settings.socketAddress(socket)));
         start();
     }
 
     public Socket socket() {
         return socket;
-    }
-
-    public void run() {
-        fn.accept(this);
     }
 
     public boolean send(String msg) {
@@ -69,38 +66,38 @@ public class Connectivity extends Thread {
         return in.readLine();
     }
 
-    // todo: used for test function
-    public boolean fetch(String msg, Consumer<String> callback) {
-        boolean ok = send(msg);
-        if (!ok) {
-            return false;
-        }
-        try {
-            String reply = in.readLine();
-            callback.accept(reply);
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    // todo: not useful now, may be removed
-    public <T> boolean fetch(Object src, Class<T> classOfT, Consumer<T> callback) {
-        boolean ok = sendln(src);
-        if (!ok) {
-            return false;
-        }
-        try {
-            String reply = in.readLine();
-            T result = g.fromJson(reply, classOfT);
-            callback.accept(result);
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
+    //    // todo: used for test function
+//    public boolean fetch(String msg, Consumer<String> callback) {
+//        boolean ok = send(msg);
+//        if (!ok) {
+//            return false;
+//        }
+//        try {
+//            String reply = in.readLine();
+//            callback.accept(reply);
+//            return true;
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return false;
+//    }
+//
+//    // todo: not useful now, may be removed
+//    public <T> boolean fetch(Object src, Class<T> classOfT, Consumer<T> callback) {
+//        boolean ok = sendln(src);
+//        if (!ok) {
+//            return false;
+//        }
+//        try {
+//            String reply = in.readLine();
+//            T result = g.fromJson(reply, classOfT);
+//            callback.accept(result);
+//            return true;
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return false;
+//    }
 
     // todo: improve process, maybe close in stream inside
     public boolean redirect(BiFunction<Connectivity, String, Boolean> process) {
@@ -118,12 +115,16 @@ public class Connectivity extends Thread {
         return false;
     }
 
-    public void bind(MessageRouter router) {
-        context = new MessageContext(router);
+    public void bindRouter(IMessageRouter router) {
+        if (context == null) {
+            context = new MessageContext(router);
+        } else {
+            context.bindRouter(router);
+        }
     }
 
-    public boolean redirect(MessageRouter router) {
-        bind(router);
+    public boolean redirect(IMessageRouter router) {
+        bindRouter(router);
         return redirect((conn, msg) -> context.process(conn, msg));
     }
 
@@ -149,10 +150,17 @@ public class Connectivity extends Thread {
                 open = true;
                 in.close();
                 out.close();
+                whenClosedCallbacks.forEach(Runnable::run);
             } catch (IOException e) {
                 // already closed?
                 log.error("received exception closing the connection " + Settings.socketAddress(socket) + ": " + e);
             }
+        }
+    }
+
+    public void whenClosed(Runnable fn) {
+        if (fn != null) {
+            whenClosedCallbacks.add(0, fn);
         }
     }
 

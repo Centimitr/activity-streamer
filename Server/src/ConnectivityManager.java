@@ -1,22 +1,47 @@
-class ConnectivityManager {
-    private static MessageRouter tempMessageRouter = new MessageRouter();
-    private static MessageRouter clientMessageRouter = new MessageRouter();
-    private static MessageRouter serverMessageRouter = new MessageRouter();
+import java.util.function.Consumer;
 
-    private ConnectivitySet temp = new ConnectivitySet();
-    private ConnectivitySet clients = new ConnectivitySet();
-    private ConnectivitySet servers = new ConnectivitySet();
-    private SingleConnectivitySet server = new SingleConnectivitySet();
+class ConnectivityManager {
+
+    private final ConnectivitySet temp = new ConnectivitySet();
+    private final ConnectivitySet clients = new ConnectivitySet();
+    private final ConnectivitySet servers = new ConnectivitySet();
+    private final SingleConnectivitySet server = new SingleConnectivitySet();
+
+    private final ConnectivitySetGroup possibleClients = new ConnectivitySetGroup(temp, clients);
+    private final ConnectivitySetGroup allServers = new ConnectivitySetGroup(servers, server);
+    private final ConnectivitySetGroup all = new ConnectivitySetGroup(servers, clients, server);
+
+    private final CentralRouter centralRouter = new CentralRouter(this);
+    private final RouterManager routers = new RouterManager();
 
     ConnectivityManager() {
-        temp.bind(tempMessageRouter);
-        clients.bind(clientMessageRouter);
-        servers.bind(serverMessageRouter);
+
+        all.sets().forEach(set -> set.bindRouter(centralRouter));
+
+        // set represented routers
+        temp.setRouter(routers.temp());
+        clients.setRouter(routers.client());
+        servers.setRouter(routers.child());
+        server.setRouter(routers.parent());
+
+        possibleClients.setRouter(routers.register());
+        allServers.setRouter(routers.server());
+//        all.bindRouter(routerManager);
+//        possibleClients.bind(routers.register());
+//        temp.bind(routers.temp());
+//        clients.bind(routers.client());
+//        allServers.bind(routers.server());
+//        servers.bind(routers.child());
+//        server.bind(routers.parent());
+//        temp.bind(routers);
+//        clients.bind(routers);
+//        servers.bind(routers);
+//        server.bind(routers);
     }
 
-
-    private ConnectivitySetGroup allServers = new ConnectivitySetGroup(servers, server);
-    private ConnectivitySetGroup all = new ConnectivitySetGroup(servers, clients, server);
+    RouterManager routerManager() {
+        return routers;
+    }
 
     ConnectivitySet temp() {
         return temp;
@@ -24,6 +49,10 @@ class ConnectivityManager {
 
     ConnectivitySet clients() {
         return clients;
+    }
+
+    ConnectivitySetGroup possibleClients() {
+        return possibleClients;
     }
 
     SingleConnectivitySet parent() {
@@ -41,4 +70,83 @@ class ConnectivityManager {
     ConnectivitySetGroup all() {
         return all;
     }
+}
+
+class CentralRouter implements IMessageRouter {
+    private ConnectivitySet[] primitives;
+    private ConnectivitySetGroup[] compounds;
+
+    CentralRouter(ConnectivityManager cm) {
+        primitives = new ConnectivitySet[]{cm.temp(), cm.clients(), cm.parent(), cm.children()};
+        compounds = new ConnectivitySetGroup[]{cm.possibleClients(), cm.servers(), cm.all()};
+    }
+
+
+    @Override
+    public boolean support(String command) {
+        return false;
+    }
+
+    @Override
+    public Consumer<MessageContext> getHandler(Connectivity c, String command) {
+        for (ConnectivitySet set : primitives) {
+            if (set.contains(c)) {
+                if (set.router().support(command)) {
+                    return set.router().getHandler(c, command);
+                }
+            }
+        }
+        for (ConnectivitySetGroup group : compounds) {
+            if (group.contains(c)) {
+                if (group.router().support(command)) {
+                    return group.router().getHandler(c, command);
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Consumer<MessageContext> getErrorHandler(Connectivity c) {
+        for (ConnectivitySet set : primitives) {
+            if (set.contains(c)) {
+                return set.router().getErrorHandler(c);
+            }
+        }
+        return null;
+    }
+}
+
+class RouterManager {
+    private MessageRouter temp = new MessageRouter();
+    private MessageRouter client = new MessageRouter();
+    private MessageRouter register = new MessageRouter();
+    private MessageRouter server = new MessageRouter();
+    private MessageRouter parent = new MessageRouter();
+    private MessageRouter child = new MessageRouter();
+
+    MessageRouter temp() {
+        return temp;
+    }
+
+    MessageRouter client() {
+        return client;
+    }
+
+    MessageRouter register() {
+        return register;
+    }
+
+    MessageRouter server() {
+        return server;
+    }
+
+    MessageRouter parent() {
+        return parent;
+    }
+
+    MessageRouter child() {
+        return child;
+    }
+
 }

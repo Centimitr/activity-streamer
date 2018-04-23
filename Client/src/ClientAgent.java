@@ -5,9 +5,12 @@ class ClientAgent extends Agent {
     private static Gson g = new Gson();
     private boolean needReconnect = false;
     String reconnectHostname;
-    Integer reconnectPort;
+    int reconnectPort;
+    Lock registerLock = new Lock();
+    Lock loginLock = new Lock();
 
-    void reconnect(String hostname, Integer port) {
+
+    void reconnect(String hostname, int port) {
         needReconnect = true;
         reconnectHostname = hostname;
         reconnectPort = port;
@@ -25,14 +28,19 @@ class ClientAgent extends Agent {
         User Methods
      */
 
-    void register(String username, String secret) {
+    String register(String username) {
+        String secret = Settings.nextSecret();
         MsgRegister m = new MsgRegister(username, secret);
         sendln(m);
+        registerLock.lock();
+        return secret;
     }
+
 
     void login(String username, String secret) {
         MsgLogin m = new MsgLogin(username, secret);
         sendln(m);
+        loginLock.lock();
     }
 
     void logout() {

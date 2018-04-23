@@ -6,11 +6,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.jmx.Server;
 
 // todo: exception when sending data vai a closed connection
 
 @SuppressWarnings("WeakerAccess")
-public class Control extends Thread {
+public class Control extends Async {
     private static final Logger log = LogManager.getLogger();
     private static final Gson g = new Gson();
 
@@ -50,14 +51,18 @@ public class Control extends Thread {
     private void connectParent() {
         if (Settings.getRemoteHostname() != null) {
             try {
-                Connectivity conn = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort(), this::startAuthentication);
+                Connectivity conn = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort());
                 cm.parent().set(conn);
-                (new Thread(() -> {
-                    boolean closed = conn.redirect(cm.parent().router());
+                async(() -> {
+                    boolean closed = conn.redirect(cm.routerManager().parent());
                     if (closed) {
                         log.info("Parent connection closed!");
                     }
-                })).start();
+                });
+                async(() -> {
+                    conn.sendln(new MsgAuthenticate(Settings.getSecret()));
+                    log.info("Start Authentication!");
+                });
             } catch (IOException e) {
                 log.error("failed to make connection to " + Settings.getRemoteHostname() + ":" + Settings.getRemotePort() + " :" + e);
                 System.exit(-1);
@@ -65,9 +70,38 @@ public class Control extends Thread {
         }
     }
 
+    private void handleIncomingConn(Socket s) {
+        try {
+            //            Connectivity c = new Connectivity(s, con -> {
+////                MessageContext ctx = new MessageContext(cm.temp().router());
+////                boolean ok = con.redirect((conn, msg) -> {
+////                    // todo: remove this debug use code
+////                    if (!msg.startsWith("{")) {
+////                        System.out.println("RCV: " + msg);
+////                        conn.sendln("R: " + msg);
+////                        return false;
+////                    }
+////                    return ctx.process(conn, msg);
+////                });
+//                boolean closed = con.redirect()
+//                if (!closed) {
+//                    log.debug("connection closed to " + Settings.socketAddress(s));
+//                    handleClosedConn(con);
+//                    // todo: find a good time to close in stream to ensure the I/O order
+//                    // conn.in.close();
+//                }
+//            });
+            cm.temp().add(new Connectivity(s));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     @SuppressWarnings({"CodeBlock2Expr", "Convert2MethodRef"})
     private void setMessageHandlers() {
-        cm.temp().router()
+        RouterManager routers = cm.routerManager();
+        routers.temp()
                 .registerHandler(MessageCommands.AUTHENTICATE, context -> {
                     MsgAuthenticate m = context.read(MsgAuthenticate.class);
                     boolean success = m.secret.equals(Settings.getSecret());
@@ -88,16 +122,50 @@ public class Control extends Thread {
                     context.write(new MsgLoginSuccess("logged in as user " + m.username));
                     cm.temp().transfer(context.connectivity, cm.clients());
                     // todo: load balance: redirect
-                    boolean needRedirect = false;
+                    int currentLoad = cm.clients().size();
+                    ServerRecord availableServer = servers.balancer().getAvailableServer(currentLoad);
+                    boolean needRedirect = availableServer != null;
                     if (needRedirect) {
-//                        context.write(new MsgRedirect("logged in as user " + m.username));
+                        context.write(new MsgRedirect(availableServer.hostname, availableServer.port));
                         context.close();
                     }
-                }).registerErrorHandler(context -> {
-                    context.write(new MsgInvalidMessage("INVALID MESSAGE?"));
-                }
-        );
-        cm.clients().router()
+                })
+                .registerErrorHandler(context -> {
+                            context.write(new MsgInvalidMessage("INVALID MESSAGE?"));
+                        }
+                );
+        routers.register()
+                .registerHandler(MessageCommands.REGISTER, context -> {
+                    MsgRegister m = context.read(MsgRegister.class);
+                    boolean registered = users.has(m.username);
+                    // todo：need test
+                    Runnable handleRegisteredRequest = () -> {
+                        String info = m.username + " is already registered with the system.";
+                        MsgRegisterFailed res = new MsgRegisterFailed(info);
+                        context.write(res);
+                        context.close();
+                    };
+                    if (registered) {
+                        handleRegisteredRequest.run();
+                        return;
+                    }
+                    // ask other servers' options
+                    // broadcast lock request to all other servers, and wait for responds
+                    MsgLockRequest req = new MsgLockRequest(m.username, m.secret);
+                    cm.servers().broadcast(req);
+                    boolean possibleRegistered = rm.wait(m.username, m.secret, servers.num());
+                    if (!possibleRegistered) {
+                        handleRegisteredRequest.run();
+                        return;
+                    }
+                    String info = "register success for " + m.username;
+                    MsgRegisterSuccess res = new MsgRegisterSuccess(info);
+                    context.write(res);
+                    // todo: move to clients
+                })
+                .registerErrorHandler(c -> {
+                });
+        routers.client()
                 .registerHandler(MessageCommands.LOGOUT, context -> {
                     context.close();
                 })
@@ -127,37 +195,16 @@ public class Control extends Thread {
                     );
                     cm.servers().broadcast(broadcast);
                 })
-                .registerHandler(MessageCommands.REGISTER, context -> {
-                    MsgRegister m = context.read(MsgRegister.class);
-                    boolean registered = users.has(m.username);
-                    // todo：need test
-                    Runnable handleRegisteredRequest = () -> {
-                        String info = m.username + " is already registered with the system.";
-                        MsgRegisterFailed res = new MsgRegisterFailed(info);
-                        context.write(res);
-                        context.close();
-                    };
-                    if (registered) {
-                        handleRegisteredRequest.run();
-                        return;
-                    }
-                    // ask other servers' options
-                    // broadcast lock request to all other servers, and wait for responds
-                    MsgLockRequest req = new MsgLockRequest(m.username, m.secret);
-                    cm.servers().broadcast(req);
-                    boolean possibleRegistered = rm.wait(m.username, m.secret, servers.num());
-                    if (!possibleRegistered) {
-                        handleRegisteredRequest.run();
-                        return;
-                    }
-                    String info = "register success for " + m.username;
-                    MsgRegisterSuccess res = new MsgRegisterSuccess(info);
-                    context.write(res);
+                .registerErrorHandler(c -> {
+
+                });
+        routers.parent()
+                .registerHandler(MessageCommands.AUTHENTICATION_FAIL, context -> {
                 })
                 .registerErrorHandler(c -> {
 
                 });
-        cm.children().router()
+        routers.server()
                 .registerHandler(MessageCommands.ACTIVITY_BROADCAST, context -> {
                     // todo: INVALID_MESSAGE, incorrect in anyway
                     // todo: received from an unauthenticated server
@@ -172,8 +219,6 @@ public class Control extends Thread {
                     MsgServerAnnounce m = context.read(MsgServerAnnounce.class);
                     servers.records().put(m.id, m.hostname, m.port, m.load);
                     cm.servers().exclude(context.connectivity).broadcast(m);
-                })
-                .registerHandler(MessageCommands.AUTHENTICATION_FAIL, context -> {
                 })
                 .registerHandler(MessageCommands.LOCK_REQUEST, context -> {
                     MsgLockRequest req = context.read(MsgLockRequest.class);
@@ -206,46 +251,15 @@ public class Control extends Thread {
                 });
     }
 
-    // todo: check if synchronized is appropriate
-    private synchronized void startAuthentication(Connectivity c) {
-        c.sendln(new MsgAuthenticate(Settings.getSecret()));
-        log.info("Start Authentication!");
-    }
 
-    private void handleIncomingConn(Socket s) {
-        try {
-            Connectivity c = new Connectivity(s, con -> {
-                MessageContext ctx = new MessageContext(cm.temp().router());
-                boolean ok = con.redirect((conn, msg) -> {
-                    // todo: remove this debug use code
-                    if (!msg.startsWith("{")) {
-                        System.out.println("RCV: " + msg);
-                        conn.sendln("R: " + msg);
-                        return false;
-                    }
-                    return ctx.process(conn, msg);
-                });
-                if (!ok) {
-                    log.debug("connection closed to " + Settings.socketAddress(s));
-                    handleClosedConn(con);
-                    // todo: find a good time to close in stream to ensure the I/O order
-                    // conn.in.close();
-                }
-            });
-            cm.temp().add(c);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void handleClosedConn(Connectivity c) {
-        if (!term) {
-            ConnectivitySet ownerSet = cm.all().owner(c);
-            if (ownerSet != null) {
-                ownerSet.remove(c);
-            }
-        }
-    }
+//    private void handleClosedConn(Connectivity c) {
+//        if (!term) {
+//            ConnectivitySet ownerSet = cm.all().owner(c);
+//            if (ownerSet != null) {
+//                ownerSet.remove(c);
+//            }
+//        }
+//    }
 
     @Override
     public void run() {
