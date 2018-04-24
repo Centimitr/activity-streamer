@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.Scanner;
 
 @SuppressWarnings("WeakerAccess")
-public class Client extends Base {
+public class Client extends ClientResponder {
     private static Client clientSolution;
     private TextFrame gui = new TextFrame();
 
@@ -62,7 +62,6 @@ public class Client extends Base {
         }
         agent.login(Settings.getUsername(), Settings.getSecret());
         gui.present();
-        // agent.sendActivity(new TestMessage("Never Gonna Give You Up"));
     }
 
     // todo: used to test connectivity, to remove

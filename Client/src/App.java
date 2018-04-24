@@ -30,7 +30,6 @@ public class App {
         options.addOption("rh", true, "remote hostname");
         options.addOption("s", true, "secret for username");
 
-
         // build the parser
         CommandLineParser parser = new DefaultParser();
 

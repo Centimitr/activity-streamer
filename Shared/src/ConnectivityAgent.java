@@ -1,4 +1,4 @@
-abstract class Agent {
+abstract class ConnectivityAgent {
     private Connectivity connectivity;
 
     void bind(Connectivity c) {
@@ -9,6 +9,7 @@ abstract class Agent {
         connectivity = null;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     boolean sendln(Object src) {
         if (connectivity == null) {
             return false;

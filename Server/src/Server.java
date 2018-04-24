@@ -1,31 +1,24 @@
 import java.io.IOException;
 import java.net.Socket;
-import java.util.UUID;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.jmx.Server;
 
 // todo: exception when sending data vai a closed connection
 
 @SuppressWarnings("WeakerAccess")
-public class Control extends Base {
+public class Server extends ServerResponder {
 
     private Listener listener;
     private boolean term = false;
 
-    protected static Control control = null;
+    protected static Server control = null;
 
-    public static Control getInstance() {
+    public static Server getInstance() {
         if (control == null) {
-            control = new Control();
+            control = new Server();
         }
         return control;
     }
 
-    public Control() {
+    public Server() {
         connectParent();
         startListen();
         start();
@@ -35,7 +28,7 @@ public class Control extends Base {
         try {
             listener = new Listener(Settings.getLocalPort(), this::handleIncomingConn);
         } catch (IOException e) {
-            log.fatal("failed to startup a listening thread: " + e);
+            log.fatal("Listener.Failed " + e);
             System.exit(-1);
         }
     }
@@ -46,17 +39,16 @@ public class Control extends Base {
                 Connectivity conn = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort());
                 cm.parent().set(conn);
                 async(() -> {
-                    boolean closed = conn.redirect(cm.routerManager().parent());
-                    if (closed) {
-                        log.info("Parent connection closed!");
-                    }
+                    boolean ok = conn.redirect(cm.routerManager().parent());
+                    log.info("Parent.Closed " + (ok ? "Normal" : "Exception"));
+                    terminate();
                 });
                 async(() -> {
+                    log.info("Authenticate.Start");
                     conn.sendln(new MsgAuthenticate(Settings.getSecret()));
-                    log.info("Start Authentication!");
                 });
             } catch (IOException e) {
-                log.error("failed to make connection to " + Settings.getRemoteHostname() + ":" + Settings.getRemotePort() + " :" + e);
+                log.error("Parent.Failed " + Settings.getRemoteHostname() + ":" + Settings.getRemotePort() + " :" + e);
                 System.exit(-1);
             }
         }
@@ -72,35 +64,34 @@ public class Control extends Base {
 
     @Override
     public void run() {
-        log.info("using activity interval of " + Settings.getActivityInterval() + " milliseconds");
+        log.info("Activity.Start Interval: " + Settings.getActivityInterval());
         while (!term) {
-            log.debug("doing activity");
             term = doActivity();
             if (!term) {
                 try {
                     Thread.sleep(Settings.getActivityInterval());
                 } catch (InterruptedException e) {
-                    log.info("received an interrupt, system is shutting down");
+                    log.info("Interrupt");
                     break;
                 }
             }
         }
-        log.info("closing " + cm.clients().size() + " client connections.");
-        log.info("closing " + cm.children().size() + " server connections.");
-        // clean up
-        cm.all().sets().forEach(ConnectivitySet::closeAll);
-        log.info("closing parent server connection.");
         listener.terminate();
+
+        cm.all().sets().forEach(ConnectivitySet::closeAll);
+        cm.parent().close();
+        log.info("Closed: parent, " + cm.clients().size() + " Clients, " + cm.children().size() + " Children");
+        System.exit(0);
     }
 
     public boolean doActivity() {
-        System.out.println("DoActivity!");
         doServerAnnounce();
         return false;
     }
 
     private void doServerAnnounce() {
         Integer load = cm.clients().size();
+        log.info("Activity.Announce Load: " + load);
         MsgServerAnnounce m = new MsgServerAnnounce(
                 uuid,
                 Settings.getLocalHostname(),

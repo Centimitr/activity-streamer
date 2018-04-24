@@ -6,19 +6,21 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.concurrent.BlockingDeque;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 @SuppressWarnings({"Duplicates", "WeakerAccess"})
 public class Connectivity extends Thread {
-
     private static final Logger log = LogManager.getLogger();
-    private Gson g = new Gson();
+    private static Gson g = new Gson();
+
+    private Socket socket;
     private BufferedReader in;
     private BufferedWriter out;
+
     private boolean open;
-    private Socket socket;
     private MessageContext context;
     private ArrayList<Runnable> whenClosedCallbacks = new ArrayList<>();
 
@@ -32,8 +34,8 @@ public class Connectivity extends Thread {
         in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
         out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
         open = true;
-        log.info("[Conn::Established] " + Settings.socketAddress(socket));
-        whenClosed(() -> log.info("[Conn::Closed] " + Settings.socketAddress(socket)));
+        log.info("Established: " + Settings.socketAddress(socket));
+        whenClosed(() -> log.info("Closed: " + Settings.socketAddress(socket)));
         start();
     }
 
@@ -48,6 +50,7 @@ public class Connectivity extends Thread {
                 out.flush();
                 return true;
             } catch (IOException e) {
+                log.error("Send Failed");
                 e.printStackTrace();
             }
         }
@@ -55,6 +58,7 @@ public class Connectivity extends Thread {
     }
 
     public boolean sendln(String msg) {
+        log.debug("Sendln: " + msg);
         return send(msg + "\n");
     }
 
@@ -63,7 +67,9 @@ public class Connectivity extends Thread {
     }
 
     public String receiveln() throws IOException {
-        return in.readLine();
+        String line = in.readLine();
+        log.debug("Receiveln: " + line);
+        return line;
     }
 
     // todo: used for test function
@@ -101,7 +107,6 @@ public class Connectivity extends Thread {
         return false;
     }
 
-    // todo: improve process, maybe close in stream inside
     public boolean redirect(BiFunction<Connectivity, String, Boolean> process) {
         boolean term = false;
         String msg;
@@ -109,12 +114,11 @@ public class Connectivity extends Thread {
             while (!term && (msg = in.readLine()) != null) {
                 term = process.apply(this, msg);
             }
-            return true;
         } catch (IOException e) {
-            log.error("REDIRECT: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Redirect: " + e.getMessage());
         }
-        return false;
+        close();
+        return term;
     }
 
     public void bindRouter(IMessageRouter router) {
@@ -134,20 +138,9 @@ public class Connectivity extends Thread {
         return socket.isClosed();
     }
 
-    // todo: check if only close in stream is necessary
-    public void closeIn() {
-        if (open) {
-            try {
-                in.close();
-            } catch (IOException e) {
-                log.error("received exception closing the connection " + Settings.socketAddress(socket) + ": " + e);
-            }
-        }
-    }
-
     public void close() {
         if (open) {
-            log.info("closing connection " + Settings.socketAddress(socket));
+            log.info("Closing: " + Settings.socketAddress(socket));
             try {
                 open = true;
                 in.close();
@@ -155,7 +148,7 @@ public class Connectivity extends Thread {
                 whenClosedCallbacks.forEach(Runnable::run);
             } catch (IOException e) {
                 // already closed?
-                log.error("received exception closing the connection " + Settings.socketAddress(socket) + ": " + e);
+                log.error("Exception: when closing " + Settings.socketAddress(socket) + ": " + e);
             }
         }
     }

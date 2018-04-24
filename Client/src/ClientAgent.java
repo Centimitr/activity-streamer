@@ -2,7 +2,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 @SuppressWarnings("WeakerAccess")
-class ClientAgent extends Agent {
+class ClientAgent extends ConnectivityAgent {
     private static Gson g = new Gson();
     private boolean needReconnect = false;
     String reconnectHostname;

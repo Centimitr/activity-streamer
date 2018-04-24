@@ -22,7 +22,7 @@ public class Listener extends Async {
 
     @Override
     public void run() {
-        log.info("listening for new connections on " + port);
+        log.info("Listening Port: " + port);
         while (!term) {
             Socket clientSocket;
             try {

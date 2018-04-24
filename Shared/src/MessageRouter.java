@@ -21,12 +21,12 @@ class MessageRouter implements IMessageRouter {
         return MessageCommands.contains(command);
     }
 
-    MessageRouter registerHandler(MessageCommands command, Consumer<MessageContext> handler) {
+    MessageRouter handle(MessageCommands command, Consumer<MessageContext> handler) {
         handlers.put(command.name(), handler);
         return this;
     }
 
-    void registerErrorHandler(Consumer<MessageContext> handler) {
+    void handleError(Consumer<MessageContext> handler) {
         errorHandler = handler;
     }
 
