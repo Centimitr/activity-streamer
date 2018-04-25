@@ -18,7 +18,12 @@ class MessageRouter implements IMessageRouter {
 
     @Override
     public boolean support(String command) {
-        return MessageCommands.contains(command);
+        for (Map.Entry<String, Consumer<MessageContext>> handler : handlers.entrySet()) {
+            if (handler.getKey().equals(command)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     MessageRouter handle(MessageCommands command, Consumer<MessageContext> handler) {

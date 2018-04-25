@@ -1,5 +1,6 @@
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,9 +17,10 @@ abstract class ServerResponder extends Async {
     Servers servers = new Servers(cm.servers());
     Users users = new Users();
 
-    @SuppressWarnings("Convert2MethodRef")
+    @SuppressWarnings({"CodeBlock2Expr", "Convert2MethodRef"})
     ServerResponder() {
         RouterManager routers = cm.routerManager();
+        // todo: handleError need an error parameter
         routers.temp()
                 .handle(MessageCommands.AUTHENTICATE, context -> {
                     MsgAuthenticate m = context.read(MsgAuthenticate.class);
@@ -28,31 +30,46 @@ abstract class ServerResponder extends Async {
                         context.write(res);
                         context.close();
                     }
+                    cm.temp().transfer(context.connectivity, cm.children());
                 })
-                .handle(MessageCommands.LOGIN, context -> {
-                    MsgLogin m = context.read(MsgLogin.class);
-                    boolean match = users.match(m.username, m.secret);
-                    if (!match) {
-                        context.write(new MsgLoginFailed("attempt to login with wrong secret"));
+                .handle(MessageCommands.REGISTER, context -> {
+                    MsgRegister m = context.read(MsgRegister.class);
+                    log.info("Register: Start:" + m.username + " " + m.secret);
+
+                    Runnable handleRegisteredRequest = () -> {
+                        String info = m.username + " is already registered with the system.";
+                        MsgRegisterFailed res = new MsgRegisterFailed(info);
+                        context.write(res);
                         context.close();
+                    };
+                    boolean anonymous = m.username.equals("anonymous");
+                    boolean registered = users.has(m.username);
+                    if (registered || anonymous) {
+                        log.info("Register: Local already registered: " + m.username + " " + m.secret);
+                        handleRegisteredRequest.run();
                         return;
                     }
-                    context.write(new MsgLoginSuccess("logged in as user " + m.username));
-                    cm.temp().transfer(context.connectivity, cm.clients());
-                    // todo: load balance: redirect
-                    int currentLoad = cm.clients().size();
-                    ServerRecord availableServer = servers.balancer().getAvailableServer(currentLoad);
-                    boolean needRedirect = availableServer != null;
-                    if (needRedirect) {
-                        context.write(new MsgRedirect(availableServer.hostname, availableServer.port));
-                        context.close();
+
+                    // ask other servers' options
+                    MsgLockRequest req = new MsgLockRequest(m.username, m.secret);
+                    cm.servers().broadcast(req);
+                    boolean available = rm.wait(m.username, m.secret, servers.num());
+                    if (!available) {
+                        log.info("Register: Remote already registered: " + m.username + " " + m.secret);
+                        handleRegisteredRequest.run();
+                        return;
                     }
+                    users.add(m.username, m.secret);
+
+                    String info = "register success for " + m.username;
+                    MsgRegisterSuccess res = new MsgRegisterSuccess(info);
+                    context.write(res);
+                    cm.temp().transfer(context.connectivity, cm.clients());
+                    log.info("Register: Success:" + m.username + " " + m.secret);
                 })
                 .handleError(context -> {
-                            context.write(new MsgInvalidMessage("INVALID MESSAGE?"));
-                        }
-                );
-
+                    context.write(new MsgInvalidMessage("INVALID MESSAGE?"));
+                });
         routers.client()
                 .handle(MessageCommands.LOGOUT, context -> {
                     context.close();
@@ -62,11 +79,8 @@ abstract class ServerResponder extends Async {
                     boolean anonymous = m.username.equals("anonymous");
                     boolean match = m.username.equals(context.get("username")) && m.secret.equals(context.get("secret"));
                     boolean loggedIn = context.get("username") != null;
-                    if (!anonymous || !match || !loggedIn) {
-                        String info = "";
-                        if (!anonymous || !loggedIn) {
-                            info = "username is not anonymous or no user logged in.";
-                        }
+                    if (!(anonymous || loggedIn && match)) {
+                        String info = "username is not anonymous or no user logged in.";
                         if (!match) {
                             info = "the supplied secret is incorrect: " + m.secret;
                         }
@@ -77,11 +91,11 @@ abstract class ServerResponder extends Async {
                     }
                     // todo: INVALID_MESSAGE, incorrect in anyway
                     // todo: need check if the activity(JsonObject) can be marshaled correctly
-                    m.activity.addProperty("authenticated_user", context.get("username"));
+                    JsonObject activity = (new JsonParser()).parse(m.activity).getAsJsonObject();
+                    activity.addProperty("authenticated_user", context.get("username"));
                     MsgActivityBroadcast broadcast = new MsgActivityBroadcast(
-                            g.toJson(m.activity)
+                            g.toJson(activity)
                     );
-
                     cm.servers().broadcast(broadcast);
                     cm.clients().broadcast(broadcast);
                 })
@@ -90,52 +104,43 @@ abstract class ServerResponder extends Async {
                 });
         routers.parent()
                 .handle(MessageCommands.AUTHENTICATION_FAIL, context -> {
+                    context.close();
                 })
                 .handleError(c -> {
 
                 });
 
         // group routing
-        routers.register()
-                .handle(MessageCommands.REGISTER, context -> {
-                    MsgRegister m = context.read(MsgRegister.class);
-                    boolean registered = users.has(m.username);
-                    // todo：need test
-                    Runnable handleRegisteredRequest = () -> {
-                        String info = m.username + " is already registered with the system.";
-                        MsgRegisterFailed res = new MsgRegisterFailed(info);
-                        context.write(res);
+        routers.possibleClient()
+                .handle(MessageCommands.LOGIN, context -> {
+                    MsgLogin m = context.read(MsgLogin.class);
+                    boolean anonymous = m.username.equals("anonymous");
+                    boolean match = users.match(m.username, m.secret);
+                    log.info(anonymous);
+                    log.info(match);
+                    if (!match && !anonymous) {
+                        context.write(new MsgLoginFailed("attempt to login with wrong secret"));
                         context.close();
-                    };
-                    if (registered) {
-                        handleRegisteredRequest.run();
                         return;
                     }
-                    // ask other servers' options
-                    // broadcast lock request to all other servers, and wait for responds
-                    MsgLockRequest req = new MsgLockRequest(m.username, m.secret);
-                    cm.servers().broadcast(req);
-                    boolean possibleRegistered = rm.wait(m.username, m.secret, servers.num());
-                    if (!possibleRegistered) {
-                        handleRegisteredRequest.run();
-                        return;
+                    context.write(new MsgLoginSuccess("logged in as user " + m.username));
+                    context.set("username", m.username);
+                    context.set("secret", m.secret);
+                    cm.possibleClients().transfer(context.connectivity, cm.clients());
+                    // todo: load balance: redirect
+                    int currentLoad = cm.clients().size();
+                    ServerRecord availableServer = servers.balancer().getAvailableServer(currentLoad);
+                    boolean needRedirect = availableServer != null;
+                    if (needRedirect) {
+                        context.write(new MsgRedirect(availableServer.hostname, availableServer.port));
+                        context.close();
                     }
-                    String info = "register success for " + m.username;
-                    MsgRegisterSuccess res = new MsgRegisterSuccess(info);
-                    context.write(res);
-                    // todo: move to clients
                 });
-
         routers.server()
                 .handle(MessageCommands.ACTIVITY_BROADCAST, context -> {
-                    // todo: INVALID_MESSAGE, incorrect in anyway
-                    // todo: received from an unauthenticated server
-                    if (false) {
-                        context.close();
-                        return;
-                    }
                     JsonObject m = context.read();
-                    cm.all().exclude(context.connectivity).broadcast(m);
+                    cm.servers().exclude(context.connectivity).broadcast(m);
+                    cm.clients().broadcast(m);
                 })
                 .handle(MessageCommands.SERVER_ANNOUNCE, context -> {
                     MsgServerAnnounce m = context.read(MsgServerAnnounce.class);
@@ -143,30 +148,36 @@ abstract class ServerResponder extends Async {
                     cm.servers().exclude(context.connectivity).broadcast(m);
                 })
                 .handle(MessageCommands.LOCK_REQUEST, context -> {
+                    // broadcast
+                    cm.servers().exclude(context.connectivity).broadcast(context.read());
+                    // handle request
                     MsgLockRequest req = context.read(MsgLockRequest.class);
+                    boolean known = users.has(req.username);
                     boolean match = users.match(req.username, req.secret);
-                    if (!match) {
-                        //broadcast a lock-denied to all other servers
+                    if (known) {
                         MsgLockDenied res = new MsgLockDenied(req.username, req.secret);
-                        cm.servers().exclude(context.connectivity).broadcast(res);
-                    } else if (!users.has(req.username)) {
-                        MsgLockAllowed res = new MsgLockAllowed(req.username, req.secret);
-                        cm.servers().exclude(context.connectivity).broadcast(res);
-                        users.add(req.username, req.secret);
+                        cm.servers().broadcast(res);
+                        if (match) {
+                            users.delete(req.username, req.secret);
+                        }
+                        return;
                     }
+                    users.add(req.username, req.secret);
+                    MsgLockAllowed res = new MsgLockAllowed(req.username, req.secret);
+                    cm.servers().broadcast(res);
                 })
                 .handle(MessageCommands.LOCK_ALLOWED, context -> {
-                    MsgLockAllowed req = context.read(MsgLockAllowed.class);
-                    //todo: what actions to be considered
-//                    response.add(context.connectivity, req);
+                    cm.servers().exclude(context.connectivity).broadcast(context.read());
                 })
                 .handle(MessageCommands.LOCK_DENIED, context -> {
-                    MsgLockDenied req = context.read(MsgLockDenied.class);
-                    // todo:
-                    users.delete(req.username, req.secret);
-//                    response.add(context.connectivity, req);
-                })
-                .handle(MessageCommands.INVALID_MESSAGE, context -> {
+                    // broadcast
+                    cm.servers().exclude(context.connectivity).broadcast(context.read());
+                    // handle denied
+                    MsgLockDenied m = context.read(MsgLockDenied.class);
+                    boolean match = users.match(m.username, m.secret);
+                    if (match) {
+                        users.delete(m.username, m.secret);
+                    }
                 });
     }
 }

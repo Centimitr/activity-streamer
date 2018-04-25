@@ -24,33 +24,30 @@ public class Server extends ServerResponder {
         start();
     }
 
+    private void connectParent() {
+        if (Settings.getRemoteHostname() != null) {
+            try {
+                Connectivity conn = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort());
+                cm.parent().set(conn);
+                conn.whenClosed(() -> {
+                    log.info("Parent.Closed");
+                    terminate();
+                });
+                log.info("Authenticate.Start");
+                conn.sendln(new MsgAuthenticate(Settings.getSecret()));
+            } catch (IOException e) {
+                log.error("Parent.Failed" + Settings.getRemoteHostname() + ":" + Settings.getRemotePort() + " :" + e);
+                System.exit(-1);
+            }
+        }
+    }
+
     private void startListen() {
         try {
             listener = new Listener(Settings.getLocalPort(), this::handleIncomingConn);
         } catch (IOException e) {
             log.fatal("Listener.Failed " + e);
             System.exit(-1);
-        }
-    }
-
-    private void connectParent() {
-        if (Settings.getRemoteHostname() != null) {
-            try {
-                Connectivity conn = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort());
-                cm.parent().set(conn);
-                async(() -> {
-                    boolean ok = conn.redirect(cm.routerManager().parent());
-                    log.info("Parent.Closed " + (ok ? "Normal" : "Exception"));
-                    terminate();
-                });
-                async(() -> {
-                    log.info("Authenticate.Start");
-                    conn.sendln(new MsgAuthenticate(Settings.getSecret()));
-                });
-            } catch (IOException e) {
-                log.error("Parent.Failed " + Settings.getRemoteHostname() + ":" + Settings.getRemotePort() + " :" + e);
-                System.exit(-1);
-            }
         }
     }
 
@@ -76,12 +73,6 @@ public class Server extends ServerResponder {
                 }
             }
         }
-        listener.terminate();
-
-        cm.all().sets().forEach(ConnectivitySet::closeAll);
-        cm.parent().close();
-        log.info("Closed: parent, " + cm.clients().size() + " Clients, " + cm.children().size() + " Children");
-        System.exit(0);
     }
 
     public boolean doActivity() {
@@ -102,6 +93,13 @@ public class Server extends ServerResponder {
     }
 
     public final void terminate() {
-        term = true;
+        if (!term) {
+            listener.terminate();
+            cm.all().sets().forEach(ConnectivitySet::closeAll);
+            cm.parent().close();
+            log.info("Closed: " + cm.parent().size() + " parent, " + cm.clients().size() + " Clients, " + cm.children().size() + " Children");
+            term = true;
+            System.exit(0);
+        }
     }
 }

@@ -15,6 +15,10 @@ class Users {
     private Map<String, User> users = new HashMap<>();
 
     boolean has(String username) {
+        System.out.println("Print names");
+        users.forEach((name, user) -> {
+            System.out.println(name);
+        });
         return users.containsKey(username);
     }
 
@@ -35,7 +39,11 @@ class Users {
         if (!has(username)) {
             return false;
         }
+        if (secret == null) {
+            return false;
+        }
         User u = users.get(username);
+        System.out.println("Maybe null " + u.username + " " + u.secret);
         return secret.equals(u.secret);
     }
 }

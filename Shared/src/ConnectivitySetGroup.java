@@ -10,9 +10,15 @@ class ConnectivitySetGroup extends MessageRouterRepresenter implements IForEachC
         group.add(b);
     }
 
+    @SuppressWarnings("WeakerAccess")
     ConnectivitySetGroup(ConnectivitySet a, ConnectivitySet b, ConnectivitySet c) {
         this(a, b);
         group.add(c);
+    }
+
+    ConnectivitySetGroup(ConnectivitySet a, ConnectivitySet b, ConnectivitySet c, ConnectivitySet d) {
+        this(a, b, c);
+        group.add(d);
     }
 
     ArrayList<ConnectivitySet> sets() {
@@ -39,6 +45,11 @@ class ConnectivitySetGroup extends MessageRouterRepresenter implements IForEachC
             }
         }
         return null;
+    }
+
+    void transfer(Connectivity c, ConnectivitySet set) {
+        ConnectivitySet ownerSet = owner(c);
+        ownerSet.transfer(c, set);
     }
 
     void broadcast(Object obj) {

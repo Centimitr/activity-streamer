@@ -69,8 +69,12 @@ public class TextFrame extends JFrame implements ActionListener {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    public void present() {
+    void present() {
         setVisible(true);
+    }
+
+    void dismiss() {
+        setVisible(false);
     }
 
     public void setOutputText(final JSONObject obj) {

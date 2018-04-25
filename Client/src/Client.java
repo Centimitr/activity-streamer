@@ -1,3 +1,5 @@
+import javafx.application.Application;
+
 import java.io.*;
 import java.util.Scanner;
 
@@ -5,6 +7,7 @@ import java.util.Scanner;
 public class Client extends ClientResponder {
     private static Client clientSolution;
     private TextFrame gui = new TextFrame();
+    private View view = new View();
 
     public static Client getInstance() {
         if (clientSolution == null) {
@@ -29,6 +32,7 @@ public class Client extends ClientResponder {
 
     @Override
     public void run() {
+        view.show();
         connect(Settings.getRemoteHostname(), Settings.getRemotePort());
     }
 
@@ -37,11 +41,15 @@ public class Client extends ClientResponder {
             connectivity = new Connectivity(hostname, port);
             agent.bind(connectivity);
             async(() -> {
-                boolean closed = connectivity.redirect(router);
-                if (closed) {
-                    agent.unbind();
+                boolean normalExit = connectivity.redirect(router);
+                if (normalExit) {
+                    log.info("normal exit");
+                } else {
+                    log.info("exception exit");
                 }
-                if (closed && agent.needReconnect()) {
+//                gui.dismiss();
+                agent.unbind();
+                if (normalExit && agent.needReconnect()) {
                     connect(agent.reconnectHostname, agent.reconnectPort);
                 }
             });
@@ -53,6 +61,7 @@ public class Client extends ClientResponder {
     }
 
     private void whenConnected() {
+
         boolean anonymous = Settings.getUsername().equals("anonymous");
         boolean needRegister = Settings.getSecret() == null && !anonymous;
         if (needRegister) {
@@ -61,7 +70,7 @@ public class Client extends ClientResponder {
             Settings.setSecret(secret);
         }
         agent.login(Settings.getUsername(), Settings.getSecret());
-        gui.present();
+//        gui.present();
     }
 
     // todo: used to test connectivity, to remove

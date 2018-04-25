@@ -20,7 +20,6 @@ public class Connectivity extends Thread {
     private BufferedReader in;
     private BufferedWriter out;
 
-    private boolean open;
     private boolean redirecting = false;
     private MessageContext context;
     private ArrayList<Runnable> whenClosedCallbacks = new ArrayList<>();
@@ -35,9 +34,7 @@ public class Connectivity extends Thread {
         this.socket = socket;
         in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
         out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
-        open = true;
         log.info("Established: " + Settings.socketAddress(socket));
-        whenClosed(() -> log.info("Closed: " + Settings.socketAddress(socket)));
         start();
     }
 
@@ -46,7 +43,7 @@ public class Connectivity extends Thread {
     }
 
     public boolean send(String msg) {
-        if (open) {
+        if (!socket.isClosed()) {
             try {
                 out.write(msg);
                 out.flush();
@@ -124,6 +121,7 @@ public class Connectivity extends Thread {
             }
         } catch (IOException e) {
             log.error("Redirect: " + e.getMessage());
+            e.printStackTrace();
         }
         close();
         return term;
@@ -147,16 +145,13 @@ public class Connectivity extends Thread {
     }
 
     public void close() {
-        if (open) {
+        if (!socket.isClosed()) {
             log.info("Closing: " + Settings.socketAddress(socket));
             try {
-                log.info("0");
-                open = true;
                 in.close();
                 out.close();
-                log.info("1");
+                socket.close();
                 whenClosedCallbacks.forEach(Runnable::run);
-                log.info("2");
                 log.info("Closed: " + Settings.socketAddress(socket));
             } catch (IOException e) {
 //                 already closed?
@@ -169,9 +164,5 @@ public class Connectivity extends Thread {
         if (fn != null) {
             whenClosedCallbacks.add(0, fn);
         }
-    }
-
-    public boolean isOpen() {
-        return open;
     }
 }

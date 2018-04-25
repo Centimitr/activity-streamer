@@ -20,9 +20,9 @@ class RegisterManager {
     boolean wait(String username, String secret, int num) {
         RegisterRequest req = new RegisterRequest(username, secret);
         requests.add(req);
-        boolean ok = req.wait(num);
+        boolean notCancelled = req.wait(num);
         requests.remove(req);
-        return ok;
+        return notCancelled;
     }
 
     RegisterRequest get(String username, String secret) {

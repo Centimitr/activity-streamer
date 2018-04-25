@@ -63,8 +63,9 @@ class ConnectivitySet extends MessageRouterRepresenter implements IForEachConnec
     }
 
     synchronized void transfer(Connectivity c, ConnectivitySet target) {
-        // todo: route bind
-        remove(c);
-        target.add(c);
+        if (target != this) {
+            remove(c);
+            target.add(c);
+        }
     }
 }

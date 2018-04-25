@@ -1,3 +1,6 @@
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.function.Consumer;
 
 class ConnectivityManager {
@@ -9,7 +12,7 @@ class ConnectivityManager {
 
     private final ConnectivitySetGroup possibleClients = new ConnectivitySetGroup(temp, clients);
     private final ConnectivitySetGroup allServers = new ConnectivitySetGroup(servers, server);
-    private final ConnectivitySetGroup all = new ConnectivitySetGroup(servers, clients, server);
+    private final ConnectivitySetGroup all = new ConnectivitySetGroup(temp, servers, clients, server);
 
     private final CentralRouter centralRouter = new CentralRouter(this);
     private final RouterManager routers = new RouterManager();
@@ -24,19 +27,8 @@ class ConnectivityManager {
         servers.setRouter(routers.child());
         server.setRouter(routers.parent());
 
-        possibleClients.setRouter(routers.register());
+        possibleClients.setRouter(routers.possibleClient());
         allServers.setRouter(routers.server());
-//        all.bindRouter(routerManager);
-//        possibleClients.bind(routers.register());
-//        temp.bind(routers.temp());
-//        clients.bind(routers.client());
-//        allServers.bind(routers.server());
-//        servers.bind(routers.child());
-//        server.bind(routers.parent());
-//        temp.bind(routers);
-//        clients.bind(routers);
-//        servers.bind(routers);
-//        server.bind(routers);
     }
 
     RouterManager routerManager() {
@@ -73,6 +65,7 @@ class ConnectivityManager {
 }
 
 class CentralRouter implements IMessageRouter {
+    static final Logger log = LogManager.getLogger();
     private ConnectivitySet[] primitives;
     private ConnectivitySetGroup[] compounds;
 
@@ -81,16 +74,16 @@ class CentralRouter implements IMessageRouter {
         compounds = new ConnectivitySetGroup[]{cm.possibleClients(), cm.servers(), cm.all()};
     }
 
-
     @Override
     public boolean support(String command) {
-        return false;
+        return MessageCommands.contains(command);
     }
 
     @Override
     public Consumer<MessageContext> getHandler(Connectivity c, String command) {
         for (ConnectivitySet set : primitives) {
             if (set.contains(c)) {
+//                log.info("Router support: "+ command+"? "+ set.router().support(command));
                 if (set.router().support(command)) {
                     return set.router().getHandler(c, command);
                 }
@@ -120,7 +113,7 @@ class CentralRouter implements IMessageRouter {
 class RouterManager {
     private MessageRouter temp = new MessageRouter();
     private MessageRouter client = new MessageRouter();
-    private MessageRouter register = new MessageRouter();
+    private MessageRouter possibleClient = new MessageRouter();
     private MessageRouter server = new MessageRouter();
     private MessageRouter parent = new MessageRouter();
     private MessageRouter child = new MessageRouter();
@@ -133,8 +126,8 @@ class RouterManager {
         return client;
     }
 
-    MessageRouter register() {
-        return register;
+    MessageRouter possibleClient() {
+        return possibleClient;
     }
 
     MessageRouter server() {

@@ -11,7 +11,7 @@ class ClientAgent extends ConnectivityAgent {
     Lock loginLock = new Lock();
 
 
-    void reconnect(String hostname, int port) {
+    void setReconnectDetail(String hostname, int port) {
         needReconnect = true;
         reconnectHostname = hostname;
         reconnectPort = port;
@@ -50,17 +50,13 @@ class ClientAgent extends ConnectivityAgent {
         close();
     }
 
-    void sendActivity(Object obj) {
+    void sendActivityObject(JsonObject obj) {
+        System.out.println(g.toJson(obj));
         MsgActivityMessage m = new MsgActivityMessage(
                 Settings.getUsername(),
                 Settings.getSecret(),
-                obj
+                g.toJson(obj)
         );
         sendln(m);
-    }
-
-    void sendActivityObject(JsonObject obj) {
-        // todo: may fail when cast types
-        sendActivity(obj);
     }
 }

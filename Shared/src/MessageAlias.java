@@ -83,25 +83,25 @@ class MsgLockAllowed extends MessageUser {
     }
 }
 
-class ObjectJsonObjectConverter {
-    static final Gson g = new Gson();
-
-    static JsonObject convert(Object obj) {
-        JsonElement elm = g.toJsonTree(obj);
-        return (JsonObject) elm;
-    }
-}
+//class ObjectJsonObjectConverter {
+//    static final Gson g = new Gson();
+//
+//    static JsonObject convert(Object obj) {
+//        JsonElement elm = g.toJsonTree(obj);
+//        return (JsonObject) elm;
+//    }
+//}
 
 // secret, username, activity
 class MsgActivityMessage extends MessageActivity {
-    MsgActivityMessage(String username, String secret, Object activity) {
-        super(MessageCommands.ACTIVITY_MESSAGE, secret, username, ObjectJsonObjectConverter.convert(activity));
+    MsgActivityMessage(String username, String secret, String activity) {
+        super(MessageCommands.ACTIVITY_MESSAGE, secret, username, activity);
     }
 }
 
 class MsgActivityBroadcast extends MessageActivityBroadcast {
-    MsgActivityBroadcast(Object activity) {
-        super(MessageCommands.ACTIVITY_BROADCAST, ObjectJsonObjectConverter.convert(activity));
+    MsgActivityBroadcast(String activity) {
+        super(MessageCommands.ACTIVITY_BROADCAST, activity);
     }
 }
 

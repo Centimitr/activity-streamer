@@ -44,9 +44,9 @@ abstract class MessageUser extends MessageSecret {
 }
 
 abstract class MessageActivity extends MessageUser {
-    JsonObject activity;
+    String activity;
 
-    MessageActivity(MessageCommands command, String secret, String username, JsonObject activity) {
+    MessageActivity(MessageCommands command, String secret, String username, String activity) {
         super(command, secret, username);
         this.activity = activity;
     }
@@ -75,9 +75,9 @@ abstract class MessageServerAnnounce extends MessageServer {
 }
 
 abstract class MessageActivityBroadcast extends Message {
-    JsonObject activity;
+    String activity;
 
-    MessageActivityBroadcast(MessageCommands command, JsonObject activity) {
+    MessageActivityBroadcast(MessageCommands command, String activity) {
         super(command);
         this.activity = activity;
     }

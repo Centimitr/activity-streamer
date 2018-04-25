@@ -103,6 +103,10 @@ class MessageContext {
         return states.put(key, value);
     }
 
+    public void delete(String key) {
+        states.remove(key);
+    }
+
     public MessageContext after(String cmd, Consumer<String> callback) {
         if (lastCommand.equals(cmd)) {
             callback.accept(lastCommand);
