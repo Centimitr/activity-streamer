@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class Client extends ClientResponder {
     private static Client clientSolution;
     private TextFrame gui = new TextFrame();
-    private View view = new View();
+//    private View view = new View();
 
     public static Client getInstance() {
         if (clientSolution == null) {
@@ -30,7 +30,7 @@ public class Client extends ClientResponder {
 
     @Override
     public void run() {
-        view.show();
+//        view.show();
         connect(Settings.getRemoteHostname(), Settings.getRemotePort());
     }
 
@@ -68,7 +68,8 @@ public class Client extends ClientResponder {
             Settings.setSecret(secret);
         }
         agent.login(Settings.getUsername(), Settings.getSecret());
-//        gui.present();
+
+        gui.present();
     }
 
     // todo: used to test connectivity, to remove

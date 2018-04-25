@@ -34,6 +34,7 @@ public class Server extends ServerResponder {
                     terminate();
                 });
                 log.info("Authenticate.Start");
+//                conn.sendln(new MsgAuthenticate(Settings.getSecret()));
                 conn.sendln(new MsgAuthenticate(Settings.getSecret()));
             } catch (IOException e) {
                 log.error("Parent.Failed" + Settings.getRemoteHostname() + ":" + Settings.getRemotePort() + " :" + e);

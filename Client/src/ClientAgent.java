@@ -1,5 +1,9 @@
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.Map;
 
 @SuppressWarnings("WeakerAccess")
 class ClientAgent extends ConnectivityAgent {
@@ -51,11 +55,12 @@ class ClientAgent extends ConnectivityAgent {
     }
 
     void sendActivityObject(JsonObject obj) {
-        System.out.println(g.toJson(obj));
+        Type type = new TypeToken<Map<String, String>>() {
+        }.getType();
         MsgActivityMessage m = new MsgActivityMessage(
                 Settings.getUsername(),
                 Settings.getSecret(),
-                g.toJson(obj)
+                g.fromJson(obj, type)
         );
         sendln(m);
     }

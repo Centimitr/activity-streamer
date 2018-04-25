@@ -2,6 +2,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.util.Map;
+
 class MsgLogout extends Message {
     MsgLogout() {
         super(MessageCommands.LOGOUT);
@@ -94,13 +96,13 @@ class MsgLockAllowed extends MessageUser {
 
 // secret, username, activity
 class MsgActivityMessage extends MessageActivity {
-    MsgActivityMessage(String username, String secret, String activity) {
+    MsgActivityMessage(String username, String secret, Map<Object, Object> activity) {
         super(MessageCommands.ACTIVITY_MESSAGE, secret, username, activity);
     }
 }
 
 class MsgActivityBroadcast extends MessageActivityBroadcast {
-    MsgActivityBroadcast(String activity) {
+    MsgActivityBroadcast(Map<Object, Object> activity) {
         super(MessageCommands.ACTIVITY_BROADCAST, activity);
     }
 }

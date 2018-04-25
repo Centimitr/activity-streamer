@@ -93,11 +93,10 @@ abstract class ServerResponder extends Async {
                         return;
                     }
                     try {
-                        JsonObject activity = (new JsonParser()).parse(m.activity).getAsJsonObject();
-                        activity.addProperty("authenticated_user", context.get("username"));
-                        MsgActivityBroadcast broadcast = new MsgActivityBroadcast(
-                                g.toJson(activity)
-                        );
+//                        JsonObject activity = (new JsonParser()).parse(m.activity).getAsJsonObject();
+//                        activity.addProperty("authenticated_user", context.get("username"));
+                        m.activity.put("authenticated_user", context.get("username"));
+                        MsgActivityBroadcast broadcast = new MsgActivityBroadcast(m.activity);
                         cm.servers().broadcast(broadcast);
                         cm.clients().broadcast(broadcast);
                     } catch (JsonSyntaxException e) {
@@ -160,7 +159,7 @@ abstract class ServerResponder extends Async {
                 });
         routers.server()
                 .handle(MessageCommands.ACTIVITY_BROADCAST, context -> {
-                    JsonObject m = context.read();
+                    MsgActivityBroadcast m = context.read(MsgActivityBroadcast.class);
                     cm.servers().exclude(context.connectivity).broadcast(m);
                     cm.clients().broadcast(m);
                 })
