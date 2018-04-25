@@ -91,7 +91,7 @@ public class Server extends ServerResponder {
 
     private void doServerAnnounce() {
         Integer load = cm.clients().size();
-        log.info("Activity.Announce Load: " + load);
+//        log.info("Activity.Announce Load: " + load);
         MsgServerAnnounce m = new MsgServerAnnounce(
                 uuid,
                 Settings.getLocalHostname(),

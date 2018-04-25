@@ -24,12 +24,16 @@ class MessageContext {
     private boolean willClose;
 
     MessageContext(IMessageRouter router) {
+        if (router == null) {
+            log.error("Router should not be null");
+        }
         bindRouter(router);
     }
 
     void bindRouter(IMessageRouter router) {
         this.router = router;
     }
+
     public boolean is(String cmd) {
         return command.equals(cmd);
     }

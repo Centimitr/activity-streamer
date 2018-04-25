@@ -16,6 +16,7 @@ abstract class ServerResponder extends Async {
     Servers servers = new Servers(cm.servers());
     Users users = new Users();
 
+    @SuppressWarnings("Convert2MethodRef")
     ServerResponder() {
         RouterManager routers = cm.routerManager();
         routers.temp()
@@ -80,7 +81,9 @@ abstract class ServerResponder extends Async {
                     MsgActivityBroadcast broadcast = new MsgActivityBroadcast(
                             g.toJson(m.activity)
                     );
+
                     cm.servers().broadcast(broadcast);
+                    cm.clients().broadcast(broadcast);
                 })
                 .handleError(c -> {
 

@@ -22,7 +22,7 @@ public class App {
 
     public static void main(String[] args) {
 
-        log.info("reading command line options");
+        log.info("Reading: command line options");
 
         Options options = new Options();
         options.addOption("u", true, "username");
@@ -63,9 +63,7 @@ public class App {
         }
 
 
-        log.info("starting client");
-
-
+        log.info("Client.Start");
         Client c = Client.getInstance();
     }
 }

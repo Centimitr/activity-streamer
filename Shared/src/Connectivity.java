@@ -21,8 +21,10 @@ public class Connectivity extends Thread {
     private BufferedWriter out;
 
     private boolean open;
+    private boolean redirecting = false;
     private MessageContext context;
     private ArrayList<Runnable> whenClosedCallbacks = new ArrayList<>();
+
 
     Connectivity(String hostname, int port) throws IOException {
         this(new Socket(hostname, port));
@@ -107,11 +109,17 @@ public class Connectivity extends Thread {
         return false;
     }
 
+    public boolean isRedirecting() {
+        return redirecting;
+    }
+
     public boolean redirect(BiFunction<Connectivity, String, Boolean> process) {
+        redirecting = true;
         boolean term = false;
         String msg;
         try {
             while (!term && (msg = in.readLine()) != null) {
+                log.info("Receiveln: " + msg);
                 term = process.apply(this, msg);
             }
         } catch (IOException e) {
@@ -142,12 +150,16 @@ public class Connectivity extends Thread {
         if (open) {
             log.info("Closing: " + Settings.socketAddress(socket));
             try {
+                log.info("0");
                 open = true;
                 in.close();
                 out.close();
+                log.info("1");
                 whenClosedCallbacks.forEach(Runnable::run);
+                log.info("2");
+                log.info("Closed: " + Settings.socketAddress(socket));
             } catch (IOException e) {
-                // already closed?
+//                 already closed?
                 log.error("Exception: when closing " + Settings.socketAddress(socket) + ": " + e);
             }
         }

@@ -26,7 +26,11 @@ class ConnectivitySet extends MessageRouterRepresenter implements IForEachConnec
     }
 
     public synchronized boolean add(Connectivity c) {
-        c.bindRouter(realRouter);
+        if (c.isRedirecting()) {
+            c.bindRouter(realRouter);
+        } else {
+            (new Thread(() -> c.redirect(realRouter))).start();
+        }
         c.whenClosed(() -> remove(c));
         return conns.add(c);
     }
