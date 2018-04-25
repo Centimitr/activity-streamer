@@ -13,7 +13,7 @@ public class View extends Application {
         WebEngine engine = webview.getEngine();
         Scene scene = new Scene(webview, 800, 600);
         stage.setScene(scene);
-        engine.load("http://google.com");
+        engine.load("http://stackoverflow.com");
         stage.show();
     }
 

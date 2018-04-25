@@ -1,6 +1,7 @@
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,7 +35,7 @@ abstract class ServerResponder extends Async {
                 })
                 .handle(MessageCommands.REGISTER, context -> {
                     MsgRegister m = context.read(MsgRegister.class);
-                    log.info("Register: Start:" + m.username + " " + m.secret);
+//                    log.info("Register: Start:" + m.username + " " + m.secret);
 
                     Runnable handleRegisteredRequest = () -> {
                         String info = m.username + " is already registered with the system.";
@@ -45,7 +46,7 @@ abstract class ServerResponder extends Async {
                     boolean anonymous = m.username.equals("anonymous");
                     boolean registered = users.has(m.username);
                     if (registered || anonymous) {
-                        log.info("Register: Local already registered: " + m.username + " " + m.secret);
+//                        log.info("Register: Local already registered: " + m.username + " " + m.secret);
                         handleRegisteredRequest.run();
                         return;
                     }
@@ -55,7 +56,7 @@ abstract class ServerResponder extends Async {
                     cm.servers().broadcast(req);
                     boolean available = rm.wait(m.username, m.secret, servers.num());
                     if (!available) {
-                        log.info("Register: Remote already registered: " + m.username + " " + m.secret);
+//                        log.info("Register: Remote already registered: " + m.username + " " + m.secret);
                         handleRegisteredRequest.run();
                         return;
                     }
@@ -68,7 +69,9 @@ abstract class ServerResponder extends Async {
                     log.info("Register: Success:" + m.username + " " + m.secret);
                 })
                 .handleError(context -> {
+                    log.error("temp: HANDLE ERROR");
                     context.write(new MsgInvalidMessage("INVALID MESSAGE?"));
+                    context.close();
                 });
         routers.client()
                 .handle(MessageCommands.LOGOUT, context -> {
@@ -89,25 +92,46 @@ abstract class ServerResponder extends Async {
                         context.close();
                         return;
                     }
-                    // todo: INVALID_MESSAGE, incorrect in anyway
-                    // todo: need check if the activity(JsonObject) can be marshaled correctly
-                    JsonObject activity = (new JsonParser()).parse(m.activity).getAsJsonObject();
-                    activity.addProperty("authenticated_user", context.get("username"));
-                    MsgActivityBroadcast broadcast = new MsgActivityBroadcast(
-                            g.toJson(activity)
-                    );
-                    cm.servers().broadcast(broadcast);
-                    cm.clients().broadcast(broadcast);
+                    try {
+                        JsonObject activity = (new JsonParser()).parse(m.activity).getAsJsonObject();
+                        activity.addProperty("authenticated_user", context.get("username"));
+                        MsgActivityBroadcast broadcast = new MsgActivityBroadcast(
+                                g.toJson(activity)
+                        );
+                        cm.servers().broadcast(broadcast);
+                        cm.clients().broadcast(broadcast);
+                    } catch (JsonSyntaxException e) {
+                        MsgInvalidMessage res = new MsgInvalidMessage("activity object json syntax error");
+                        context.write(res);
+                        context.close();
+                    }
                 })
-                .handleError(c -> {
-
+                .handleError(context -> {
+                    log.error("client: HANDLE ERROR");
+                    context.write(new MsgInvalidMessage("INVALID MESSAGE?"));
+                    context.close();
                 });
         routers.parent()
                 .handle(MessageCommands.AUTHENTICATION_FAIL, context -> {
                     context.close();
                 })
-                .handleError(c -> {
-
+                .handle(MessageCommands.INVALID_MESSAGE, context -> {
+                    log.error("RCV INVALID MESSAGE");
+                })
+                .handleError(context -> {
+                    log.error("parent: HANDLE ERROR");
+                    context.write(new MsgInvalidMessage("INVALID MESSAGE?"));
+                    context.close();
+                });
+        routers.child()
+                .handle(MessageCommands.AUTHENTICATE, context -> {
+                    context.write(new MsgInvalidMessage("Server already authenticated"));
+                    context.close();
+                })
+                .handleError(context -> {
+                    log.error("child: HANDLE ERROR");
+                    context.write(new MsgInvalidMessage("INVALID MESSAGE?"));
+                    context.close();
                 });
 
         // group routing
@@ -116,8 +140,6 @@ abstract class ServerResponder extends Async {
                     MsgLogin m = context.read(MsgLogin.class);
                     boolean anonymous = m.username.equals("anonymous");
                     boolean match = users.match(m.username, m.secret);
-                    log.info(anonymous);
-                    log.info(match);
                     if (!match && !anonymous) {
                         context.write(new MsgLoginFailed("attempt to login with wrong secret"));
                         context.close();

@@ -62,9 +62,6 @@ class MessageContext {
     }
 
     public synchronized boolean process(Connectivity c, String msg) {
-        {
-            System.out.println("Msg: " + msg);
-        }
         if (c.isClosed()) {
             return true;
         }
