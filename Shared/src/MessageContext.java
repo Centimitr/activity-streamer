@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 @SuppressWarnings("WeakerAccess")
@@ -74,11 +75,14 @@ class MessageContext {
     }
 
     public void handle(boolean valid) {
-        Consumer<MessageContext> handler = valid ?
-                router.getHandler(connectivity, command) :
-                router.getErrorHandler(connectivity);
+        BiConsumer<MessageContext,String> errorHandler = router.getErrorHandler(connectivity);
+        if (!valid) {
+            errorHandler.accept(this, "Parse Error");
+        }
+        Consumer<MessageContext> handler = router.getHandler(connectivity, command);
         if (handler == null) {
             log.warn("No handler for message:" + g.toJson(j));
+            errorHandler.accept(this,"No Command");
             return;
         }
         handler.accept(this);

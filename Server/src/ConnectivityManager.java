@@ -1,6 +1,7 @@
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 class ConnectivityManager {
@@ -91,7 +92,7 @@ class CentralRouter implements IMessageRouter {
         }
         for (ConnectivitySetGroup group : compounds) {
             if (group.contains(c)) {
-                if (group.router().support(command)) {
+                if (group.router()!=null && group.router().support(command)) {
                     return group.router().getHandler(c, command);
                 }
             }
@@ -100,7 +101,7 @@ class CentralRouter implements IMessageRouter {
     }
 
     @Override
-    public Consumer<MessageContext> getErrorHandler(Connectivity c) {
+    public BiConsumer<MessageContext,String> getErrorHandler(Connectivity c) {
         for (ConnectivitySet set : primitives) {
             if (set.contains(c)) {
                 return set.router().getErrorHandler(c);
@@ -108,6 +109,7 @@ class CentralRouter implements IMessageRouter {
         }
         return null;
     }
+
 }
 
 class RouterManager {
