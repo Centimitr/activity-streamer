@@ -1,3 +1,4 @@
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public interface IMessageRouter {
@@ -6,5 +7,5 @@ public interface IMessageRouter {
 
     Consumer<MessageContext> getHandler(Connectivity conn, String command);
 
-    Consumer<MessageContext> getErrorHandler(Connectivity conn);
+    BiConsumer<MessageContext,String> getErrorHandler(Connectivity conn);
 }

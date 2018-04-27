@@ -6,6 +6,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.UUID;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 @SuppressWarnings("WeakerAccess")
 abstract class ServerResponder extends Async {
@@ -21,6 +23,24 @@ abstract class ServerResponder extends Async {
     @SuppressWarnings({"CodeBlock2Expr", "Convert2MethodRef"})
     ServerResponder() {
         RouterManager routers = cm.routerManager();
+        BiConsumer<MessageContext,String> errorHandle = (context, error) -> {
+            String info;
+            switch (error) {
+                case "Parse Error":
+                    info = "Json Parse Error while parsing message.";
+                    break;
+                case "Syntax Error":
+                    info = "Message Syntax Error.";
+                    break;
+                default:
+                    info = "Command not support.";
+                    break;
+            }
+            MsgInvalidMessage res = new MsgInvalidMessage(info);
+            context.write(res);
+            context.close();
+        };
+
         // todo: handleError need an error parameter
         routers.temp()
                 .handle(MessageCommands.AUTHENTICATE, context -> {
@@ -68,10 +88,23 @@ abstract class ServerResponder extends Async {
                     cm.temp().transfer(context.connectivity, cm.clients());
                     log.info("Register: Success:" + m.username + " " + m.secret);
                 })
-                .handleError(context -> {
+                .handleError((context, error) -> {
                     log.error("temp: HANDLE ERROR");
-                    context.write(new MsgInvalidMessage("INVALID MESSAGE?"));
-                    context.close();
+                    String command = context.command;
+                    switch (command) {
+                        case "ACTIVITY_BROADCAST":
+                        case "SERVER_ANNOUNCE":
+                        case "LOCK_REQUEST":
+                        case "LOCK_ALLOWED":
+                        case "LOCK_DENIED":
+                            String info = "Message received from unauthenticated server.";
+                            MsgInvalidMessage res = new MsgInvalidMessage(info);
+                            context.write(res);
+                            context.close();
+                            break;
+                        default:
+                            errorHandle.accept(context,error);
+                    }
                 });
         routers.client()
                 .handle(MessageCommands.LOGOUT, context -> {
@@ -105,10 +138,14 @@ abstract class ServerResponder extends Async {
                         context.close();
                     }
                 })
-                .handleError(context -> {
-                    log.error("client: HANDLE ERROR");
-                    context.write(new MsgInvalidMessage("INVALID MESSAGE?"));
+                .handle(MessageCommands.REGISTER, context -> {
+                    MsgInvalidMessage res = new MsgInvalidMessage("User has already logged in.");
+                    context.write(res);
                     context.close();
+                })
+                .handleError((context,error) -> {
+                    log.error("client: HANDLE ERROR");
+                    errorHandle.accept(context,error);
                 });
         routers.parent()
                 .handle(MessageCommands.AUTHENTICATION_FAIL, context -> {
@@ -117,20 +154,18 @@ abstract class ServerResponder extends Async {
                 .handle(MessageCommands.INVALID_MESSAGE, context -> {
                     log.error("RCV INVALID MESSAGE");
                 })
-                .handleError(context -> {
+                .handleError((context,error) -> {
                     log.error("parent: HANDLE ERROR");
-                    context.write(new MsgInvalidMessage("INVALID MESSAGE?"));
-                    context.close();
+                    errorHandle.accept(context,error);
                 });
         routers.child()
                 .handle(MessageCommands.AUTHENTICATE, context -> {
                     context.write(new MsgInvalidMessage("Server already authenticated"));
                     context.close();
                 })
-                .handleError(context -> {
+                .handleError((context,error) -> {
                     log.error("child: HANDLE ERROR");
-                    context.write(new MsgInvalidMessage("INVALID MESSAGE?"));
-                    context.close();
+                    errorHandle.accept(context,error);
                 });
 
         // group routing

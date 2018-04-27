@@ -56,12 +56,32 @@ abstract class ClientResponder extends Async {
                     agent.eval(String.format("addMessage('%s')", g.toJson(m.activity)));
                 })
 
+                .handle(MessageCommands.INVALID_MESSAGE, context -> {
+                    MsgInvalidMessage m = context.read(MsgInvalidMessage.class);
+                    log.info("Rcv: Invalid Message: " + g.toJson(m.info));
+                    context.close();
+                })
+
                 .handle(MessageCommands.AUTHENTICATION_FAIL, context -> {
                     log.info("Activity broadcast authentication fail.");
                     context.close();
                 })
-                .handleError(context -> {
-
+                .handleError((context,error) -> {
+                    String info;
+                    switch (error) {
+                        case "Parse Error":
+                            info = "Json Parse Error while parsing message.";
+                            break;
+                        case "Syntax Error":
+                            info = "Message Syntax Error.";
+                            break;
+                        default:
+                            info = "Command not support.";
+                            break;
+                    }
+                    MsgInvalidMessage res = new MsgInvalidMessage(info);
+                    context.write(res);
+                    context.close();
                 });
     }
 }
