@@ -4,7 +4,7 @@ import java.util.Scanner;
 @SuppressWarnings("WeakerAccess")
 public class Client extends ClientResponder {
     private static Client clientSolution;
-    private TextFrame gui = new TextFrame();
+//    private TextFrame gui = new TextFrame();
 //    private View view = new View();
 
     public static Client getInstance() {
@@ -35,6 +35,8 @@ public class Client extends ClientResponder {
     }
 
     private void connect(String hostname, Integer port) {
+        Settings.setRemoteHostname(hostname);
+        Settings.setRemotePort(port);
         try {
             connectivity = new Connectivity(hostname, port);
             agent.bind(connectivity);
@@ -59,17 +61,20 @@ public class Client extends ClientResponder {
     }
 
     private void whenConnected() {
-
         boolean anonymous = Settings.getUsername().equals("anonymous");
         boolean needRegister = Settings.getSecret() == null && !anonymous;
+        agent.eval(String.format("setLoaded(true, '%s', '%s')",
+//                needRegister,
+                Settings.getUsername(),
+                Settings.getSecret()
+        ));
         if (needRegister) {
             String secret = agent.register(Settings.getUsername());
             log.info("Your secret is: " + secret);
             Settings.setSecret(secret);
         }
         agent.login(Settings.getUsername(), Settings.getSecret());
-
-        gui.present();
+//        gui.present();
     }
 
     // todo: used to test connectivity, to remove

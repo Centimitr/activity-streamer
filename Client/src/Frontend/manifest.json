@@ -1,0 +1,8 @@
+{
+  "short_name": "COMP90015",
+  "name": "COMP90015 - Client User Interface",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}

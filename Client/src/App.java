@@ -1,3 +1,4 @@
+import javafx.application.Application;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -8,7 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @SuppressWarnings({"Duplicates", "ConstantConditions"})
-public class App {
+public class App extends View {
 
     private static final Logger log = LogManager.getLogger();
 
@@ -65,5 +66,6 @@ public class App {
 
         log.info("Client.Start");
         Client c = Client.getInstance();
+        Application.launch();
     }
 }

@@ -21,28 +21,39 @@ abstract class ClientResponder extends Async {
                 .handle(MessageCommands.REGISTER_SUCCESS, context -> {
                     agent.registerLock.unlock();
                     log.info("Register successfully!");
+                    agent.eval(String.format("setRegistered(%s, '%s', '%s')",
+                            true,
+                            Settings.getUsername(),
+                            Settings.getSecret()
+                    ));
                 })
 
                 .handle(MessageCommands.REGISTER_FAILED, context -> {
                     log.info("Register Failed!");
                     context.close();
+                    agent.eval(String.format("setRegistered(%s, '%s', '%s')",
+                            false,
+                            Settings.getUsername(),
+                            Settings.getSecret()
+                    ));
                 })
 
                 .handle(MessageCommands.LOGIN_SUCCESS, context -> {
                     agent.loginLock.unlock();
                     log.info("Login successfully!");
+                    agent.eval(String.format("setLoggedIn(%s, '%s', '%s')", true, Settings.getRemoteHostname(), Settings.getRemotePort()));
                 })
 
                 .handle(MessageCommands.LOGIN_FAILED, context -> {
                     log.info("Login Failed!");
+                    agent.eval(String.format("setLoggedIn(%s, '%s', '%s')", false, Settings.getRemoteHostname(), Settings.getRemotePort()));
                     context.close();
                 })
 
                 .handle(MessageCommands.ACTIVITY_BROADCAST, context -> {
                     MsgActivityBroadcast m = context.read(MsgActivityBroadcast.class);
                     log.info("Rcv Broadcast: " + g.toJson(m.activity));
-                    // todo: print to GUI
-                    // todo: may need to apply filter of sending activity objects
+                    agent.eval(String.format("addMessage('%s')", g.toJson(m.activity)));
                 })
 
                 .handle(MessageCommands.AUTHENTICATION_FAIL, context -> {
