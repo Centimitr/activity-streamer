@@ -47,7 +47,6 @@ public class Client extends ClientResponder {
                 } else {
                     log.info("exception exit");
                 }
-//                gui.dismiss();
                 agent.unbind();
                 if (normalExit && agent.needReconnect()) {
                     connect(agent.reconnectHostname, agent.reconnectPort);
@@ -63,11 +62,7 @@ public class Client extends ClientResponder {
     private void whenConnected() {
         boolean anonymous = Settings.getUsername().equals("anonymous");
         boolean needRegister = Settings.getSecret() == null && !anonymous;
-        agent.eval(String.format("setLoaded(true, '%s', '%s')",
-//                needRegister,
-                Settings.getUsername(),
-                Settings.getSecret()
-        ));
+        agent.uiSetLoaded(needRegister);
         if (needRegister) {
             String secret = agent.register(Settings.getUsername());
             log.info("Your secret is: " + secret);

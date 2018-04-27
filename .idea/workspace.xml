@@ -2,13 +2,21 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2bae8d95-19df-4f10-8dac-d5664eef7352" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/shixiao.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/shixiao.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/src/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/Client/src/App.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Client/src/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/Client/src/Client.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Client/src/ClientAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/Client/src/ClientAgent.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Client/src/ClientResponder.java" beforeDir="false" afterPath="$PROJECT_DIR$/Client/src/ClientResponder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/src/Frontend/asset-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/Client/src/Frontend/asset-manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/src/Frontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/Client/src/Frontend/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/src/Frontend/service-worker.js" beforeDir="false" afterPath="$PROJECT_DIR$/Client/src/Frontend/service-worker.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/src/Frontend/static/css/main.1b763ee9.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/src/Frontend/static/css/main.1b763ee9.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/src/Frontend/static/js/main.f88ace96.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/src/Frontend/static/js/main.f88ace96.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/src/TextFrame.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Client/src/View.java" beforeDir="false" afterPath="$PROJECT_DIR$/Client/src/View.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/src/ServerResponder.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server/src/ServerResponder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shared/src/MessageContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/Shared/src/MessageContext.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -25,11 +33,29 @@
       <file leaf-file-name="View.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Client/src/View.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="416">
-              <caret line="24" column="37" lean-forward="true" selection-start-line="24" selection-start-column="37" selection-end-line="24" selection-end-column="37" />
+            <state relative-caret-position="20">
+              <caret line="7" selection-start-line="7" selection-end-line="7" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Client.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Client/src/Client.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="116">
+              <caret line="66" column="67" selection-start-line="66" selection-start-column="67" selection-end-line="66" selection-end-column="67" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ClientResponder.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Client/src/ClientResponder.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="72">
+              <caret line="5" column="4" selection-start-line="5" selection-start-column="4" selection-end-line="5" selection-end-column="4" />
             </state>
           </provider>
         </entry>
@@ -49,9 +75,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>remove(</find>
-      <find>MsgI</find>
-      <find>uuid</find>
       <find>anonymous</find>
       <find>r</find>
       <find>REDIRE</find>
@@ -77,22 +100,25 @@
       <find>activity</find>
       <find>g.fromjson</find>
       <find>Map</find>
-      <find>String, String</find>
-      <find>login succe</find>
+      <find />
+      <find />
+      <find>responder</find>
+      <find>reply</find>
+      <find>eval</find>
     </findStrings>
     <replaceStrings>
       <replace>ProtocolSecret</replace>
       <replace>ProtocolInfo</replace>
       <replace>Message</replace>
-      <replace>case &quot;</replace>
+      <replace />
       <replace>:</replace>
-      <replace>} else if (mp.is(&quot;</replace>
-      <replace>&quot;) {</replace>
-      <replace>)) {</replace>
+      <replace />
+      <replace />
+      <replace />
       <replace>,</replace>
       <replace>Consumer&lt;MessageParser&gt;</replace>
-      <replace>MessageCommands command;</replace>
-      <replace>abstract class</replace>
+      <replace />
+      <replace />
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -141,22 +167,22 @@
         <option value="$PROJECT_DIR$/Server/src/ConnectivityManager.java" />
         <option value="$PROJECT_DIR$/Server/src/Users.java" />
         <option value="$PROJECT_DIR$/Shared/src/SingleConnectivitySet.java" />
-        <option value="$PROJECT_DIR$/Shared/src/MessageContext.java" />
         <option value="$PROJECT_DIR$/Shared/src/ConnectivitySet.java" />
         <option value="$PROJECT_DIR$/Shared/src/Connectivity.java" />
         <option value="$PROJECT_DIR$/Shared/src/Message.java" />
         <option value="$PROJECT_DIR$/Shared/src/MessageAlias.java" />
         <option value="$PROJECT_DIR$/Client/src/TextFrame.java" />
         <option value="$PROJECT_DIR$/Server/src/Server.java" />
-        <option value="$PROJECT_DIR$/Server/src/ServerResponder.java" />
         <option value="$PROJECT_DIR$/Client/src/App.java" />
         <option value="$PROJECT_DIR$/Client/src/Frontend/index.html" />
         <option value="$PROJECT_DIR$/Client/src/FrontendAPI.java" />
         <option value="$PROJECT_DIR$/Shared/src/Lock.java" />
-        <option value="$PROJECT_DIR$/Client/src/ClientResponder.java" />
-        <option value="$PROJECT_DIR$/Client/src/ClientAgent.java" />
-        <option value="$PROJECT_DIR$/Client/src/Client.java" />
         <option value="$PROJECT_DIR$/Client/src/View.java" />
+        <option value="$PROJECT_DIR$/Server/src/ServerResponder.java" />
+        <option value="$PROJECT_DIR$/Shared/src/MessageContext.java" />
+        <option value="$PROJECT_DIR$/Client/src/Client.java" />
+        <option value="$PROJECT_DIR$/Client/src/ClientAgent.java" />
+        <option value="$PROJECT_DIR$/Client/src/ClientResponder.java" />
       </list>
     </option>
   </component>
@@ -240,6 +266,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="AndroidView" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -274,7 +301,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="AndroidView" />
       <pane id="PackagesPane" />
     </panes>
   </component>
@@ -318,19 +344,19 @@
     <configuration name="ClientLA" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="App" />
       <module name="Client" />
-      <option name="PROGRAM_PARAMETERS" value="-u cm001 -rh localhost -rp 7001 -s v87shajevk85o4qug27hi6ffpm" />
+      <option name="PROGRAM_PARAMETERS" value="-u cm001 -rh localhost -rp 7000 " />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     </configuration>
     <configuration name="ClientLA2" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="App" />
       <module name="Client" />
-      <option name="PROGRAM_PARAMETERS" value="-u cm002 -rh localhost -rp 7001 -s 61v5inivn6hmdg3qhhchkvtotl" />
+      <option name="PROGRAM_PARAMETERS" value="-u cm002 -rh localhost -rp 7001" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     </configuration>
     <configuration name="ClientLA3" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="App" />
       <module name="Client" />
-      <option name="PROGRAM_PARAMETERS" value="-u cm003 -rh localhost -rp 7001 -s abkbp3hc9farm6j2lnoj636lms" />
+      <option name="PROGRAM_PARAMETERS" value="-u cm003 -rh localhost -rp 7001 " />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     </configuration>
     <configuration name="ClientLA4" type="Application" factoryName="Application">
@@ -366,7 +392,7 @@
     <configuration name="Server_ConnectAaron" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="App" />
       <module name="Server" />
-      <option name="PROGRAM_PARAMETERS" value="-rp 3781 -s gen1p85md2qnq0d59qll3fbcoa -rh sunrise.cis.unimelb.edu.au -lp 7000" />
+      <option name="PROGRAM_PARAMETERS" value="-rp 3781 -s gen1p85md2qnq0d59qll3fbcoa -rh sunrise.cis.unimelb.edu.au -lp 7000 -lh localhost" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     </configuration>
     <configuration name="Server_ConnectLocal" type="Application" factoryName="Application">
@@ -461,11 +487,12 @@
       <workItem from="1524623993733" duration="20050000" />
       <workItem from="1524650508036" duration="5352000" />
       <workItem from="1524656723527" duration="4184000" />
+      <workItem from="1524855856087" duration="2451000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="290838000" />
+    <option name="totallyTimeSpent" value="293509000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -478,7 +505,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="22" width="1680" height="960" extended-state="0" />
-    <editor active="true" />
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="bottom" id="TODO" order="5" weight="0.32908458" />
@@ -486,16 +512,15 @@
       <window_info anchor="right" id="Palette&#9;" order="4" />
       <window_info id="Image Layers" order="2" />
       <window_info anchor="right" id="Capture Analysis" order="5" />
-      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" weight="0.3295711" />
+      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="right" id="Maven Projects" order="6" />
       <window_info anchor="bottom" id="Database Changes" order="8" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info active="true" anchor="right" x="139" y="288" width="1181" height="831" id="Run" order="9" side_tool="true" type="WINDOWED" visible="true" weight="0.20833333" />
-      <window_info anchor="right" id="Coverage" side_tool="true" weight="0.3297619" />
+      <window_info active="true" anchor="right" x="232" y="191" width="1215" height="853" id="Run" order="9" side_tool="true" type="WINDOWED" visible="true" weight="0.20833333" />
       <window_info anchor="bottom" id="Terminal" order="10" weight="0.3236677" />
       <window_info id="Capture Tool" order="6" />
       <window_info id="Designer" order="3" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18095239" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.19107144" />
       <window_info anchor="right" id="Database" order="7" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3291536" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -504,61 +529,40 @@
       <window_info anchor="right" id="Theme Preview" order="8" />
       <window_info id="Favorites" order="5" side_tool="true" />
       <window_info anchor="bottom" id="Debug" order="2" weight="0.3939052" />
-      <window_info anchor="right" id="Palette" order="3" />
-      <window_info id="Designer" order="3" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="Capture Analysis" order="5" />
+      <window_info anchor="right" id="Coverage" order="10" side_tool="true" weight="0.3297619" />
       <window_info anchor="bottom" id="Inspection" order="4" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="bottom" id="Terminal" order="10" weight="0.3236677" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="5" weight="0.32908458" />
-      <window_info anchor="bottom" id="Database Changes" order="8" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info anchor="right" x="441" y="175" width="1215" height="853" id="Run" order="9" side_tool="true" type="WINDOWED" visible="true" weight="0.20833333" />
-      <window_info id="Image Layers" order="2" />
-      <window_info id="Capture Tool" order="6" />
-      <window_info id="UI Designer" order="4" />
-      <window_info anchor="bottom" id="Debug" order="2" weight="0.3939052" />
-      <window_info anchor="right" id="Theme Preview" order="8" />
-      <window_info anchor="right" id="Database" order="7" />
-      <window_info anchor="right" id="Palette&#9;" order="4" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Cvs" order="3" weight="0.25" />
-      <window_info id="Favorites" order="5" side_tool="true" />
-      <window_info anchor="bottom" id="Messages" order="6" weight="0.14785554" />
-      <window_info anchor="right" id="Maven Projects" order="6" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.19107144" />
     </layout>
     <layout-to-restore>
       <window_info anchor="right" id="Palette" order="3" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32844242" />
+      <window_info anchor="bottom" id="Version Control" order="9" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Capture Analysis" order="5" />
       <window_info active="true" anchor="right" x="436" y="603" width="1181" height="672" id="Run" order="9" side_tool="true" type="WINDOWED" visible="true" weight="0.20833333" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="right" id="Theme Preview" order="8" />
+      <window_info anchor="bottom" id="Messages" order="6" weight="0.14785554" />
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.11875" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="right" id="Theme Preview" order="8" />
-      <window_info anchor="bottom" id="TODO" order="5" weight="0.32908458" />
+      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="bottom" id="Database Changes" order="8" show_stripe_button="false" />
+      <window_info anchor="bottom" id="TODO" order="5" weight="0.32908458" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
-      <window_info anchor="bottom" id="Cvs" order="3" weight="0.25" />
       <window_info id="UI Designer" order="4" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32844242" />
       <window_info anchor="bottom" id="Debug" order="2" weight="0.3939052" />
-      <window_info anchor="right" id="Database" order="7" />
       <window_info anchor="right" id="Palette&#9;" order="4" />
       <window_info anchor="bottom" id="Terminal" order="10" weight="0.3236677" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" weight="0.3295711" />
       <window_info anchor="bottom" id="Inspection" order="4" weight="0.4" />
-      <window_info anchor="bottom" id="Version Control" order="9" />
+      <window_info anchor="bottom" id="Cvs" order="3" weight="0.25" />
       <window_info id="Capture Tool" order="6" />
-      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
-      <window_info anchor="bottom" id="Messages" order="6" weight="0.14785554" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="right" id="Database" order="7" />
       <window_info anchor="right" id="Maven Projects" order="6" />
       <window_info id="Favorites" order="5" side_tool="true" />
     </layout-to-restore>
@@ -601,10 +605,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="342">
           <caret line="1718" column="23" selection-start-line="1718" selection-start-column="23" selection-end-line="1718" selection-end-column="23" />
-          <folding>
-            <element signature="e#74377#74378#0" expanded="true" />
-            <element signature="e#74426#74427#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -880,36 +880,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Shared/src/MessageContext.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="476">
-          <caret line="118" selection-start-line="118" selection-end-line="118" />
-          <folding>
-            <element signature="method#parse#0;class#MessageContext#0" />
-            <element signature="method#clearState#0;class#MessageContext#0" />
-            <element signature="method#handleStateChange#0;class#MessageContext#0" />
-            <element signature="method#after#0;class#MessageContext#0" />
-            <element signature="e#3013#3014#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Server/src/Server.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="322">
-          <caret line="34" column="19" lean-forward="true" selection-start-line="34" selection-start-column="19" selection-end-line="34" selection-end-column="19" />
-          <folding>
-            <element signature="method#getInstance#0;class#Server#0" />
-            <element signature="method#Server#0;class#Server#0" />
-            <element signature="method#startListen#0;class#Server#0" />
-            <element signature="method#handleIncomingConn#0;class#Server#0" />
-            <element signature="method#doActivity#0;class#Server#0" />
-            <element signature="method#doServerAnnounce#0;class#Server#0" />
-            <element signature="method#terminate#0;class#Server#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Shared/src/MessageAlias.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="538">
@@ -933,59 +903,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Client/src/App.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="264">
-          <caret line="11" column="13" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Shared/src/Message.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="269">
-          <caret line="48" column="7" selection-start-line="48" selection-start-column="4" selection-end-line="48" selection-end-column="7" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Server/src/ServerResponder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-761">
-          <caret line="79" column="40" selection-start-line="79" selection-start-column="40" selection-end-line="79" selection-end-column="40" />
-          <folding>
-            <element signature="e#928#1459#0" />
-            <element signature="e#1511#3359#0" />
-            <element signature="e#1731#2016#0" />
-            <element signature="e#3390#3588#0" />
-            <element signature="e#3664#3731#0" />
-            <element signature="e#4691#4794#0" />
-            <element signature="e#5507#5707#0" />
-            <element signature="e#5796#5863#0" />
-            <element signature="e#5922#6006#0" />
-            <element signature="e#6037#6237#0" />
-            <element signature="e#6318#6475#0" />
-            <element signature="e#6506#6705#0" />
-            <element signature="e#6814#8067#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Client/src/FrontendAPI.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="26" lean-forward="true" selection-start-column="26" selection-end-column="26" />
-          <folding>
-            <element signature="e#64#65#0" expanded="true" />
-            <element signature="e#85#86#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/Client/src/FrontendAPI.java" />
     <entry file="file://$PROJECT_DIR$/Shared/src/Lock.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="96">
@@ -1000,10 +918,113 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Client/src/TextFrame.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-820">
+          <caret line="40" column="42" selection-start-line="40" selection-start-column="42" selection-end-line="40" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Server/src/Server.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="524">
+          <caret line="77" lean-forward="true" selection-start-line="77" selection-end-line="77" />
+          <folding>
+            <element signature="method#getInstance#0;class#Server#0" />
+            <element signature="method#Server#0;class#Server#0" />
+            <element signature="method#startListen#0;class#Server#0" />
+            <element signature="method#handleIncomingConn#0;class#Server#0" />
+            <element signature="method#doActivity#0;class#Server#0" />
+            <element signature="method#doServerAnnounce#0;class#Server#0" />
+            <element signature="method#terminate#0;class#Server#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Shared/src/MessageContext.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="480">
+          <caret line="39" column="18" selection-start-line="39" selection-start-column="18" selection-end-line="39" selection-end-column="18" />
+          <folding>
+            <element signature="method#MessageContext#0;class#MessageContext#0" />
+            <element signature="method#parse#0;class#MessageContext#0" />
+            <element signature="method#clearState#0;class#MessageContext#0" />
+            <element signature="method#handleStateChange#0;class#MessageContext#0" />
+            <element signature="method#process#0;class#MessageContext#0" />
+            <element signature="method#handle#0;class#MessageContext#0" />
+            <element signature="e#2516#2550#0" />
+            <element signature="method#after#0;class#MessageContext#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Server/src/ServerResponder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="465">
+          <caret line="180" column="30" selection-start-line="180" selection-start-column="30" selection-end-line="180" selection-end-column="30" />
+          <folding>
+            <element signature="e#737#795#1" expanded="true" />
+            <element signature="e#936#1513#0" />
+            <element signature="e#1593#2124#0" />
+            <element signature="e#2176#4024#0" />
+            <element signature="e#2396#2681#0" />
+            <element signature="e#4055#4899#0" />
+            <element signature="e#4975#5042#0" />
+            <element signature="e#5102#6787#0" />
+            <element signature="e#6002#6105#0" />
+            <element signature="e#6839#7044#0" />
+            <element signature="e#7075#7232#0" />
+            <element signature="e#7321#7388#0" />
+            <element signature="e#7447#7531#0" />
+            <element signature="e#7562#7719#0" />
+            <element signature="e#7800#7957#0" />
+            <element signature="e#7988#8144#0" />
+            <element signature="e#9594#9835#0" />
+            <element signature="e#9894#10159#0" />
+            <element signature="e#10215#11172#0" />
+            <element signature="e#11228#11348#0" />
+            <element signature="e#11403#11852#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Shared/src/Message.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="522">
+          <caret line="79" column="4" selection-start-line="79" selection-start-column="4" selection-end-line="79" selection-end-column="23" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Client/src/ClientAgent.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="284">
-          <caret line="86" column="37" lean-forward="true" selection-start-line="86" selection-start-column="37" selection-end-line="86" selection-end-column="37" />
+        <state relative-caret-position="462">
+          <caret line="59" column="11" lean-forward="true" selection-start-line="59" selection-start-column="11" selection-end-line="59" selection-end-column="11" />
+          <folding>
+            <element signature="e#1903#1904#0" expanded="true" />
+            <element signature="e#1978#1979#0" expanded="true" />
+            <element signature="method#setReconnectDetail#0;class#ClientAgent#0" />
+            <element signature="method#needReconnect#0;class#ClientAgent#0" />
+            <element signature="method#logout#0;class#ClientAgent#0" />
+            <element signature="method#sendActivityObject#0;class#ClientAgent#0" />
+            <element signature="method#send#0;class#ClientAgent#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Client/src/ClientResponder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="72">
+          <caret line="5" column="4" selection-start-line="5" selection-start-column="4" selection-end-line="5" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Client/src/App.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="572">
+          <caret line="66" column="33" lean-forward="true" selection-start-line="66" selection-start-column="33" selection-end-line="66" selection-end-column="33" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1012,32 +1033,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Client/src/Client.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="356">
-          <caret line="81" column="36" lean-forward="true" selection-start-line="81" selection-start-column="36" selection-end-line="81" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Client/src/ClientResponder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="284">
-          <caret line="50" column="18" lean-forward="true" selection-start-line="50" selection-start-column="18" selection-end-line="50" selection-end-column="18" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Client/src/TextFrame.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="474">
-          <caret line="97" column="19" selection-start-line="97" selection-start-column="19" selection-end-line="97" selection-end-column="19" />
+        <state relative-caret-position="116">
+          <caret line="66" column="67" selection-start-line="66" selection-start-column="67" selection-end-line="66" selection-end-column="67" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Client/src/View.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="416">
-          <caret line="24" column="37" lean-forward="true" selection-start-line="24" selection-start-column="37" selection-end-line="24" selection-end-column="37" />
+        <state relative-caret-position="20">
+          <caret line="7" selection-start-line="7" selection-end-line="7" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

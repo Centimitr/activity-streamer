@@ -5,6 +5,7 @@ import com.google.gson.JsonSyntaxException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -21,7 +22,7 @@ class MessageContext {
     public String command;
     public String lastCommand;
     private JsonObject j;
-    private String reply;
+    private ArrayList<String> replies;
     private boolean willClose;
 
     MessageContext(IMessageRouter router) {
@@ -52,14 +53,12 @@ class MessageContext {
 
     private void clearState() {
         willClose = false;
-        reply = null;
+        replies = new ArrayList<>();
     }
 
     private void handleStateChange() {
         lastCommand = command;
-        if (reply != null) {
-            connectivity.sendln(reply);
-        }
+        replies.forEach(reply -> connectivity.sendln(reply));
     }
 
     public synchronized boolean process(Connectivity c, String msg) {
@@ -75,14 +74,14 @@ class MessageContext {
     }
 
     public void handle(boolean valid) {
-        BiConsumer<MessageContext,String> errorHandler = router.getErrorHandler(connectivity);
+        BiConsumer<MessageContext, String> errorHandler = router.getErrorHandler(connectivity);
         if (!valid) {
             errorHandler.accept(this, "Parse Error");
         }
         Consumer<MessageContext> handler = router.getHandler(connectivity, command);
         if (handler == null) {
             log.warn("No handler for message:" + g.toJson(j));
-            errorHandler.accept(this,"No Command");
+            errorHandler.accept(this, "No Command");
             return;
         }
         handler.accept(this);
@@ -124,7 +123,7 @@ class MessageContext {
     }
 
     public void write(String reply) {
-        this.reply = reply;
+        this.replies.add(reply);
     }
 
     public void write(Object obj) {

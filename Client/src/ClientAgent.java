@@ -40,6 +40,38 @@ public class ClientAgent extends ConnectivityAgent {
         exec(script);
     }
 
+    /*
+        UI Methods
+     */
+
+    void uiSetLoaded(boolean needRegister) {
+        eval(String.format("setLoaded(%s, '%s', '%s')",
+                needRegister,
+                Settings.getUsername(),
+                Settings.getSecret()
+        ));
+    }
+
+    void uiSetRegistered(boolean success) {
+        eval(String.format("setRegistered(%s, '%s', '%s')",
+                success,
+                Settings.getUsername(),
+                Settings.getSecret()
+        ));
+    }
+
+    void uiSetLoggedIn(boolean success) {
+        eval(String.format("setLoggedIn(%s, '%s', '%s')", success, Settings.getRemoteHostname(), Settings.getRemotePort()));
+    }
+
+    void uiAddMessage(Map<Object, Object> activity) {
+        eval(String.format("addMessage('%s')", g.toJson(activity)));
+    }
+
+    /*
+        Reconnect
+     */
+
     void setReconnectDetail(String hostname, int port) {
         needReconnect = true;
         reconnectHostname = hostname;

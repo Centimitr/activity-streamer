@@ -23,7 +23,7 @@ abstract class ServerResponder extends Async {
     @SuppressWarnings({"CodeBlock2Expr", "Convert2MethodRef"})
     ServerResponder() {
         RouterManager routers = cm.routerManager();
-        BiConsumer<MessageContext,String> errorHandle = (context, error) -> {
+        BiConsumer<MessageContext, String> commonErrorHandler = (context, error) -> {
             String info;
             switch (error) {
                 case "Parse Error":
@@ -41,7 +41,6 @@ abstract class ServerResponder extends Async {
             context.close();
         };
 
-        // todo: handleError need an error parameter
         routers.temp()
                 .handle(MessageCommands.AUTHENTICATE, context -> {
                     MsgAuthenticate m = context.read(MsgAuthenticate.class);
@@ -89,7 +88,7 @@ abstract class ServerResponder extends Async {
                     log.info("Register: Success:" + m.username + " " + m.secret);
                 })
                 .handleError((context, error) -> {
-                    log.error("temp: HANDLE ERROR");
+                    log.info("temp error: ", error);
                     String command = context.command;
                     switch (command) {
                         case "ACTIVITY_BROADCAST":
@@ -103,7 +102,7 @@ abstract class ServerResponder extends Async {
                             context.close();
                             break;
                         default:
-                            errorHandle.accept(context,error);
+                            commonErrorHandler.accept(context, error);
                     }
                 });
         routers.client()
@@ -143,9 +142,9 @@ abstract class ServerResponder extends Async {
                     context.write(res);
                     context.close();
                 })
-                .handleError((context,error) -> {
-                    log.error("client: HANDLE ERROR");
-                    errorHandle.accept(context,error);
+                .handleError((context, error) -> {
+                    log.info("client error: ", error);
+                    commonErrorHandler.accept(context, error);
                 });
         routers.parent()
                 .handle(MessageCommands.AUTHENTICATION_FAIL, context -> {
@@ -154,18 +153,18 @@ abstract class ServerResponder extends Async {
                 .handle(MessageCommands.INVALID_MESSAGE, context -> {
                     log.error("RCV INVALID MESSAGE");
                 })
-                .handleError((context,error) -> {
-                    log.error("parent: HANDLE ERROR");
-                    errorHandle.accept(context,error);
+                .handleError((context, error) -> {
+                    log.info("parent error: ", error);
+                    commonErrorHandler.accept(context, error);
                 });
         routers.child()
                 .handle(MessageCommands.AUTHENTICATE, context -> {
                     context.write(new MsgInvalidMessage("Server already authenticated"));
                     context.close();
                 })
-                .handleError((context,error) -> {
-                    log.error("child: HANDLE ERROR");
-                    errorHandle.accept(context,error);
+                .handleError((context, error) -> {
+                    log.info("child error: ", error);
+                    commonErrorHandler.accept(context, error);
                 });
 
         // group routing
