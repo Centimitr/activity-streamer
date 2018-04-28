@@ -7,7 +7,7 @@ A simple distributed system; Clients can send and receive activity objects from 
 
 Developed and tested using Intellij IDEA under Java 10 environment.
 
-This project does not use Java 10's local-variable type interface (var), and use Java 9's module system to organize code files. So it should be able to build with JDK 9+. The project is fully configured under Intellij IDEA so the build process can be easily executed by using Compile option in the menu. The two Jar packages are also set to be generated in the build process.  
+This project does not use Java 10's local-variable type interface (var), and use Java 9's module system to organize code files. So it should be able to build with JDK 9+. The project is fully configured under Intellij IDEA so the build process can be easily executed by using Compile option in the menu. The two Jar packages are also set to be generated in the build process. Client GUI part is built with React and does not depend on more preprocessing tools.
 
 
 ## Usages
@@ -41,7 +41,7 @@ A client maintains a 1 to 1 connection to a specific server and a GUI interface 
 
 ## Main Ideas
 
-1. 3 modules: Client, Server, Shared.
+1. 3 modules: Client, Server, Shared
 2. Message Routing
 3. Strong message type definitions
 4. Responder pattern, split initiative and passive parts
