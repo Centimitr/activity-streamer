@@ -1,4 +1,4 @@
-# COMP90015 Activity Streamer
+# COMP90015-1 Activity Streamer
 
 A simple distributed system; Clients can send and receive activity objects from a stream with the help of multiple servers. TCP + JSON.
 
@@ -57,6 +57,7 @@ A client maintains a 1 to 1 connection to a specific server and a GUI interface 
 ## Project Stucture
 
 ```
+Activity Streamer
 ├── Client         
 ├───── App.java                         # CLI entrance              
 ├───── View.java                        # GUI interface, using JavaFX webview to load the compiled React app               
