@@ -1,4 +1,4 @@
-# COMP90015-1 Activity Streamer
+# COMP90015 Project 1: Activity Streamer
 
 A simple distributed system; Clients can send and receive activity objects from a stream with the help of multiple servers. TCP + JSON.
 
