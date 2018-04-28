@@ -16,6 +16,10 @@ This project does not use Java 10's local-variable type interface (var), and use
 
 __Server__
 
+```
+java -jar ActivityStreamerServer.jar -rp <remote port> -rh <remote host> -s <secret> -lp <local port> -lh <local host>
+```
+
 A server can connect to another server. It listens to clients' requests and also allow for more servers to connect to expand the network.
 
 ```
@@ -29,6 +33,9 @@ s                secret for the server to use
 A server maintains mainly three groups of connections. Clients, children servers and its parent server. Although this mechanism makes servers forming a tree, there is no central server in this system. 
 
 __Client__
+```
+java -jar ActivityStreamerClient.jar -rp <remote port> -rh <remote host> -u <username> -s <secret>
+```
 
 Clients should login to a server and then they can broadcast activity objects.
 ```
