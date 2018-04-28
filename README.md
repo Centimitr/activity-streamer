@@ -1,6 +1,6 @@
 # COMP90015 Activity Streamer
 
-A simple distributed system; Clients can send and receive activity objects from a stream with the help of multiple servers.
+A simple distributed system; Clients can send and receive activity objects from a stream with the help of multiple servers. TCP + JSON.
 
 
 ## Build
@@ -78,3 +78,6 @@ A client maintains a 1 to 1 connection to a specific server and a GUI interface 
 └───── MessageContext.java              # context for message handlers
 └───── ... 10+ Java files               # for async/sync, connection management and message definitions 
 ```
+
+<br />  
+<sup>Sat, 28 April 2018</sup> 
