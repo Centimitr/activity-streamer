@@ -1,0 +1,48 @@
+.ChatMessage {
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.ChatMessage .ChatMessage-Notification {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.ChatMessage .ChatMessage-Notification-Content {
+    padding: 4px 0;
+    color: #999;
+    font-size: 12px;
+    /*background-color: #cccccc;*/
+    /*padding: 4px;*/
+    /*border-radius: 2px;*/
+}
+
+.ChatMessage .ChatMessage-Message {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: left;
+}
+
+.ChatMessage .ChatMessage-Header {
+    margin: 0 0 8px 8px;
+    text-align: left;
+}
+
+.ChatMessage .ChatMessage-Header .ChatMessage-Username {
+    color: #666;
+}
+
+.ChatMessage .ChatMessage-Body {
+    background-color: white;
+    box-shadow: 0 0 24px 0 rgba(0, 0, 0, .1);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    word-break: break-word;
+    text-align: left;
+    padding: 16px;
+    margin-bottom: 20px;
+    user-select: auto;
+}

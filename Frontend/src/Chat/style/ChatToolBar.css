@@ -1,0 +1,46 @@
+.ChatToolBar {
+    width: 100%;
+    height: 40px;
+    border-bottom: 1px solid #eee;
+}
+
+.ChatToolBar .ChatToolBar-Row {
+    padding: 4px 8px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.ChatToolBar button {
+    color: #666;
+    line-height: 32px;
+    height: 32px;
+    padding: 0 8px;
+    text-transform: uppercase;
+    border-radius: 4px;
+}
+
+.ChatToolBar button:hover {
+    color: #444;
+    cursor: pointer;
+    background-color: #f4f4f4;
+    box-shadow: inset 0 0 8px 4px rgba(222, 222, 222, 0.1);
+}
+
+.ChatToolBar button:active {
+    background-color: #f0f0f0;
+}
+
+.ChatToolBar button.accept {
+    color: #58a63e;
+}
+
+.ChatToolBar button.refuse {
+    color: #f0bbbb;
+}
+
+.ChatToolBar button.refuse:hover,
+.ChatToolBar button.refuse:active {
+    cursor: default;
+    background: none;
+    box-shadow: none;
+}
