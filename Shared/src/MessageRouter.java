@@ -3,42 +3,54 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-class MessageRouter {
+class MessageRouter implements IMessageRouter {
     private static final Logger log = LogManager.getLogger();
 
     MessageRouter() {
     }
 
     private Map<String, Consumer<MessageContext>> handlers = new HashMap<>();
-    private Consumer<MessageContext> errorHandler = c -> {
+    private BiConsumer<MessageContext,String> errorHandler = (c,error) -> {
         log.warn("No unknown handler configured but invoked.");
     };
+    private Consumer<MessageContext> parseHandler = c -> {
+        log.warn("Json Parse Error.");
+    };
 
-    boolean supportCommand(String command) {
-        return MessageCommands.contains(command);
+    @Override
+    public boolean support(String command) {
+        for (Map.Entry<String, Consumer<MessageContext>> handler : handlers.entrySet()) {
+            if (handler.getKey().equals(command)) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    MessageRouter registerHandler(MessageCommands command, Consumer<MessageContext> handler) {
+    MessageRouter handle(MessageCommands command, Consumer<MessageContext> handler) {
         handlers.put(command.name(), handler);
         return this;
     }
 
-    @SuppressWarnings("UnusedReturnValue")
-    MessageRouter registerErrorHandler(Consumer<MessageContext> handler) {
+    void handleError(BiConsumer<MessageContext,String> handler) {
         errorHandler = handler;
-        return this;
     }
 
-    Consumer<MessageContext> getHandler(String command) {
-        if (!supportCommand(command)) {
+    void handleParseError(Consumer<MessageContext> handler) { parseHandler = handler; }
+
+    @Override
+    public Consumer<MessageContext> getHandler(Connectivity conn, String command) {
+        if (!support(command)) {
             log.warn("Protocol does not support command: " + command);
         }
         return handlers.get(command);
     }
 
-    Consumer<MessageContext> getErrorHandler() {
+    @Override
+    public BiConsumer<MessageContext,String> getErrorHandler(Connectivity conn) {
         if (errorHandler == null) {
             log.error("No error handler is set, error will be dismissed.");
         }

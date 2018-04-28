@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class Listener extends Thread {
+public class Listener extends Async {
     private static final Logger log = LogManager.getLogger();
     private ServerSocket serverSocket;
     private boolean term = false;
@@ -22,12 +22,12 @@ public class Listener extends Thread {
 
     @Override
     public void run() {
-        log.info("listening for new connections on " + port);
+        log.info("Listening Port: " + port);
         while (!term) {
             Socket clientSocket;
             try {
                 clientSocket = serverSocket.accept();
-                (new Thread(() -> fn.accept(clientSocket))).start();
+                async(() -> fn.accept(clientSocket));
             } catch (IOException e) {
                 log.info("received exception, shutting down");
                 term = true;

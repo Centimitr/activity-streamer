@@ -1,3 +1,4 @@
+import javafx.application.Application;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -7,8 +8,8 @@ import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@SuppressWarnings("Duplicates")
-public class App {
+@SuppressWarnings({"Duplicates", "ConstantConditions"})
+public class App extends View {
 
     private static final Logger log = LogManager.getLogger();
 
@@ -22,14 +23,13 @@ public class App {
 
     public static void main(String[] args) {
 
-        log.info("reading command line options");
+        log.info("Reading: command line options");
 
         Options options = new Options();
         options.addOption("u", true, "username");
         options.addOption("rp", true, "remote port number");
         options.addOption("rh", true, "remote hostname");
         options.addOption("s", true, "secret for username");
-
 
         // build the parser
         CommandLineParser parser = new DefaultParser();
@@ -64,9 +64,8 @@ public class App {
         }
 
 
-        log.info("starting client");
-
-
+        log.info("Client.Start");
         Client c = Client.getInstance();
+        Application.launch();
     }
 }

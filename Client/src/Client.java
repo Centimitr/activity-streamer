@@ -1,16 +1,11 @@
 import java.io.*;
 import java.util.Scanner;
 
-import com.google.gson.Gson;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.json.simple.JSONObject;
-
 @SuppressWarnings("WeakerAccess")
-public class Client extends Thread {
-    private static final Logger log = LogManager.getLogger();
-    private static final Gson g = new Gson();
+public class Client extends ClientResponder {
     private static Client clientSolution;
+//    private TextFrame gui = new TextFrame();
+//    private View view = new View();
 
     public static Client getInstance() {
         if (clientSolution == null) {
@@ -23,46 +18,8 @@ public class Client extends Thread {
         return getInstance().agent;
     }
 
-    private MessageRouter router = new MessageRouter();
-    private ClientAgent agent = new ClientAgent();
-    private Connectivity connectivity;
-    private TextFrame textFrame;
-
     public Client() {
-        // todo: add gui features
-//        textFrame = new TextFrame();
-        setMessageHandlers();
         start();
-    }
-
-
-    private void setMessageHandlers() {
-        // todo: add protocol logic
-        router
-                .registerHandler(MessageCommands.REDIRECT, context -> {
-                    MsgRedirect m = context.read(MsgRedirect.class);
-                    log.info("Will Redirect: " + m.hostname + " " + m.port);
-                    agent.reconnect(m.hostname, m.port);
-                    context.close();
-                })
-                .registerHandler(MessageCommands.LOGIN_SUCCESS, context -> {
-                    log.info("Login successfully!");
-                })
-                .registerHandler(MessageCommands.REGISTER_SUCCESS, context -> {
-                    log.info("Register successfully!");
-                })
-                .registerHandler(MessageCommands.REGISTER_FAILED, context -> {
-                    log.info("Register Failed!");
-                })
-                .registerHandler(MessageCommands.ACTIVITY_BROADCAST, context -> {
-                    MsgActivityBroadcast m = context.read(MsgActivityBroadcast.class);
-                    log.info("AM: " + g.toJson(m.activity));
-                    System.out.println(g.toJson(m.activity));
-                    // todo: may need to apply filter of sending activity objects
-                })
-                .registerErrorHandler(context -> {
-
-                });
     }
 
     public void disconnect() {
@@ -73,30 +30,50 @@ public class Client extends Thread {
 
     @Override
     public void run() {
+//        view.show();
         connect(Settings.getRemoteHostname(), Settings.getRemotePort());
     }
 
     private void connect(String hostname, Integer port) {
+        Settings.setRemoteHostname(hostname);
+        Settings.setRemotePort(port);
         try {
-            connectivity = new Connectivity(hostname, port, c -> agent.bind(c));
-            agent.login("xiaoming1", "fjskl");
-            agent.sendActivity(new TestMessage("Never Gonna Give You Up"));
-            (new Thread(() -> {
-                boolean closed = connectivity.redirect(router);
-                if (closed) {
-                    agent.unbind();
+            connectivity = new Connectivity(hostname, port);
+            agent.bind(connectivity);
+            async(() -> {
+                boolean normalExit = connectivity.redirect(router);
+                if (normalExit) {
+                    log.info("normal exit");
+                } else {
+                    log.info("exception exit");
                 }
-                if (closed && agent.needReconnect()) {
+                agent.unbind();
+                if (normalExit && agent.needReconnect()) {
                     connect(agent.reconnectHostname, agent.reconnectPort);
                 }
-            })).start();
+            });
+            whenConnected();
         } catch (IOException e) {
             e.printStackTrace();
             log.error("connect failed.");
         }
     }
 
+    private void whenConnected() {
+        boolean anonymous = Settings.getUsername().equals("anonymous");
+        boolean needRegister = Settings.getSecret() == null && !anonymous;
+        agent.uiSetLoaded(needRegister);
+        if (needRegister) {
+            String secret = agent.register(Settings.getUsername());
+            log.info("Your secret is: " + secret);
+            Settings.setSecret(secret);
+        }
+        agent.login(Settings.getUsername(), Settings.getSecret());
+//        gui.present();
+    }
+
     // todo: used to test connectivity, to remove
+    @SuppressWarnings("unused")
     private void handleTestREPL(Connectivity c) {
         Scanner scanner = new Scanner(System.in);
         String inputStr;

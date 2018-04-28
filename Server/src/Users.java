@@ -11,7 +11,7 @@ class User {
     }
 }
 
-public class Users {
+class Users {
     private Map<String, User> users = new HashMap<>();
 
     boolean has(String username) {
@@ -27,8 +27,15 @@ public class Users {
         return true;
     }
 
+    boolean delete(String username, String secret) {
+        return users.remove(username, secret);
+    }
+
     boolean match(String username, String secret) {
         if (!has(username)) {
+            return false;
+        }
+        if (secret == null) {
             return false;
         }
         User u = users.get(username);

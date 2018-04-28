@@ -5,8 +5,10 @@ import com.google.gson.JsonSyntaxException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 @SuppressWarnings("WeakerAccess")
@@ -14,17 +16,23 @@ class MessageContext {
     private static final Logger log = LogManager.getLogger();
     private static final Gson g = new Gson();
     public Connectivity connectivity;
-    private MessageRouter router;
+    private IMessageRouter router;
     private Map<String, String> states = new HashMap<>();
     // states
     public String command;
     public String lastCommand;
     private JsonObject j;
-    private String reply;
+    private ArrayList<String> replies;
     private boolean willClose;
 
+    MessageContext(IMessageRouter router) {
+        if (router == null) {
+            log.error("Router should not be null");
+        }
+        bindRouter(router);
+    }
 
-    MessageContext(MessageRouter router) {
+    void bindRouter(IMessageRouter router) {
         this.router = router;
     }
 
@@ -40,43 +48,40 @@ class MessageContext {
             return false;
         }
         command = j.get("command").getAsString();
-        return router.supportCommand(command);
+        return command != null;
     }
 
     private void clearState() {
         willClose = false;
-        reply = null;
+        replies = new ArrayList<>();
     }
 
     private void handleStateChange() {
         lastCommand = command;
-        if (reply != null) {
-            connectivity.sendln(reply);
-        }
+        replies.forEach(reply -> connectivity.sendln(reply));
     }
 
     public synchronized boolean process(Connectivity c, String msg) {
-        {
-            System.out.println("Msg: " + msg);
+        if (c.isClosed()) {
+            return true;
         }
         clearState();
         connectivity = c;
         boolean valid = parse(msg);
         handle(valid);
         handleStateChange();
-        {
-            // todo: remove this debug print
-            // c.sendln("RJ: " + msg);
-        }
         return willClose;
     }
 
     public void handle(boolean valid) {
-        Consumer<MessageContext> handler = valid ?
-                router.getHandler(command) :
-                router.getErrorHandler();
+        BiConsumer<MessageContext, String> errorHandler = router.getErrorHandler(connectivity);
+        if (!valid) {
+            errorHandler.accept(this, "Parse Error");
+        }
+        Consumer<MessageContext> handler = router.getHandler(connectivity, command);
         if (handler == null) {
             log.warn("No handler for message:" + g.toJson(j));
+            errorHandler.accept(this, "No Command");
             return;
         }
         handler.accept(this);
@@ -98,6 +103,10 @@ class MessageContext {
         return states.put(key, value);
     }
 
+    public void delete(String key) {
+        states.remove(key);
+    }
+
     public MessageContext after(String cmd, Consumer<String> callback) {
         if (lastCommand.equals(cmd)) {
             callback.accept(lastCommand);
@@ -114,7 +123,7 @@ class MessageContext {
     }
 
     public void write(String reply) {
-        this.reply = reply;
+        this.replies.add(reply);
     }
 
     public void write(Object obj) {

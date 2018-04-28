@@ -1,5 +1,7 @@
 import com.google.gson.JsonObject;
 
+import java.util.Map;
+
 class TestMessage {
     String msg;
 
@@ -44,9 +46,9 @@ abstract class MessageUser extends MessageSecret {
 }
 
 abstract class MessageActivity extends MessageUser {
-    JsonObject activity;
+    Map<Object, Object> activity;
 
-    MessageActivity(MessageCommands command, String secret, String username, JsonObject activity) {
+    MessageActivity(MessageCommands command, String secret, String username, Map<Object, Object> activity) {
         super(command, secret, username);
         this.activity = activity;
     }
@@ -75,9 +77,9 @@ abstract class MessageServerAnnounce extends MessageServer {
 }
 
 abstract class MessageActivityBroadcast extends Message {
-    JsonObject activity;
+    Map<Object, Object> activity;
 
-    MessageActivityBroadcast(MessageCommands command, JsonObject activity) {
+    MessageActivityBroadcast(MessageCommands command, Map<Object, Object> activity) {
         super(command);
         this.activity = activity;
     }
