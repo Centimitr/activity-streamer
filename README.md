@@ -23,12 +23,12 @@ java -jar ActivityStreamerServer.jar -rp <remote port> -rh <remote host> -s <sec
 A server can connect to another server. It listens to clients' requests and also allow for more servers to connect to expand the network.
 
 ```
-lp               local port number
-rp               remote port number
-rh               remote hostname
-lh               local hostname
-a                activity interval in milliseconds
-s                secret for the server to use
+lp                              local port number
+rp                              remote port number
+rh                              remote hostname
+lh                              local hostname
+a                               activity interval in milliseconds
+s                               secret for the server to use
 ```
 A server maintains mainly three groups of connections. Clients, children servers and its parent server. Although this mechanism makes servers forming a tree, there is no central server in this system. 
 
@@ -39,10 +39,10 @@ java -jar ActivityStreamerClient.jar -rp <remote port> -rh <remote host> -u <use
 
 Clients should login to a server and then they can broadcast activity objects.
 ```
--u               username
--rp              remote port number
--rh              remote hostname
--s               secret for username
+-u                              username
+-rp                             remote port number
+-rh                             remote hostname
+-s                              secret for username
 ```   
 A client maintains a 1 to 1 connection to a specific server and a GUI interface is provided. The interface is built with React + MobX which embeded in a JavaFx application.
 
