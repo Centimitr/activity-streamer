@@ -23,12 +23,12 @@ java -jar ActivityStreamerServer.jar -rp <remote port> -rh <remote host> -s <sec
 A server can connect to another server. It listens to clients' requests and also allow for more servers to connect to expand the network.
 
 ```
-lp                              local port number
-rp                              remote port number
-rh                              remote hostname
-lh                              local hostname
-a                               activity interval in milliseconds
-s                               secret for the server to use
+-lp                              local port number
+-rp                              remote port number
+-rh                              remote hostname
+-lh                              local hostname
+-a                               activity interval in milliseconds
+-s                               secret for the server to use
 ```
 A server maintains mainly three groups of connections. Clients, children servers and its parent server. Although this mechanism makes servers forming a tree, there is no central server in this system. 
 
@@ -48,10 +48,11 @@ A client maintains a 1 to 1 connection to a specific server and a GUI interface 
 
 ## Main Ideas
 
-1. 3 modules: Client, Server, Shared
-2. Message Routing
-3. Strong message type definitions
-4. Responder pattern, split initiative and passive parts
+- 3 modules: Client, Server, Shared
+- Message Routing
+- Strong message type definitions
+- Responder pattern, split initiative and passive parts
+- States management at different scales
 
 ## Project Stucture
 
