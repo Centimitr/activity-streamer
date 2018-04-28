@@ -79,7 +79,7 @@ Activity Streamer
 ├───── MessageRouter.java               # simple routing for the system
 ├───── MessageContext.java              # context for message handlers
 ├───── ... 10+ Java files               # for async/sync, connection management and message definitions 
-└── FrontEnd                            # GUI application source code
+└── Frontend                            # GUI application source code
 ```
 
 <br />  
