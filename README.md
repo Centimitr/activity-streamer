@@ -1,20 +1,72 @@
-# COMP90015
+# COMP90015 Activity Streamer
 
-## Shared
-The `Shared` module includes concept classes for this project.
+A simple distributed system; Clients can send and receive activity objects from a stream with the help of multiple servers.
 
-- `Connectivity` wraps a Socket and provide I/O functions with String and Objects.
-- `Listener` wraps a ServerSocket and is only useful for server code.
-- `MessageRouter` is a abstract router for allocate different messages to many handle functions, which can help the program to be clear.
-- `MessageContext` is used in the handle functions registered to a MessageRouter. It can help features decoupling.
-- `MessageCommands` enums the possible commands' type.
 
-## Client
-The singleton Client has 1 C/S connection and a GUI instance.
+## Build
 
-It manages the connection with a Connectivity instance and redirect its input stream to a MessageRouter instance.
+Developed and tested using Intellij IDEA under Java 10 environment.
 
-## Server
-The singleton Server is actually the Control instance. It has an array of C/S connections and might have a S/S connection.
+This project does not use Java 10's local-variable type interface (var), and use Java 9's module system to organize code files. So it should be able to build with JDK 9+. The project is fully configured under Intellij IDEA so the build process can be easily executed by using Compile option in the menu. The two Jar packages are also set to be generated in the build process.  
 
-Similarly, it manages the connections with Connectivity instances and redirect their input to either the serverMessageRouter or the clientMessageRouter.
+
+## Usages
+
+`ActivityStreamerClient.jar` and `ActivityStreamerServer.jar` are provided to work as client and server.
+
+__Server__
+
+A server can connect to another server. It listens to clients' requests and also allow for more servers to connect to expand the network.
+
+```
+lp               local port number
+rp               remote port number
+rh               remote hostname
+lh               local hostname
+a                activity interval in milliseconds
+s                secret for the server to use
+```
+A server maintains mainly three groups of connections. Clients, children servers and its parent server. Although this mechanism makes servers forming a tree, there is no central server in this system. 
+
+__Client__
+
+Clients should login to a server and then they can broadcast activity objects.
+```
+-u               username
+-rp              remote port number
+-rh              remote hostname
+-s               secret for username
+```   
+A client maintains a 1 to 1 connection to a specific server and a GUI interface is provided. The interface is built with React + MobX which embeded in a JavaFx application.
+
+## Main Ideas
+
+1. 3 modules: Client, Server, Shared.
+2. Message Routing
+3. Strong message type definitions
+4. Responder pattern, split initiative and passive parts
+
+## Project Stucture
+
+```
+├── Client         
+├───── App.java                         # CLI entrance              
+├───── View.java                        # GUI interface, using JavaFX webview to load the compiled React app               
+├───── Client.java                      # inherit from ClientResponder, create connection with a server
+├───── ClientResponder.java             # server messages handling
+├───── ClientAgent.java                 # perform actions and manage states for client
+├── Server                              
+├───── App.java                         # CLI entrance
+├───── Server.java                      # inherit from ServerResponder, maintain connections with clients and servers
+├───── ServerResponder.java             # server/client messages handling
+├───── ConnectivityManager.java         # maintains connections by groups and corresponding router
+├───── RegisterManager.java             # states for register feature
+├───── Users.java                       # record user information
+├───── Servers.java                     # record server information (e.g loads)  
+├── Shared            
+└───── Listener.java                    # wraps ServerSocket
+└───── Connectivity.java                # wraps Socket
+└───── MessageRouter.java               # simple routing for the system
+└───── MessageContext.java              # context for message handlers
+└───── ... 10+ Java files               # for async/sync, connection management and message definitions 
+```
