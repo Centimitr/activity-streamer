@@ -63,6 +63,7 @@ A client maintains a 1 to 1 connection to a specific server and a GUI interface 
 ├───── Client.java                      # inherit from ClientResponder, create connection with a server
 ├───── ClientResponder.java             # server messages handling
 ├───── ClientAgent.java                 # perform actions and manage states for client
+├───── Frontend                         # store compiled React app for GUI
 ├── Server                              
 ├───── App.java                         # CLI entrance
 ├───── Server.java                      # inherit from ServerResponder, maintain connections with clients and servers
@@ -72,11 +73,12 @@ A client maintains a 1 to 1 connection to a specific server and a GUI interface 
 ├───── Users.java                       # record user information
 ├───── Servers.java                     # record server information (e.g loads)  
 ├── Shared            
-└───── Listener.java                    # wraps ServerSocket
-└───── Connectivity.java                # wraps Socket
-└───── MessageRouter.java               # simple routing for the system
-└───── MessageContext.java              # context for message handlers
-└───── ... 10+ Java files               # for async/sync, connection management and message definitions 
+├───── Listener.java                    # wraps ServerSocket
+├───── Connectivity.java                # wraps Socket
+├───── MessageRouter.java               # simple routing for the system
+├───── MessageContext.java              # context for message handlers
+├───── ... 10+ Java files               # for async/sync, connection management and message definitions 
+└── FrontEnd                            # GUI application source code
 ```
 
 <br />  
