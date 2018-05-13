@@ -183,8 +183,8 @@ class MsgRedirect extends MessageServer {
 }
 
 // hostname, port, id, load
-class MsgServerAnnounce extends MessageServerAnnounce {
-    MsgServerAnnounce(String id, String hostname, Integer port, Integer load) {
-        super(MessageCommands.SERVER_ANNOUNCE, hostname, port, id, load);
-    }
-}
+//class MsgServerAnnounce extends MessageServerAnnounce {
+//    MsgServerAnnounce(String id, String hostname, Integer port, Integer load) {
+//        super(MessageCommands.SERVER_ANNOUNCE, hostname, port, id, load);
+//    }
+//}
