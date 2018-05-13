@@ -23,6 +23,36 @@ class MsgAuthenticationFail extends MessageInfo {
     }
 }
 
+class MsgAuthenticationSucess extends MessageInfo {
+    MsgAuthenticationSucess(String info) {
+        super(MessageCommands.AUTHENTICATION_SUCCESS, info);
+    }
+}
+
+class MsgClientAnnounce extends MessageInfo {
+    MsgClientAnnounce(String info) {
+        super(MessageCommands.CLIENT_ANNOUNCE, info);
+    }
+}
+
+class MsgMasterAnnounce extends MessageInfo {
+    MsgMasterAnnounce(String info) {
+        super(MessageCommands.MASTER_ANNOUNCE, info);
+    }
+}
+
+class MsgSystemBusy extends MessageInfo {
+    MsgSystemBusy(String info) {
+        super(MessageCommands.SYSTEM_BUSY, info);
+    }
+}
+
+class MsgLoadRequire extends MessageInfo {
+    MsgLoadRequire(String info) {
+        super(MessageCommands.LOAD_REQUIRE, info);
+    }
+}
+
 class MsgLoginSuccess extends MessageInfo {
     MsgLoginSuccess(String info) {
         super(MessageCommands.LOGIN_SUCCESS, info);
@@ -48,9 +78,15 @@ class MsgRegisterSuccess extends MessageInfo {
 }
 
 // secret
-class MsgAuthenticate extends MessageSecret {
-    MsgAuthenticate(String secret) {
-        super(MessageCommands.AUTHENTICATE, secret);
+class MsgSlaveAuthenticate extends MessageSecret {
+    MsgSlaveAuthenticate(String secret) {
+        super(MessageCommands.SLAVE_AUTHENTICATE, secret);
+    }
+}
+
+class MsgGatewayAuthenticate extends MessageSecret {
+    MsgGatewayAuthenticate(String secret) {
+        super(MessageCommands.GATEWAY_AUTHENTICATE, secret);
     }
 }
 
@@ -85,6 +121,38 @@ class MsgLockAllowed extends MessageUser {
     }
 }
 
+class MsgUserUpdate extends MessageUser {
+    MsgUserUpdate(String username, String secret) {
+        super(MessageCommands.USER_UPDATE, secret, username);
+    }
+}
+
+// secret, username, server_id
+class MsgUserLogout extends MessageUserStatus {
+    MsgUserLogout(String username, String secret, int id) {
+        super(MessageCommands.USER_LOGOUT, secret, username, id);
+    }
+}
+
+class MsgUserLogin extends MessageUserStatus {
+    MsgUserLogin(String username, String secret, int id) {
+        super(MessageCommands.USER_LOGIN, secret, username, id);
+    }
+}
+
+// map
+class MsgLoadUpdate extends MessageServerList{
+    MsgLoadUpdate(Map<Integer,Integer> load_info){
+        super(MessageCommands.LOAD_UPDATE, load_info);
+    }
+}
+
+class MsgUserList extends MessageUserList{
+    MsgUserList(Map<String,String> users){
+        super(MessageCommands.USER_LIST, users);
+    }
+}
+
 //class ObjectJsonObjectConverter {
 //    static final Gson g = new Gson();
 //
@@ -115,8 +183,8 @@ class MsgRedirect extends MessageServer {
 }
 
 // hostname, port, id, load
-class MsgServerAnnounce extends MessageServerAnnounce {
-    MsgServerAnnounce(String id, String hostname, Integer port, Integer load) {
-        super(MessageCommands.SERVER_ANNOUNCE, hostname, port, id, load);
-    }
-}
+//class MsgServerAnnounce extends MessageServerAnnounce {
+//    MsgServerAnnounce(String id, String hostname, Integer port, Integer load) {
+//        super(MessageCommands.SERVER_ANNOUNCE, hostname, port, id, load);
+//    }
+//}
