@@ -20,8 +20,8 @@ public class View extends Application {
         stage.setWidth(480);
         stage.setHeight(640);
         engine.setJavaScriptEnabled(true);
-//        engine.load("http://localhost:3000");
-        engine.load(this.getClass().getResource("/Frontend/index.html").toExternalForm());
+        engine.load("http://localhost:3000");
+//        engine.load(this.getClass().getResource("/Frontend/index.html").toExternalForm());
         engine.getLoadWorker().stateProperty().addListener((ov, oldState, newState) -> {
                     if (newState == Worker.State.SUCCEEDED) {
                         Client.getAgent().bindEngine(engine);
