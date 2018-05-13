@@ -3,3 +3,5 @@ out
 .idea
 
 Frontend/package-lock.json
+.idea/modules.xml
+.idea/workspace.xml
