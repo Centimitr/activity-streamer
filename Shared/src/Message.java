@@ -18,6 +18,24 @@ abstract class Message {
     }
 }
 
+abstract class MessageServerList extends Message {
+    Map<Integer, Integer> load_info;
+
+    MessageServerList(MessageCommands command, Map<Integer, Integer> load_info) {
+        super(command);
+        this.load_info = load_info;
+    }
+}
+
+abstract class MessageUserList extends Message {
+    Map<String, String> users;
+
+    MessageUserList(MessageCommands command, Map<String, String> users) {
+        super(command);
+        this.users = users;
+    }
+}
+
 abstract class MessageSecret extends Message {
     String secret;
 
@@ -42,6 +60,15 @@ abstract class MessageUser extends MessageSecret {
     MessageUser(MessageCommands command, String secret, String username) {
         super(command, secret);
         this.username = username;
+    }
+}
+
+abstract class MessageUserStatus extends MessageUser {
+    int id;
+
+    MessageUserStatus(MessageCommands command, String secret, String username, int id) {
+        super(command, secret, username);
+        this.id = id;
     }
 }
 
