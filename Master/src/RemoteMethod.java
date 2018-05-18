@@ -8,23 +8,47 @@ public class RemoteMethod extends UnicastRemoteObject implements IRemoteMath{
     }
 
     @Override
-    public Map<Integer, Integer> getServerStatus() throws RemoteException {
+    public String authenticate(String secret) throws RemoteException {
         return null;
     }
 
     @Override
-    public Map<String, String> getUserList() throws RemoteException {
+    public String updateServerAdd(String hostname, Integer port) throws RemoteException {
         return null;
     }
 
     @Override
-    public String gatewayAuthenticate() throws RemoteException {
+    public Integer getLoad() throws RemoteException {
         return null;
     }
 
     @Override
-    public String slaveAuthenticate() throws RemoteException {
+    public String userList(Map<String, String> user) throws RemoteException {
         return null;
     }
 
+    @Override
+    public String activityBroadcast(Object msg) throws RemoteException {
+        return null;
+    }
+
+    @Override
+    public String lockRequest(String username, String secret) throws RemoteException {
+        return null;
+    }
+
+    @Override
+    public String userUpdate(String username, String secret) throws RemoteException {
+        return null;
+    }
+
+    @Override
+    public String userLogout(String username) throws RemoteException {
+        return null;
+    }
+
+    @Override
+    public String userLogin(String username) throws RemoteException {
+        return null;
+    }
 }
