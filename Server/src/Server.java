@@ -1,5 +1,3 @@
-import org.w3c.dom.Node;
-
 import java.io.IOException;
 import java.net.Socket;
 import java.rmi.*;
@@ -55,20 +53,6 @@ public class Server extends ServerResponder {
             // todo: sync states
             // todo: connect all nodes
             recoverLock.until();
-//            try {
-//                Connectivity conn = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort());
-//                cm.parent().set(conn);
-//                conn.whenClosed(() -> {
-//                    log.info("Parent.Closed");
-//                    terminate();
-//                });
-//                log.info("Authenticate.Start");
-////                conn.sendln(new MsgAuthenticate(Settings.getSecret()));
-//                conn.sendln(new MsgAuthenticate(Settings.getSecret()));
-//            } catch (IOException e) {
-//                log.error("Parent.Failed" + Settings.getRemoteHostname() + ":" + Settings.getRemotePort() + " :" + e);
-//                System.exit(-1);
-//            }
         }
     }
 
@@ -125,8 +109,8 @@ public class Server extends ServerResponder {
         if (!term) {
             listener.terminate();
             cm.all().sets().forEach(ConnectivitySet::closeAll);
-            cm.parent().close();
-            log.info("Closed: " + cm.parent().size() + " parent, " + cm.clients().size() + " Clients, " + cm.children().size() + " Children");
+//            cm.parent().close();
+//            log.info("Closed: " + cm.parent().size() + " parent, " + cm.clients().size() + " Clients, " + cm.children().size() + " Children");
             term = true;
             System.exit(0);
         }

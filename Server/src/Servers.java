@@ -1,3 +1,5 @@
+import org.w3c.dom.Node;
+
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -72,7 +74,6 @@ class ServerRecordSet {
     }
 }
 
-
 @SuppressWarnings("WeakerAccess")
 class ServiceBalancer {
 
@@ -100,14 +101,13 @@ class ServiceBalancer {
     }
 }
 
-
 class Servers implements IRecoverable {
-    private ConnectivitySetGroup connectedServers;
     private ServerRecordSet records = new ServerRecordSet();
     private ServiceBalancer balancer = new ServiceBalancer(records);
+    private NodesManager nm;
 
-    Servers(ConnectivitySetGroup servers) {
-        this.connectedServers = servers;
+    Servers(NodesManager nm) {
+        this.nm = nm;
     }
 
     ServiceBalancer balancer() {
@@ -118,21 +118,21 @@ class Servers implements IRecoverable {
         return records;
     }
 
-    int num() {
-        HashMap<String, Boolean> addresses = new HashMap<>();
-        records.forEach((id, record) -> {
-            String address = record.hostname + ":" + record.port;
-            addresses.put(address, true);
-        });
-        connectedServers.forEach(conn -> {
-            // todo: might not be the correct address
-            String ip = conn.socket().getInetAddress().getHostAddress();
-            int port = conn.socket().getPort();
-            String address = ip + ":" + port;
-            addresses.put(address, true);
-        });
-        return addresses.size();
-    }
+//    int num() {
+////        HashMap<String, Boolean> addresses = new HashMap<>();
+////        records.forEach((id, record) -> {
+////            String address = record.hostname + ":" + record.port;
+////            addresses.put(address, true);
+////        });
+////        nm.forEach(node -> {
+////            // todo: might not be the correct address
+////            String ip = conn.socket().getInetAddress().getHostAddress();
+////            int port = conn.socket().getPort();
+////            String address = ip + ":" + port;
+////            addresses.put(address, true);
+////        });
+////        return addresses.size();
+////    }
 
     @Override
     public String snapshot() {

@@ -20,7 +20,7 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
     ConnectivityManager cm = new ConnectivityManager();
     NodesManager nm = new NodesManager();
     RegisterManager rm = new RegisterManager();
-    Servers servers = new Servers(cm.servers());
+    Servers servers = new Servers(nm);
     Users users = new Users();
     Lock recoverLock = new Lock();
 
@@ -45,16 +45,6 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
         };
 
         routers.temp()
-//                .handle(MessageCommands.AUTHENTICATE, context -> {
-//                    MsgAuthenticate m = context.read(MsgAuthenticate.class);
-//                    boolean success = m.secret.equals(Settings.getSecret());
-//                    if (!success) {
-//                        MsgAuthenticationFail res = new MsgAuthenticationFail("the supplied secret is incorrect:" + m.secret);
-//                        context.write(res);
-//                        context.close();
-//                    }
-//                    cm.temp().transfer(context.connectivity, cm.children());
-//                })
                 .handle(MessageCommands.REGISTER, context -> {
                     MsgRegister m = context.read(MsgRegister.class);
 //                    log.info("Register: Start:" + m.username + " " + m.secret);
@@ -75,8 +65,10 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
 
                     // ask other servers' options
                     MsgLockRequest req = new MsgLockRequest(m.username, m.secret);
-                    cm.servers().broadcast(req);
-                    boolean available = rm.wait(m.username, m.secret, servers.num());
+                    // todo: server broadcase
+//                    cm.servers().broadcast(req);
+                    // todo: new wait for remotes, 0
+                    boolean available = rm.wait(m.username, m.secret, 0);
                     if (!available) {
 //                        log.info("Register: Remote already registered: " + m.username + " " + m.secret);
                         handleRegisteredRequest.run();
@@ -132,7 +124,8 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
 //                        activity.addProperty("authenticated_user", context.get("username"));
                         m.activity.put("authenticated_user", context.get("username"));
                         MsgActivityBroadcast broadcast = new MsgActivityBroadcast(m.activity);
-                        cm.servers().broadcast(broadcast);
+//                        cm.servers().broadcast(broadcast);
+                        // todo: server broadcast
                         cm.clients().broadcast(broadcast);
                     } catch (JsonSyntaxException e) {
                         MsgInvalidMessage res = new MsgInvalidMessage("activity object json syntax error");
@@ -149,26 +142,6 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
                     log.info("client error: ", error);
                     commonErrorHandler.accept(context, error);
                 });
-//        routers.parent()
-//                .handle(MessageCommands.AUTHENTICATION_FAIL, context -> {
-//                    context.close();
-//                })
-//                .handle(MessageCommands.INVALID_MESSAGE, context -> {
-//                    log.error("RCV INVALID MESSAGE");
-//                })
-//                .handleError((context, error) -> {
-//                    log.info("parent error: ", error);
-//                    commonErrorHandler.accept(context, error);
-//                });
-//        routers.child()
-//                .handle(MessageCommands.AUTHENTICATE, context -> {
-//                    context.write(new MsgInvalidMessage("Server already authenticated"));
-//                    context.close();
-//                })
-//                .handleError((context, error) -> {
-//                    log.info("child error: ", error);
-//                    commonErrorHandler.accept(context, error);
-//                });
 
         // group routing
         routers.possibleClient()
@@ -194,49 +167,6 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
                         context.close();
                     }
                 });
-//        routers.server()
-//                .handle(MessageCommands.ACTIVITY_BROADCAST, context -> {
-//                    MsgActivityBroadcast m = context.read(MsgActivityBroadcast.class);
-//                    cm.servers().exclude(context.connectivity).broadcast(m);
-//                    cm.clients().broadcast(m);
-//                })
-//                .handle(MessageCommands.SERVER_ANNOUNCE, context -> {
-//                    MsgServerAnnounce m = context.read(MsgServerAnnounce.class);
-//                    servers.records().put(m.id, m.hostname, m.port, m.load);
-//                    cm.servers().exclude(context.connectivity).broadcast(m);
-//                })
-//                .handle(MessageCommands.LOCK_REQUEST, context -> {
-//                    // broadcast
-//                    cm.servers().exclude(context.connectivity).broadcast(context.read());
-//                    // handle request
-//                    MsgLockRequest req = context.read(MsgLockRequest.class);
-//                    boolean known = users.has(req.username);
-//                    boolean match = users.match(req.username, req.secret);
-//                    if (known) {
-//                        MsgLockDenied res = new MsgLockDenied(req.username, req.secret);
-//                        cm.servers().broadcast(res);
-//                        if (match) {
-//                            users.delete(req.username, req.secret);
-//                        }
-//                        return;
-//                    }
-//                    users.add(req.username, req.secret);
-//                    MsgLockAllowed res = new MsgLockAllowed(req.username, req.secret);
-//                    cm.servers().broadcast(res);
-//                })
-//                .handle(MessageCommands.LOCK_ALLOWED, context -> {
-//                    cm.servers().exclude(context.connectivity).broadcast(context.read());
-//                })
-//                .handle(MessageCommands.LOCK_DENIED, context -> {
-//                    // broadcast
-//                    cm.servers().exclude(context.connectivity).broadcast(context.read());
-//                    // handle denied
-//                    MsgLockDenied m = context.read(MsgLockDenied.class);
-//                    boolean match = users.match(m.username, m.secret);
-//                    if (match) {
-//                        users.delete(m.username, m.secret);
-//                    }
-//                });
     }
 
     IRemoteNode connectNode(String hostname, int port) {
@@ -272,7 +202,6 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
         return true;
     }
 
-
     @Override
     public void recover(String serversSnapshot, String usersSnapshot) throws RemoteException {
         servers.recover(serversSnapshot);
@@ -282,7 +211,7 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
             if (node == null) {
                 return;
             }
-            // todo: add node in nodes
+            // todo: add node in nodes, might be merged with Servers
             nm.put(record.id, node);
         });
     }
