@@ -19,27 +19,30 @@ public class Server extends ServerResponder {
     }
 
     public Server() {
-        connectParent();
+        connectNodes();
         startListen();
         start();
     }
 
-    private void connectParent() {
+    private void connectNodes() {
         if (Settings.getRemoteHostname() != null) {
-            try {
-                Connectivity conn = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort());
-                cm.parent().set(conn);
-                conn.whenClosed(() -> {
-                    log.info("Parent.Closed");
-                    terminate();
-                });
-                log.info("Authenticate.Start");
+            // todo: connect parent, parent should add this node
+            // todo: sync states
+            // todo: connect all nodes
+//            try {
+//                Connectivity conn = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort());
+//                cm.parent().set(conn);
+//                conn.whenClosed(() -> {
+//                    log.info("Parent.Closed");
+//                    terminate();
+//                });
+//                log.info("Authenticate.Start");
+////                conn.sendln(new MsgAuthenticate(Settings.getSecret()));
 //                conn.sendln(new MsgAuthenticate(Settings.getSecret()));
-                conn.sendln(new MsgAuthenticate(Settings.getSecret()));
-            } catch (IOException e) {
-                log.error("Parent.Failed" + Settings.getRemoteHostname() + ":" + Settings.getRemotePort() + " :" + e);
-                System.exit(-1);
-            }
+//            } catch (IOException e) {
+//                log.error("Parent.Failed" + Settings.getRemoteHostname() + ":" + Settings.getRemotePort() + " :" + e);
+//                System.exit(-1);
+//            }
         }
     }
 
@@ -77,21 +80,21 @@ public class Server extends ServerResponder {
     }
 
     public boolean doActivity() {
-        doServerAnnounce();
+//        doServerAnnounce();
         return false;
     }
 
-    private void doServerAnnounce() {
-        Integer load = cm.clients().size();
-//        log.info("Activity.Announce Load: " + load);
-        MsgServerAnnounce m = new MsgServerAnnounce(
-                uuid,
-                Settings.getLocalHostname(),
-                Settings.getLocalPort(),
-                load
-        );
-        cm.servers().broadcast(m);
-    }
+//    private void doServerAnnounce() {
+//        Integer load = cm.clients().size();
+////        log.info("Activity.Announce Load: " + load);
+//        MsgServerAnnounce m = new MsgServerAnnounce(
+//                uuid,
+//                Settings.getLocalHostname(),
+//                Settings.getLocalPort(),
+//                load
+//        );
+//        cm.servers().broadcast(m);
+//    }
 
     public final void terminate() {
         if (!term) {

@@ -42,16 +42,16 @@ abstract class ServerResponder extends Async {
         };
 
         routers.temp()
-                .handle(MessageCommands.AUTHENTICATE, context -> {
-                    MsgAuthenticate m = context.read(MsgAuthenticate.class);
-                    boolean success = m.secret.equals(Settings.getSecret());
-                    if (!success) {
-                        MsgAuthenticationFail res = new MsgAuthenticationFail("the supplied secret is incorrect:" + m.secret);
-                        context.write(res);
-                        context.close();
-                    }
-                    cm.temp().transfer(context.connectivity, cm.children());
-                })
+//                .handle(MessageCommands.AUTHENTICATE, context -> {
+//                    MsgAuthenticate m = context.read(MsgAuthenticate.class);
+//                    boolean success = m.secret.equals(Settings.getSecret());
+//                    if (!success) {
+//                        MsgAuthenticationFail res = new MsgAuthenticationFail("the supplied secret is incorrect:" + m.secret);
+//                        context.write(res);
+//                        context.close();
+//                    }
+//                    cm.temp().transfer(context.connectivity, cm.children());
+//                })
                 .handle(MessageCommands.REGISTER, context -> {
                     MsgRegister m = context.read(MsgRegister.class);
 //                    log.info("Register: Start:" + m.username + " " + m.secret);
@@ -146,26 +146,26 @@ abstract class ServerResponder extends Async {
                     log.info("client error: ", error);
                     commonErrorHandler.accept(context, error);
                 });
-        routers.parent()
-                .handle(MessageCommands.AUTHENTICATION_FAIL, context -> {
-                    context.close();
-                })
-                .handle(MessageCommands.INVALID_MESSAGE, context -> {
-                    log.error("RCV INVALID MESSAGE");
-                })
-                .handleError((context, error) -> {
-                    log.info("parent error: ", error);
-                    commonErrorHandler.accept(context, error);
-                });
-        routers.child()
-                .handle(MessageCommands.AUTHENTICATE, context -> {
-                    context.write(new MsgInvalidMessage("Server already authenticated"));
-                    context.close();
-                })
-                .handleError((context, error) -> {
-                    log.info("child error: ", error);
-                    commonErrorHandler.accept(context, error);
-                });
+//        routers.parent()
+//                .handle(MessageCommands.AUTHENTICATION_FAIL, context -> {
+//                    context.close();
+//                })
+//                .handle(MessageCommands.INVALID_MESSAGE, context -> {
+//                    log.error("RCV INVALID MESSAGE");
+//                })
+//                .handleError((context, error) -> {
+//                    log.info("parent error: ", error);
+//                    commonErrorHandler.accept(context, error);
+//                });
+//        routers.child()
+//                .handle(MessageCommands.AUTHENTICATE, context -> {
+//                    context.write(new MsgInvalidMessage("Server already authenticated"));
+//                    context.close();
+//                })
+//                .handleError((context, error) -> {
+//                    log.info("child error: ", error);
+//                    commonErrorHandler.accept(context, error);
+//                });
 
         // group routing
         routers.possibleClient()
@@ -191,48 +191,48 @@ abstract class ServerResponder extends Async {
                         context.close();
                     }
                 });
-        routers.server()
-                .handle(MessageCommands.ACTIVITY_BROADCAST, context -> {
-                    MsgActivityBroadcast m = context.read(MsgActivityBroadcast.class);
-                    cm.servers().exclude(context.connectivity).broadcast(m);
-                    cm.clients().broadcast(m);
-                })
-                .handle(MessageCommands.SERVER_ANNOUNCE, context -> {
-                    MsgServerAnnounce m = context.read(MsgServerAnnounce.class);
-                    servers.records().put(m.id, m.hostname, m.port, m.load);
-                    cm.servers().exclude(context.connectivity).broadcast(m);
-                })
-                .handle(MessageCommands.LOCK_REQUEST, context -> {
-                    // broadcast
-                    cm.servers().exclude(context.connectivity).broadcast(context.read());
-                    // handle request
-                    MsgLockRequest req = context.read(MsgLockRequest.class);
-                    boolean known = users.has(req.username);
-                    boolean match = users.match(req.username, req.secret);
-                    if (known) {
-                        MsgLockDenied res = new MsgLockDenied(req.username, req.secret);
-                        cm.servers().broadcast(res);
-                        if (match) {
-                            users.delete(req.username, req.secret);
-                        }
-                        return;
-                    }
-                    users.add(req.username, req.secret);
-                    MsgLockAllowed res = new MsgLockAllowed(req.username, req.secret);
-                    cm.servers().broadcast(res);
-                })
-                .handle(MessageCommands.LOCK_ALLOWED, context -> {
-                    cm.servers().exclude(context.connectivity).broadcast(context.read());
-                })
-                .handle(MessageCommands.LOCK_DENIED, context -> {
-                    // broadcast
-                    cm.servers().exclude(context.connectivity).broadcast(context.read());
-                    // handle denied
-                    MsgLockDenied m = context.read(MsgLockDenied.class);
-                    boolean match = users.match(m.username, m.secret);
-                    if (match) {
-                        users.delete(m.username, m.secret);
-                    }
-                });
+//        routers.server()
+//                .handle(MessageCommands.ACTIVITY_BROADCAST, context -> {
+//                    MsgActivityBroadcast m = context.read(MsgActivityBroadcast.class);
+//                    cm.servers().exclude(context.connectivity).broadcast(m);
+//                    cm.clients().broadcast(m);
+//                })
+//                .handle(MessageCommands.SERVER_ANNOUNCE, context -> {
+//                    MsgServerAnnounce m = context.read(MsgServerAnnounce.class);
+//                    servers.records().put(m.id, m.hostname, m.port, m.load);
+//                    cm.servers().exclude(context.connectivity).broadcast(m);
+//                })
+//                .handle(MessageCommands.LOCK_REQUEST, context -> {
+//                    // broadcast
+//                    cm.servers().exclude(context.connectivity).broadcast(context.read());
+//                    // handle request
+//                    MsgLockRequest req = context.read(MsgLockRequest.class);
+//                    boolean known = users.has(req.username);
+//                    boolean match = users.match(req.username, req.secret);
+//                    if (known) {
+//                        MsgLockDenied res = new MsgLockDenied(req.username, req.secret);
+//                        cm.servers().broadcast(res);
+//                        if (match) {
+//                            users.delete(req.username, req.secret);
+//                        }
+//                        return;
+//                    }
+//                    users.add(req.username, req.secret);
+//                    MsgLockAllowed res = new MsgLockAllowed(req.username, req.secret);
+//                    cm.servers().broadcast(res);
+//                })
+//                .handle(MessageCommands.LOCK_ALLOWED, context -> {
+//                    cm.servers().exclude(context.connectivity).broadcast(context.read());
+//                })
+//                .handle(MessageCommands.LOCK_DENIED, context -> {
+//                    // broadcast
+//                    cm.servers().exclude(context.connectivity).broadcast(context.read());
+//                    // handle denied
+//                    MsgLockDenied m = context.read(MsgLockDenied.class);
+//                    boolean match = users.match(m.username, m.secret);
+//                    if (match) {
+//                        users.delete(m.username, m.secret);
+//                    }
+//                });
     }
 }

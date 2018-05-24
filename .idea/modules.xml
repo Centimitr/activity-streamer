@@ -3,11 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Client/Client.iml" filepath="$PROJECT_DIR$/Client/Client.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Gateway/Gateway.iml" filepath="$PROJECT_DIR$/Gateway/Gateway.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Master/Master.iml" filepath="$PROJECT_DIR$/Master/Master.iml" />
       <module fileurl="file://$PROJECT_DIR$/Server/Server.iml" filepath="$PROJECT_DIR$/Server/Server.iml" />
       <module fileurl="file://$PROJECT_DIR$/Shared/Shared.iml" filepath="$PROJECT_DIR$/Shared/Shared.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Slave/Slave.iml" filepath="$PROJECT_DIR$/Slave/Slave.iml" />
     </modules>
   </component>
 </project>
