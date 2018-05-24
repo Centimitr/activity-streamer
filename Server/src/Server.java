@@ -1,5 +1,10 @@
+import org.w3c.dom.Node;
+
 import java.io.IOException;
 import java.net.Socket;
+import java.rmi.*;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
 // todo: exception when sending data vai a closed connection
 
@@ -13,22 +18,43 @@ public class Server extends ServerResponder {
 
     public static Server getInstance() {
         if (control == null) {
-            control = new Server();
+            try {
+                control = new Server();
+            } catch (RemoteException e) {
+                log.fatal(e);
+                System.exit(-1);
+            }
         }
         return control;
     }
 
-    public Server() {
-        connectNodes();
-        startListen();
-        start();
+    public Server() throws RemoteException {
+        super();
+        init();
+//        startListen();
+        (new Thread(this::run)).run();
     }
 
-    private void connectNodes() {
+    private void init() {
+        // accept remote invocations
+        try {
+            Registry localRegistry = LocateRegistry.createRegistry(Settings.getLocalPort());
+            localRegistry.bind("Node", this);
+        } catch (RemoteException | AlreadyBoundException e) {
+            // todo: local node exception
+            log.error("local node:", e);
+            e.printStackTrace();
+        }
         if (Settings.getRemoteHostname() != null) {
             // todo: connect parent, parent should add this node
+            recoverLock.lock();
+            IRemoteNode parent = connectNode(Settings.getRemoteHostname(), Settings.getRemotePort());
+            if (parent == null) {
+                System.exit(-1);
+            }
             // todo: sync states
             // todo: connect all nodes
+            recoverLock.until();
 //            try {
 //                Connectivity conn = new Connectivity(Settings.getRemoteHostname(), Settings.getRemotePort());
 //                cm.parent().set(conn);
@@ -63,7 +89,6 @@ public class Server extends ServerResponder {
         }
     }
 
-    @Override
     public void run() {
         log.info("Activity.Start Interval: " + Settings.getActivityInterval());
         while (!term) {

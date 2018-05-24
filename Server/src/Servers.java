@@ -2,6 +2,7 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+@SuppressWarnings("WeakerAccess")
 class ServerRecord {
     String id;
     String hostname;
@@ -20,6 +21,7 @@ class ServerRecord {
     }
 }
 
+@SuppressWarnings({"WeakerAccess", "SameParameterValue"})
 class ServerRecordSet {
     private Map<String, ServerRecord> records = new HashMap<>();
 
@@ -99,7 +101,7 @@ class ServiceBalancer {
 }
 
 
-class Servers {
+class Servers implements IRecoverable {
     private ConnectivitySetGroup connectedServers;
     private ServerRecordSet records = new ServerRecordSet();
     private ServiceBalancer balancer = new ServiceBalancer(records);
@@ -131,4 +133,15 @@ class Servers {
         });
         return addresses.size();
     }
+
+    @Override
+    public String snapshot() {
+        return "";
+    }
+
+    @Override
+    public void recover(String snapshot) {
+
+    }
+
 }

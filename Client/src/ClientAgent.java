@@ -94,14 +94,14 @@ public class ClientAgent extends ConnectivityAgent {
         String secret = Settings.nextSecret();
         MsgRegister m = new MsgRegister(username, secret);
         sendln(m);
-        registerLock.lock();
+        registerLock.lockAndWait();
         return secret;
     }
 
     void login(String username, String secret) {
         MsgLogin m = new MsgLogin(username, secret);
         sendln(m);
-        loginLock.lock();
+        loginLock.lockAndWait();
     }
 
     public void logout() {

@@ -11,7 +11,7 @@ class User {
     }
 }
 
-class Users {
+class Users implements IRecoverable {
     private Map<String, User> users = new HashMap<>();
 
     boolean has(String username) {
@@ -41,4 +41,15 @@ class Users {
         User u = users.get(username);
         return secret.equals(u.secret);
     }
+
+    @Override
+    public String snapshot() {
+        return null;
+    }
+
+    @Override
+    public void recover(String snapshot) {
+
+    }
+
 }

@@ -9,6 +9,15 @@ class Lock {
 
     void lock() {
         locked = true;
+    }
+
+    void until() {
+        wg.wait(1);
+        locked = false;
+    }
+
+    void lockAndWait() {
+        locked = true;
         wg.wait(1);
         locked = false;
     }

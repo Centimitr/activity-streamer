@@ -1,27 +1,30 @@
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.UUID;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
-@SuppressWarnings("WeakerAccess")
-abstract class ServerResponder extends Async {
+@SuppressWarnings({"WeakerAccess", "Convert2MethodRef"})
+abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNode {
     static final Logger log = LogManager.getLogger();
     static final Gson g = new Gson();
 
-    String uuid = UUID.randomUUID().toString();
+    String id = UUID.randomUUID().toString();
     ConnectivityManager cm = new ConnectivityManager();
+    NodesManager nm = new NodesManager();
     RegisterManager rm = new RegisterManager();
     Servers servers = new Servers(cm.servers());
     Users users = new Users();
+    Lock recoverLock = new Lock();
 
-    @SuppressWarnings({"CodeBlock2Expr", "Convert2MethodRef"})
-    ServerResponder() {
+    ServerResponder() throws RemoteException {
         RouterManager routers = cm.routerManager();
         BiConsumer<MessageContext, String> commonErrorHandler = (context, error) -> {
             String info;
@@ -234,5 +237,53 @@ abstract class ServerResponder extends Async {
 //                        users.delete(m.username, m.secret);
 //                    }
 //                });
+    }
+
+    IRemoteNode connectNode(String hostname, int port) {
+        try {
+            Registry remoteRegistry = LocateRegistry.getRegistry(hostname, port);
+            IRemoteNode node = (IRemoteNode) remoteRegistry.lookup("Node");
+            boolean ok = node.declare(Settings.getSecret(), id, Settings.getRemoteHostname(), Settings.getRemotePort(), true);
+            if (ok) {
+                return node;
+            }
+        } catch (RemoteException | NotBoundException e) {
+            // todo: maybe remote fails
+            log.error("parent node:", e);
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public boolean declare(String secret, String id, String remoteHostname, int remotePort, boolean needRecovery) throws RemoteException {
+        if (!secret.equals(Settings.getSecret())) {
+            return false;
+        }
+        IRemoteNode node = connectNode(remoteHostname, remotePort);
+        if (node == null) {
+            return false;
+        }
+        servers.records().put(id, remoteHostname, remotePort, 0);
+        if (needRecovery) {
+            // todo: add messages recovery
+            node.recover(servers.snapshot(), users.snapshot());
+        }
+        return true;
+    }
+
+
+    @Override
+    public void recover(String serversSnapshot, String usersSnapshot) throws RemoteException {
+        servers.recover(serversSnapshot);
+        users.recover(usersSnapshot);
+        servers.records().forEach((id, record) -> {
+            IRemoteNode node = connectNode(record.hostname, record.port);
+            if (node == null) {
+                return;
+            }
+            // todo: add node in nodes
+            nm.put(record.id, node);
+        });
     }
 }
