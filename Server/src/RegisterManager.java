@@ -1,36 +1,63 @@
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
-class RegisterRequest extends WaitGroup {
-    private String username;
-    private String secret;
+class User {
+    String username;
+    String secret;
 
-    RegisterRequest(String username, String secret) {
+    User(String username, String secret) {
         this.username = username;
         this.secret = secret;
     }
+}
+
+class Users implements IRecoverable {
+    private Map<String, User> users = new HashMap<>();
+
+    boolean has(String username) {
+        return users.containsKey(username);
+    }
+
+    boolean add(String username, String secret) {
+        if (has(username)) {
+            return false;
+        }
+        User u = new User(username, secret);
+        users.put(username, u);
+        return true;
+    }
+
+    boolean delete(String username, String secret) {
+        return users.remove(username, secret);
+    }
 
     boolean match(String username, String secret) {
-        return this.username.equals(username) && this.secret.equals(secret);
+        if (!has(username)) {
+            return false;
+        }
+        if (secret == null) {
+            return false;
+        }
+        User u = users.get(username);
+        return secret.equals(u.secret);
     }
+
+    @Override
+    public String snapshot() {
+        return null;
+    }
+
+    @Override
+    public void recover(String snapshot) {
+
+    }
+
 }
 
 class RegisterManager {
-    private ArrayList<RegisterRequest> requests = new ArrayList<>();
+    private final Users _users = new Users();
 
-    boolean wait(String username, String secret, int num) {
-        RegisterRequest req = new RegisterRequest(username, secret);
-        requests.add(req);
-        boolean notCancelled = req.wait(num);
-        requests.remove(req);
-        return notCancelled;
-    }
-
-    RegisterRequest get(String username, String secret) {
-        for (RegisterRequest req : requests) {
-            if (req.match(username, secret)) {
-                return req;
-            }
-        }
-        return null;
+    Users users() {
+        return _users;
     }
 }

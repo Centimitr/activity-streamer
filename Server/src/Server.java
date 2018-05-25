@@ -29,7 +29,7 @@ public class Server extends ServerResponder {
     public Server() throws RemoteException {
         super();
         init();
-//        startListen();
+        startListen();
         (new Thread(this::run)).run();
     }
 
@@ -51,7 +51,7 @@ public class Server extends ServerResponder {
 
     private void startListen() {
         try {
-            listener = new Listener(Settings.getLocalPort(), this::handleIncomingConn);
+            listener = new Listener(Settings.getClientPort(), this::handleIncomingConn);
         } catch (IOException e) {
             log.fatal("Listener.Failed " + e);
             System.exit(-1);

@@ -8,13 +8,13 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 class LocalNode {
+    private static final String defaultServiceName = "Node";
     private static final Logger log = LogManager.getLogger();
-//    IRemoteNode node;
 
     boolean start(int port, Remote binding) {
         try {
             Registry localRegistry = LocateRegistry.createRegistry(port);
-            localRegistry.bind("Node", binding);
+            localRegistry.bind(defaultServiceName, binding);
             return true;
         } catch (RemoteException | AlreadyBoundException e) {
             // todo: local node exception

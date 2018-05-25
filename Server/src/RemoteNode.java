@@ -5,7 +5,7 @@ import java.rmi.registry.Registry;
 
 @SuppressWarnings("WeakerAccess")
 class RemoteNode {
-    static final String defaultServiceName = "Node";
+    private static final String defaultServiceName = "Node";
     String id;
     final String hostname;
     final int port;
@@ -17,7 +17,6 @@ class RemoteNode {
         this.port = port;
         this.serviceName = name;
     }
-
 
     RemoteNode(String hostname, int port) {
         this(hostname, port, RemoteNode.defaultServiceName);

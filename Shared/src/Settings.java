@@ -9,10 +9,12 @@ import org.apache.logging.log4j.Logger;
 public class Settings {
     private static final Logger log = LogManager.getLogger();
     private static SecureRandom random = new SecureRandom();
-    private static int localPort = 3780;
     private static String localHostname = "localhost";
     private static String remoteHostname = null;
-    private static int remotePort = 3780;
+    private static String clientHostname = "localhost";
+    private static int localPort = 7010;
+    private static int remotePort = 7011;
+    private static int clientPort = 7001;
     private static int activityInterval = 250; // milliseconds
     private static String secret = null;
     private static String username = "anonymous";
@@ -39,6 +41,18 @@ public class Settings {
             log.error("supplied port " + remotePort + " is out of range, using " + getRemotePort());
         } else {
             Settings.remotePort = remotePort;
+        }
+    }
+
+    public static int getClientPort() {
+        return clientPort;
+    }
+
+    public static void setClientPort(int clientPort) {
+        if (clientPort < 0 || clientPort > 65535) {
+            log.error("supplied port " + clientPort + " is out of range, using " + getClientPort());
+        } else {
+            Settings.clientPort = clientPort;
         }
     }
 
@@ -82,6 +96,13 @@ public class Settings {
         Settings.localHostname = localHostname;
     }
 
+    public static String getClientHostname() {
+        return clientHostname;
+    }
+
+    public static void setClientHostname(String clientHostname) {
+        Settings.clientHostname = clientHostname;
+    }
 
     /*
      * some general helper functions

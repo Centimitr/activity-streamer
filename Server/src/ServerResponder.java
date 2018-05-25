@@ -21,8 +21,6 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
     final ConnectivityManager cm = new ConnectivityManager();
     final NodesManager nm = new NodesManager();
     final RegisterManager rm = new RegisterManager();
-    final Servers servers = new Servers(nm);
-    final Users users = new Users();
     final Lock recoverLock = new Lock();
 
     ServerResponder() throws RemoteException {
@@ -49,7 +47,6 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
                 .handle(MessageCommands.REGISTER, context -> {
                     MsgRegister m = context.read(MsgRegister.class);
 //                    log.info("Register: Start:" + m.username + " " + m.secret);
-
                     Runnable handleRegisteredRequest = () -> {
                         String info = m.username + " is already registered with the system.";
                         MsgRegisterFailed res = new MsgRegisterFailed(info);
@@ -57,25 +54,25 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
                         context.close();
                     };
                     boolean anonymous = m.username.equals("anonymous");
-                    boolean registered = users.has(m.username);
+                    boolean registered = rm.users().has(m.username);
                     if (registered || anonymous) {
 //                        log.info("Register: Local already registered: " + m.username + " " + m.secret);
                         handleRegisteredRequest.run();
                         return;
                     }
 
-                    // ask other servers' options
-                    MsgLockRequest req = new MsgLockRequest(m.username, m.secret);
-                    // todo: server broadcase
-//                    cm.servers().broadcast(req);
-                    // todo: new wait for remotes, 0
-                    boolean available = rm.wait(m.username, m.secret, 0);
-                    if (!available) {
-//                        log.info("Register: Remote already registered: " + m.username + " " + m.secret);
-                        handleRegisteredRequest.run();
-                        return;
-                    }
-                    users.add(m.username, m.secret);
+                    //                    // ask other servers' options
+//                    MsgLockRequest req = new MsgLockRequest(m.username, m.secret);
+////                    cm.servers().broadcast(req);
+//                    boolean available = rm.wait(m.username, m.secret, 0);
+//                    if (!available) {
+////                        log.info("Register: Remote already registered: " + m.username + " " + m.secret);
+//                        handleRegisteredRequest.run();
+//                        return;
+//                    }
+                    // todo: new register process
+
+                    rm.users().add(m.username, m.secret);
 
                     String info = "register success for " + m.username;
                     MsgRegisterSuccess res = new MsgRegisterSuccess(info);
@@ -149,7 +146,7 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
                 .handle(MessageCommands.LOGIN, context -> {
                     MsgLogin m = context.read(MsgLogin.class);
                     boolean anonymous = m.username.equals("anonymous");
-                    boolean match = users.match(m.username, m.secret);
+                    boolean match = rm.users().match(m.username, m.secret);
                     if (!match && !anonymous) {
                         context.write(new MsgLoginFailed("attempt to login with wrong secret"));
                         context.close();
@@ -161,12 +158,12 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
                     cm.possibleClients().transfer(context.connectivity, cm.clients());
                     // todo: load balance: redirect
                     int currentLoad = cm.clients().size();
-                    ServerRecord availableServer = servers.balancer().getAvailableServer(currentLoad);
-                    boolean needRedirect = availableServer != null;
-                    if (needRedirect) {
-                        context.write(new MsgRedirect(availableServer.hostname, availableServer.port));
-                        context.close();
-                    }
+//                    ServerRecord availableServer = servers.balancer().getAvailableServer(currentLoad);
+//                    boolean needRedirect = availableServer != null;
+//                    if (needRedirect) {
+//                        context.write(new MsgRedirect(availableServer.hostname, availableServer.port));
+//                        context.close();
+//                    }
                 });
     }
 
