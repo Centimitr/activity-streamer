@@ -7,10 +7,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2bae8d95-19df-4f10-8dac-d5664eef7352" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/Server/src/ConnectivityManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server/src/ConnectivityManager.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Server/src/LocalNode.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Server/src/RemoteNode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/src/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server/src/App.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/src/NodesManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server/src/NodesManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Server/src/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server/src/Server.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Server/src/ServerResponder.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server/src/ServerResponder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/src/Servers.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server/src/Servers.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shared/src/IRemoteNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/Shared/src/IRemoteNode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Shared/src/Settings.java" beforeDir="false" afterPath="$PROJECT_DIR$/Shared/src/Settings.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -23,24 +28,18 @@
     <SUITE FILE_PATH="coverage/COMP90015$Client_ConnectAaron.ic" NAME="Client_ConnectAaron Coverage Results" MODIFIED="1524753086965" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file leaf-file-name="Servers.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Server/src/Servers.java">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="Server.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Server/src/Server.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="216">
-              <caret line="101" column="1" selection-start-line="101" selection-start-column="1" selection-end-line="101" selection-end-column="1" />
+            <state relative-caret-position="526">
+              <caret line="76" column="11" selection-start-line="76" selection-start-column="11" selection-end-line="76" selection-end-column="11" />
               <folding>
-                <element signature="class#ServerRecord#0" />
-                <element signature="method#ServerRecord#0;class#ServerRecord#0" />
-                <element signature="method#update#0;class#ServerRecord#0" />
-                <element signature="class#ServerRecordSet#0" />
-                <element signature="method#put#0;class#ServerRecordSet#0" />
-                <element signature="method#getLoadLowerThan#0;class#ServerRecordSet#0" />
-                <element signature="method#getLoadLeast#0;class#ServerRecordSet#0" />
-                <element signature="class#ServiceBalancer#0" />
-                <element signature="method#getAvailableServer#0;class#ServiceBalancer#0" />
-                <element signature="e#3040#3057#0" />
-                <element signature="method#recover#0;class#Servers#0" />
+                <element signature="method#getInstance#0;class#Server#0" />
+                <element signature="method#Server#0;class#Server#0" />
+                <element signature="method#startListen#0;class#Server#0" />
+                <element signature="method#handleIncomingConn#0;class#Server#0" />
+                <element signature="method#terminate#0;class#Server#0" />
               </folding>
             </state>
           </provider>
@@ -118,9 +117,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/Server/src/LockResponse.java" />
-        <option value="$PROJECT_DIR$/Server/src/Balencer.java" />
-        <option value="$PROJECT_DIR$/Shared/src/WaitGroup.java" />
         <option value="$PROJECT_DIR$/Shared/src/MultiLevelMessageRouter.java" />
         <option value="$PROJECT_DIR$/Client/src/app.html" />
         <option value="$PROJECT_DIR$/Shared/src/IForEachConnectivity.java" />
@@ -154,21 +150,24 @@
         <option value="$PROJECT_DIR$/Client/src/View.java" />
         <option value="$PROJECT_DIR$/Shared/src/Connectivity.java" />
         <option value="$PROJECT_DIR$/Node/src/App.java" />
-        <option value="$PROJECT_DIR$/Shared/src/Settings.java" />
-        <option value="$PROJECT_DIR$/Server/src/App.java" />
-        <option value="$PROJECT_DIR$/Server/src/RemoteNode.java" />
         <option value="$PROJECT_DIR$/Server/src/AbstractRemoteNode.java" />
         <option value="$PROJECT_DIR$/Shared/src/IRecoverable.java" />
         <option value="$PROJECT_DIR$/Server/src/Users.java" />
         <option value="$PROJECT_DIR$/Shared/src/AbstractRemoteNode.java" />
         <option value="$PROJECT_DIR$/Client/src/ClientAgent.java" />
         <option value="$PROJECT_DIR$/Shared/src/Lock.java" />
-        <option value="$PROJECT_DIR$/Server/src/NodesManager.java" />
-        <option value="$PROJECT_DIR$/Shared/src/IRemoteNode.java" />
         <option value="$PROJECT_DIR$/Server/src/ConnectivityManager.java" />
+        <option value="$PROJECT_DIR$/Server/src/Servers.java" />
+        <option value="$PROJECT_DIR$/Server/src/App.java" />
+        <option value="$PROJECT_DIR$/Shared/src/Node.java" />
+        <option value="$PROJECT_DIR$/Shared/src/RemoteNode.java" />
+        <option value="$PROJECT_DIR$/Server/src/LocalNode.java" />
+        <option value="$PROJECT_DIR$/Shared/src/Settings.java" />
+        <option value="$PROJECT_DIR$/Server/src/RemoteNode.java" />
+        <option value="$PROJECT_DIR$/Shared/src/IRemoteNode.java" />
         <option value="$PROJECT_DIR$/Server/src/Server.java" />
         <option value="$PROJECT_DIR$/Server/src/ServerResponder.java" />
-        <option value="$PROJECT_DIR$/Server/src/Servers.java" />
+        <option value="$PROJECT_DIR$/Server/src/NodesManager.java" />
       </list>
     </option>
   </component>
@@ -183,19 +182,26 @@
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
     <option name="y" value="22" />
-    <option name="width" value="1680" />
-    <option name="height" value="1028" />
+    <option name="width" value="2560" />
+    <option name="height" value="1418" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="PackagesPane" />
+      <pane id="AndroidView" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
               <item name="COMP90015" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Client" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="COMP90015" type="b2602c69:ProjectViewProjectNode" />
               <item name="Server" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -207,19 +213,7 @@
               <item name="COMP90015" type="b2602c69:ProjectViewProjectNode" />
               <item name="Server" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="ConnectivityManager.java" type="529ef68f:ClassesTreeStructureProvider$PsiClassOwnerTreeNode" />
-            </path>
-            <path>
-              <item name="COMP90015" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Server" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="Servers.java" type="529ef68f:ClassesTreeStructureProvider$PsiClassOwnerTreeNode" />
-            </path>
-            <path>
-              <item name="COMP90015" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Server" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="Users.java" type="529ef68f:ClassesTreeStructureProvider$PsiClassOwnerTreeNode" />
+              <item name="META-INF" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="COMP90015" type="b2602c69:ProjectViewProjectNode" />
@@ -234,14 +228,12 @@
           <select />
         </subPane>
       </pane>
-      <pane id="AndroidView" />
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="SearchEverywhereHistoryKey" value="Redirect&#9;PSI&#9;JAVA://MsgRedirect&#10;context&#9;FILE&#9;file:///Users/shixiao/Playground/COMP90015/Shared/src/MessageContext.java&#10;redirect&#9;PSI&#9;JAVA://Connectivity#redirect" />
+    <property name="ToolWindowRun.ShowToolbar" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
@@ -264,52 +256,17 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.Server">
-    <configuration name="ClientA" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="App" />
-      <module name="Client" />
-      <option name="PROGRAM_PARAMETERS" value="-u jdfklsfjklasdfjkldsakl -rp 7001 " />
-      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
-    </configuration>
-    <configuration name="ClientB" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="App" />
-      <module name="Client" />
-      <option name="PROGRAM_PARAMETERS" value="-u cm -rp 7001 -s 1234" />
-      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
-    </configuration>
-    <configuration name="Client_ConnectAaron (1)" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="App" />
-      <module name="Client" />
-      <option name="PROGRAM_PARAMETERS" value="-rp 3780 -rh sunrise.cis.unimelb.edu.au -u xiaoming2 -s varfk3qjj1tf8jbpbn36bndnim" />
-      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
-    </configuration>
-    <configuration name="Node" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="App" />
-      <module name="Node" />
-      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
-    </configuration>
-    <configuration name="Server" type="Application" factoryName="Application">
+  <component name="RunManager" selected="Application.ServerB">
+    <configuration name="ServerA" type="Application" factoryName="Application" singleton="true">
       <option name="MAIN_CLASS_NAME" value="App" />
       <module name="Server" />
       <option name="PROGRAM_PARAMETERS" value="-lp 7001 -lh localhost -s 1234" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     </configuration>
-    <configuration name="ServerB" type="Application" factoryName="Application">
+    <configuration name="ServerB" type="Application" factoryName="Application" singleton="true">
       <option name="MAIN_CLASS_NAME" value="App" />
       <module name="Server" />
-      <option name="PROGRAM_PARAMETERS" value="-lp 7002 -rp 7001 -lh localhost -rh localhost -s 1234" />
-      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
-    </configuration>
-    <configuration name="Server_ConnectAaron" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="App" />
-      <module name="Server" />
-      <option name="PROGRAM_PARAMETERS" value="-rp 3781 -s gen1p85md2qnq0d59qll3fbcoa -rh sunrise.cis.unimelb.edu.au -lp 7000 -lh localhost" />
-      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
-    </configuration>
-    <configuration name="Server_ConnectLocal" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="App" />
-      <module name="Server" />
-      <option name="PROGRAM_PARAMETERS" value="-lp 7899 -rp 7897" />
+      <option name="PROGRAM_PARAMETERS" value="-lp 7002 -lh localhost -rp 7001 -rh localhost -s 1234" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
@@ -354,14 +311,8 @@
       <listeners />
     </configuration>
     <list>
-      <item itemvalue="Application.Node" />
-      <item itemvalue="Application.Server" />
+      <item itemvalue="Application.ServerA" />
       <item itemvalue="Application.ServerB" />
-      <item itemvalue="Application.ClientA" />
-      <item itemvalue="Application.ClientB" />
-      <item itemvalue="Application.Client_ConnectAaron (1)" />
-      <item itemvalue="Application.Server_ConnectAaron" />
-      <item itemvalue="Application.Server_ConnectLocal" />
     </list>
   </component>
   <component name="SvnConfiguration">
@@ -407,12 +358,14 @@
       <workItem from="1526362372153" duration="245000" />
       <workItem from="1526381790235" duration="328000" />
       <workItem from="1526537933289" duration="67000" />
-      <workItem from="1527133028797" duration="16520000" />
+      <workItem from="1527133028797" duration="18959000" />
+      <workItem from="1527211302119" duration="628000" />
+      <workItem from="1527229192988" duration="15485000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="326968000" />
+    <option name="totallyTimeSpent" value="345520000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -424,69 +377,38 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1680" height="1028" extended-state="6" />
-    <editor active="true" />
+    <frame x="0" y="22" width="2560" height="1418" extended-state="6" />
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
-      <window_info anchor="bottom" id="TODO" order="5" weight="0.32908458" />
-      <window_info anchor="bottom" id="Messages" order="6" sideWeight="0.49960938" weight="0.14675052" />
+      <window_info anchor="bottom" id="TODO" order="5" weight="0.32291666" />
+      <window_info anchor="bottom" id="Messages" order="6" sideWeight="0.49960938" weight="0.14657739" />
       <window_info anchor="right" id="Palette&#9;" order="4" />
       <window_info id="Image Layers" order="2" />
       <window_info anchor="right" id="Capture Analysis" order="5" />
       <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.50039065" side_tool="true" weight="0.14733543" />
       <window_info anchor="right" id="Maven Projects" order="6" />
       <window_info anchor="bottom" id="Database Changes" order="8" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info anchor="right" x="287" y="300" width="1252" height="705" id="Run" order="9" side_tool="true" type="WINDOWED" weight="0.20833333" />
-      <window_info anchor="bottom" id="Terminal" order="10" weight="0.31551364" />
+      <window_info anchor="bottom" id="Version Control" order="9" weight="0.329296" />
+      <window_info active="true" anchor="right" x="287" y="300" width="1252" height="705" id="Run" order="10" side_tool="true" visible="true" weight="0.37695312" />
+      <window_info anchor="bottom" id="Terminal" order="10" weight="0.31491295" />
       <window_info id="Capture Tool" order="6" />
       <window_info id="Designer" order="3" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18869048" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4985119" visible="true" weight="0.12382813" />
       <window_info anchor="right" id="Database" order="7" />
+      <window_info id="Structure" order="1" sideWeight="0.5014881" side_tool="true" weight="0.12382813" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info id="UI Designer" order="4" />
+      <window_info anchor="right" id="Theme Preview" order="8" />
+      <window_info id="Favorites" order="5" side_tool="true" />
+      <window_info anchor="bottom" id="Debug" order="2" weight="0.39285713" />
+      <window_info anchor="right" id="Coverage" order="9" side_tool="true" weight="0.3297619" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="4" weight="0.4" />
+      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Cvs" order="3" weight="0.25" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32914045" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info id="UI Designer" order="4" />
-      <window_info anchor="right" id="Theme Preview" order="8" />
-      <window_info id="Favorites" order="5" side_tool="true" />
-      <window_info anchor="bottom" id="Debug" order="2" weight="0.39308175" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="Coverage" order="10" side_tool="true" weight="0.3297619" />
-      <window_info anchor="bottom" id="Inspection" order="4" weight="0.4" />
-      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Cvs" order="3" weight="0.25" />
     </layout>
-    <layout-to-restore>
-      <window_info anchor="right" id="Palette" order="3" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="Capture Analysis" order="5" />
-      <window_info anchor="bottom" id="Inspection" order="4" weight="0.4" />
-      <window_info active="true" anchor="right" x="436" y="603" width="1181" height="672" id="Run" order="9" side_tool="true" type="WINDOWED" visible="true" weight="0.20833333" />
-      <window_info anchor="right" id="Theme Preview" order="8" />
-      <window_info anchor="bottom" id="Cvs" order="3" weight="0.25" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.11875" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="bottom" id="TODO" order="5" weight="0.32908458" />
-      <window_info id="Image Layers" order="2" />
-      <window_info id="Designer" order="3" />
-      <window_info id="UI Designer" order="4" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32844242" />
-      <window_info anchor="right" id="Database" order="7" />
-      <window_info anchor="right" id="Palette&#9;" order="4" />
-      <window_info anchor="bottom" id="Terminal" order="10" weight="0.3236677" />
-      <window_info anchor="bottom" id="Debug" order="2" weight="0.3939052" />
-      <window_info anchor="bottom" id="Database Changes" order="8" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" weight="0.3295711" />
-      <window_info id="Capture Tool" order="6" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Messages" order="6" weight="0.14785554" />
-      <window_info anchor="right" id="Maven Projects" order="6" />
-      <window_info id="Favorites" order="5" side_tool="true" />
-    </layout-to-restore>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
@@ -500,34 +422,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Shared/src/MessageRouter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="487">
-          <caret line="25" column="21" selection-start-line="25" selection-start-column="21" selection-end-line="25" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Shared/src/MessageRouterRepresenter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="96">
-          <caret line="4" column="33" lean-forward="true" selection-start-line="4" selection-start-column="33" selection-end-line="4" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk-10.jdk/Contents/Home/lib/src.zip!/javafx.graphics/javafx/scene/Parent.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="286">
-          <caret line="80" column="22" selection-start-line="80" selection-start-column="22" selection-end-line="80" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk-10.jdk/Contents/Home/lib/src.zip!/javafx.web/javafx/scene/web/WebEngine.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="245">
-          <caret line="341" selection-start-line="341" selection-end-line="341" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar:///Library/Java/JavaVirtualMachines/jdk-10.jdk/Contents/Home/lib/src.zip!/javafx.web/javafx/scene/web/WebView.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="278">
@@ -567,13 +461,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="228">
           <caret line="391" column="31" lean-forward="true" selection-start-line="391" selection-start-column="31" selection-end-line="391" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Shared/src/ConnectivitySet.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1464">
-          <caret line="65" column="29" lean-forward="true" selection-start-line="65" selection-start-column="29" selection-end-line="65" selection-end-column="29" />
         </state>
       </provider>
     </entry>
@@ -655,16 +542,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Node/src/App.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2184">
-          <caret line="91" column="33" selection-start-line="91" selection-start-column="33" selection-end-line="91" selection-end-column="33" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/Node/src/App.java" />
     <entry file="file://$PROJECT_DIR$/Shared/src/IForEachConnectivity.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
@@ -686,24 +564,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Shared/src/Connectivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="432">
-          <caret line="38" selection-start-line="38" selection-end-line="38" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Shared/src/Settings.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="312">
-          <caret line="25" column="49" lean-forward="true" selection-start-line="25" selection-start-column="49" selection-end-line="25" selection-end-column="49" />
-          <folding>
-            <element signature="e#1665#1666#0" expanded="true" />
-            <element signature="e#1704#1705#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar:///Library/Java/JavaVirtualMachines/jdk-10.jdk/Contents/Home/lib/src.zip!/java.rmi/java/rmi/registry/LocateRegistry.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="308">
@@ -718,23 +578,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Server/src/RegisterManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="520">
-          <caret line="26" lean-forward="true" selection-start-line="26" selection-end-line="26" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Server/RemoteNode">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Server/src/App.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="376">
-          <caret line="90" lean-forward="true" selection-start-line="90" selection-end-line="90" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/Server/RemoteNode" />
     <entry file="file://$PROJECT_DIR$/Shared/src/WaitGroup.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="576">
@@ -785,25 +629,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="360">
           <caret line="17" selection-start-line="17" selection-end-line="17" />
-          <folding>
-            <element signature="e#207#208#0" expanded="true" />
-            <element signature="e#236#237#0" expanded="true" />
-            <element signature="e#425#426#0" expanded="true" />
-            <element signature="e#450#451#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Shared/src/AbstractRemoteNode.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
-          <caret line="6" lean-forward="true" selection-start-line="6" selection-end-line="6" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/Shared/src/AbstractRemoteNode.java" />
     <entry file="jar:///Library/Java/JavaVirtualMachines/jdk-10.jdk/Contents/Home/lib/src.zip!/java.rmi/java/rmi/server/UnicastRemoteObject.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="231">
@@ -818,93 +647,158 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Server/src/ConnectivityManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="264">
+          <caret line="15" column="23" selection-start-line="15" selection-start-column="23" selection-end-line="15" selection-end-column="23" />
+          <folding>
+            <element signature="method#ConnectivityManager#0;class#ConnectivityManager#0" />
+            <element signature="method#CentralRouter#0;class#CentralRouter#0" />
+            <element signature="method#getHandler#0;class#CentralRouter#0" />
+            <element signature="method#getErrorHandler#0;class#CentralRouter#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Server/src/RegisterManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="5" lean-forward="true" selection-start-line="5" selection-end-line="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk-10.jdk/Contents/Home/lib/src.zip!/java.rmi/sun/rmi/transport/tcp/TCPEndpoint.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="262">
+          <caret line="618" selection-start-line="618" selection-end-line="618" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Server/src/Servers.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="192">
+          <caret line="12" lean-forward="true" selection-start-line="12" selection-end-line="12" />
+          <folding>
+            <element signature="method#update#0;class#ServerRecord#0" />
+            <element signature="method#put#0;class#ServerRecordSet#0" />
+            <element signature="method#getLoadLowerThan#0;class#ServerRecordSet#0" />
+            <element signature="method#getLoadLeast#0;class#ServerRecordSet#0" />
+            <element signature="class#ServiceBalancer#0" />
+            <element signature="method#getAvailableServer#0;class#ServiceBalancer#0" />
+            <element signature="method#recover#0;class#Servers#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk-10.jdk/Contents/Home/lib/src.zip!/java.rmi/java/rmi/registry/Registry.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="438">
+          <caret line="126" column="45" lean-forward="true" selection-start-line="126" selection-start-column="45" selection-end-line="126" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Shared/src/ConnectivitySet.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1200">
+          <caret line="65" column="29" lean-forward="true" selection-start-line="65" selection-start-column="29" selection-end-line="65" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Shared/src/Connectivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="96">
+          <caret line="15" column="61" lean-forward="true" selection-start-line="15" selection-end-line="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Server/src/LocalNode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="144">
+          <caret line="6" column="40" lean-forward="true" selection-start-line="6" selection-start-column="40" selection-end-line="6" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Shared/src/Settings.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1078">
+          <caret line="95" column="5" selection-start-line="95" selection-start-column="5" selection-end-line="95" selection-end-column="5" />
+          <folding>
+            <element signature="e#1561#1562#0" expanded="true" />
+            <element signature="e#1617#1618#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Server/src/App.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="747">
+          <caret line="80" lean-forward="true" selection-start-line="80" selection-end-line="80" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Shared/src/IRemoteNode.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="168">
-          <caret line="7" column="72" selection-start-line="7" selection-end-line="8" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state relative-caret-position="96">
+          <caret line="5" column="18" selection-start-line="5" selection-start-column="18" selection-end-line="5" selection-end-column="18" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Server/src/NodesManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="24">
-          <caret line="1" lean-forward="true" selection-start-line="1" selection-end-line="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Server/src/ConnectivityManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="96">
-          <caret line="48" column="46" selection-start-line="48" selection-start-column="46" selection-end-line="48" selection-end-column="46" />
+        <state relative-caret-position="408">
+          <caret line="21" column="44" lean-forward="true" selection-start-line="21" selection-start-column="44" selection-end-line="21" selection-end-column="44" />
           <folding>
-            <element signature="class#ConnectivityManager#0" />
-            <element signature="method#ConnectivityManager#0;class#ConnectivityManager#0" />
-            <element signature="class#CentralRouter#0" />
-            <element signature="method#CentralRouter#0;class#CentralRouter#0" />
-            <element signature="method#getHandler#0;class#CentralRouter#0" />
-            <element signature="method#getErrorHandler#0;class#CentralRouter#0" />
-            <element signature="class#RouterManager#0" />
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Server/src/Server.java">
+    <entry file="file://$PROJECT_DIR$/Server/src/RemoteNode.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="264">
-          <caret line="11" column="30" lean-forward="true" selection-start-line="11" selection-start-column="30" selection-end-line="11" selection-end-column="30" />
+        <state relative-caret-position="574">
+          <caret line="27" column="5" lean-forward="true" selection-start-line="27" selection-start-column="5" selection-end-line="27" selection-end-column="5" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="method#startListen#0;class#Server#0" />
-            <element signature="method#handleIncomingConn#0;class#Server#0" />
+            <element signature="e#566#567#0" expanded="true" />
+            <element signature="e#633#634#0" expanded="true" />
+            <element signature="e#658#659#0" expanded="true" />
+            <element signature="e#684#685#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Server/src/ServerResponder.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="600">
-          <caret line="218" selection-end-line="218" />
+        <state relative-caret-position="792">
+          <caret line="188" column="1" selection-start-line="188" selection-start-column="1" selection-end-line="188" selection-end-column="1" />
           <folding>
             <element signature="method#ServerResponder#0;class#ServerResponder#0" />
-            <element signature="e#1103#1680#0" />
-            <element signature="e#1756#3654#0" />
-            <element signature="e#1976#2261#0" />
-            <element signature="e#2819#2844#0" />
-            <element signature="e#3685#4529#0" />
-            <element signature="e#4605#4672#0" />
-            <element signature="e#4732#6417#0" />
-            <element signature="e#5632#5735#0" />
-            <element signature="e#6052#6112#0" />
-            <element signature="e#6469#6674#0" />
-            <element signature="e#6705#6862#0" />
-            <element signature="e#6971#8224#0" />
-            <element signature="method#connectNode#0;class#ServerResponder#0" />
-            <element signature="method#declare#0;class#ServerResponder#0" />
-            <element signature="method#recover#0;class#ServerResponder#0" />
-            <element signature="e#9702#9979#0" />
+            <element signature="e#1145#1722#0" />
+            <element signature="e#1798#3735#0" />
+            <element signature="e#2018#2303#0" />
+            <element signature="e#2861#2886#0" />
+            <element signature="e#3766#4610#0" />
+            <element signature="e#4686#4753#0" />
+            <element signature="e#4813#6550#0" />
+            <element signature="e#5713#5816#0" />
+            <element signature="e#6094#6154#0" />
+            <element signature="e#6602#6807#0" />
+            <element signature="e#6838#6995#0" />
+            <element signature="e#7104#8357#0" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Server/src/Servers.java">
+    <entry file="file://$PROJECT_DIR$/Server/src/Server.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
-          <caret line="101" column="1" selection-start-line="101" selection-start-column="1" selection-end-line="101" selection-end-column="1" />
+        <state relative-caret-position="526">
+          <caret line="76" column="11" selection-start-line="76" selection-start-column="11" selection-end-line="76" selection-end-column="11" />
           <folding>
-            <element signature="class#ServerRecord#0" />
-            <element signature="method#ServerRecord#0;class#ServerRecord#0" />
-            <element signature="method#update#0;class#ServerRecord#0" />
-            <element signature="class#ServerRecordSet#0" />
-            <element signature="method#put#0;class#ServerRecordSet#0" />
-            <element signature="method#getLoadLowerThan#0;class#ServerRecordSet#0" />
-            <element signature="method#getLoadLeast#0;class#ServerRecordSet#0" />
-            <element signature="class#ServiceBalancer#0" />
-            <element signature="method#getAvailableServer#0;class#ServiceBalancer#0" />
-            <element signature="e#3040#3057#0" />
-            <element signature="method#recover#0;class#Servers#0" />
+            <element signature="method#getInstance#0;class#Server#0" />
+            <element signature="method#Server#0;class#Server#0" />
+            <element signature="method#startListen#0;class#Server#0" />
+            <element signature="method#handleIncomingConn#0;class#Server#0" />
+            <element signature="method#terminate#0;class#Server#0" />
           </folding>
         </state>
       </provider>

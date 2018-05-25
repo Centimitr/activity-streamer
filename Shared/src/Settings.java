@@ -95,5 +95,4 @@ public class Settings {
         return new BigInteger(130, random).toString(32);
     }
 
-
 }

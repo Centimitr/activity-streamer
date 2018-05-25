@@ -98,9 +98,9 @@ public class App {
         final Server c = Server.getInstance();
         // the following shutdown hook doesn't really work, it doesn't give us enough time to
         // cleanup all of our connections before the jvm is terminated.
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            c.terminate();
-            c.interrupt();
-        }));
+//        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+//            c.terminate();
+//            c.interrupt();
+//        }));
     }
 }

@@ -33,25 +33,18 @@ public class Server extends ServerResponder {
         (new Thread(this::run)).run();
     }
 
-    private void init() {
+    private void init() throws RemoteException {
         // accept remote invocations
-        try {
-            Registry localRegistry = LocateRegistry.createRegistry(Settings.getLocalPort());
-            localRegistry.bind("Node", this);
-        } catch (RemoteException | AlreadyBoundException e) {
-            // todo: local node exception
-            log.error("local node:", e);
-            e.printStackTrace();
-        }
+        nm.local().start(Settings.getLocalPort(), this);
+        // connect remote parent node
         if (Settings.getRemoteHostname() != null) {
-            // todo: connect parent, parent should add this node
             recoverLock.lock();
-            IRemoteNode parent = connectNode(Settings.getRemoteHostname(), Settings.getRemotePort());
+            RemoteNode parent = nm.add(Settings.getRemoteHostname(), Settings.getRemotePort());
+            log.info("Connected: " + Settings.getRemoteHostname() + ":" + Settings.getRemotePort());
             if (parent == null) {
                 System.exit(-1);
             }
-            // todo: sync states
-            // todo: connect all nodes
+            parent.get().declare(Settings.getSecret(), Settings.getRemoteHostname(), Settings.getRemotePort());
             recoverLock.until();
         }
     }
@@ -95,7 +88,7 @@ public class Server extends ServerResponder {
 
 //    private void doServerAnnounce() {
 //        Integer load = cm.clients().size();
-////        log.info("Activity.Announce Load: " + load);
+////        log.info("-Activity.Announce Load: " + load);
 //        MsgServerAnnounce m = new MsgServerAnnounce(
 //                uuid,
 //                Settings.getLocalHostname(),

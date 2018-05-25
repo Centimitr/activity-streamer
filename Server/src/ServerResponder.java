@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.rmi.NotBoundException;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -16,13 +17,13 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
     static final Logger log = LogManager.getLogger();
     static final Gson g = new Gson();
 
-    String id = UUID.randomUUID().toString();
-    ConnectivityManager cm = new ConnectivityManager();
-    NodesManager nm = new NodesManager();
-    RegisterManager rm = new RegisterManager();
-    Servers servers = new Servers(nm);
-    Users users = new Users();
-    Lock recoverLock = new Lock();
+    final String id = UUID.randomUUID().toString();
+    final ConnectivityManager cm = new ConnectivityManager();
+    final NodesManager nm = new NodesManager();
+    final RegisterManager rm = new RegisterManager();
+    final Servers servers = new Servers(nm);
+    final Users users = new Users();
+    final Lock recoverLock = new Lock();
 
     ServerResponder() throws RemoteException {
         RouterManager routers = cm.routerManager();
@@ -169,50 +170,20 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
                 });
     }
 
-    IRemoteNode connectNode(String hostname, int port) {
-        try {
-            Registry remoteRegistry = LocateRegistry.getRegistry(hostname, port);
-            IRemoteNode node = (IRemoteNode) remoteRegistry.lookup("Node");
-            boolean ok = node.declare(Settings.getSecret(), id, Settings.getRemoteHostname(), Settings.getRemotePort(), true);
-            if (ok) {
-                return node;
-            }
-        } catch (RemoteException | NotBoundException e) {
-            // todo: maybe remote fails
-            log.error("parent node:", e);
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     @Override
-    public boolean declare(String secret, String id, String remoteHostname, int remotePort, boolean needRecovery) throws RemoteException {
+    public boolean declare(String secret, String remoteHostname, int remotePort) throws RemoteException {
         if (!secret.equals(Settings.getSecret())) {
             return false;
         }
-        IRemoteNode node = connectNode(remoteHostname, remotePort);
-        if (node == null) {
-            return false;
-        }
-        servers.records().put(id, remoteHostname, remotePort, 0);
-        if (needRecovery) {
-            // todo: add messages recovery
-            node.recover(servers.snapshot(), users.snapshot());
-        }
+        log.info("Connected: " + remoteHostname + ":" + remotePort);
+        nm.add(remoteHostname, remotePort);
         return true;
+//        return recoverData;
     }
 
-    @Override
-    public void recover(String serversSnapshot, String usersSnapshot) throws RemoteException {
-        servers.recover(serversSnapshot);
-        users.recover(usersSnapshot);
-        servers.records().forEach((id, record) -> {
-            IRemoteNode node = connectNode(record.hostname, record.port);
-            if (node == null) {
-                return;
-            }
-            // todo: add node in nodes, might be merged with Servers
-            nm.put(record.id, node);
-        });
-    }
+//    @Override
+//    public void update() throws RemoteException {
+//        nm.broadcast();
+//    }
 }
