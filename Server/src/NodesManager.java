@@ -131,19 +131,19 @@ class NodesManager {
     }
 
     void updateLoads() {
-        // updateLoadNotify frequently so when meeting exceptions, does need to retry
+        // updateLoadNotify frequently so when meeting exceptions, does not need to retry
         for (Map.Entry<String, RemoteNode> entry : remoteNodes.entrySet()) {
             RemoteNode local = entry.getValue();
-            IRemoteNode remote = entry.getValue().node;
-            Supplier<Boolean> fn = () -> {
-                try {
-                    local.updateLoad(remote.getLoad());
-                    return true;
-                } catch (RemoteException e) {
-                    return false;
-                }
-            };
-            Util.retry(fn, Env.RETRY_INTERVAL, Env.INTERNAL_NETWORK_TIMEOUT);
+            IRemoteNode remote = entry.getValue().get();
+//            Supplier<Boolean> fn = () -> {
+            try {
+                local.updateLoad(remote.getLoad());
+//                    return true;
+            } catch (RemoteException e) {
+//                    return false;
+            }
+//            };
+//            Util.retry(fn, Env.RETRY_INTERVAL, Env.INTERNAL_NETWORK_TIMEOUT);
         }
     }
 

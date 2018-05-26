@@ -29,7 +29,7 @@ class ConnectivitySet extends MessageRouterRepresenter implements IForEachConnec
     int effectiveSize() {
         int size = 0;
         for (Connectivity conn : conns) {
-            if (conn.isClosed()) {
+            if (!conn.isClosed()) {
                 size++;
             }
         }
