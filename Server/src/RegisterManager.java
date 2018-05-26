@@ -55,11 +55,3 @@ class RegisterManager {
         return secret.equals(account.secret);
     }
 }
-//
-//class RegisterManager {
-//    private final Users _users = new Users();
-//
-//    Users users() {
-//        return _users;
-//    }
-//}

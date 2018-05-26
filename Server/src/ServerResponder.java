@@ -186,6 +186,7 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
         return failedUsers;
     }
 
+    @Override
     public void register(String id, String username, String secret) throws RemoteException {
         rm.put(id, username, secret);
     }
