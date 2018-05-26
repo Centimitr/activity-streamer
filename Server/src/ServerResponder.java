@@ -108,8 +108,9 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
                     }
                     m.activity.put("authenticated_user", context.get("username"));
                     MsgActivityBroadcast broadcast = new MsgActivityBroadcast(m.activity);
-                    nm.sendMessages(context.get("username"), sm.getUserList(), broadcast, true);
-                    cm.clients().broadcast(broadcast);
+                    nm.sendMessages(context.get("username"), broadcast, true);
+                    // todo: send messages
+//                    cm.clients().broadcast(broadcast);
                 })
                 .handle(MessageCommands.REGISTER, context -> {
                     MsgInvalidMessage res = new MsgInvalidMessage("User has already logged in.");
@@ -168,28 +169,21 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
     }
 
     @Override
-    public boolean sendMessage(String sender, ArrayList<String> receivers, MsgActivityBroadcast msg, boolean canSpread) throws RemoteException {
+    public ArrayList<String> sendMessage(String sender, ArrayList<String> receivers, MsgActivityBroadcast msg, boolean retry) throws RemoteException {
         // todo: feedback
-        ArrayList<String> spreadList = new ArrayList<>();
+        ArrayList<String> failedUsers = new ArrayList<>();
         for (Map.Entry<String, Connectivity> entry : sm.getConnectivities().entrySet()) {
             String username = entry.getKey();
             Connectivity conn = entry.getValue();
             if (receivers.contains(username)) {
+                // retry
                 boolean ok = conn.sendln(msg);
                 if (!ok) {
-                    if (canSpread) {
-                        spreadList.add(username);
-                    } else {
-                        // todo:
-                    }
+                    failedUsers.add(username);
                 }
             }
         }
-        if (canSpread && spreadList.size() > 0) {
-            nm.sendMessages(sender, spreadList, msg, false);
-            return false;
-        }
-        return true;
+        return failedUsers;
     }
 
     public void register(String id, String username, String secret) throws RemoteException {

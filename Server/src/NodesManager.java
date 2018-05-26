@@ -1,4 +1,5 @@
 import com.google.gson.Gson;
+
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -83,11 +84,23 @@ class NodesManager {
     }
 
     // group methods
-    void sendMessages(String sender, ArrayList<String> receivers, MsgActivityBroadcast msg, boolean canSpread) {
+    void sendMessages(String sender, MsgActivityBroadcast msg, boolean retry) {
         // retry until SESSION_TIMEOUT
+        ArrayList<String> allFailedUsers = new ArrayList<>();
         for (IRemoteNode node : nodes()) {
+            // retry until SESSION_TIMEOUT
             try {
-                node.sendMessage(sender, receivers, msg, canSpread);
+                ArrayList<String> receivers = node.getUserList();
+                ArrayList<String> failedUsers = node.sendMessage(sender, receivers, msg, false);
+                allFailedUsers.addAll(failedUsers);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+        for (IRemoteNode node : nodes()) {
+            // retry until SESSION_TIMEOUT
+            try {
+                node.sendMessage(sender, allFailedUsers, msg, true);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
