@@ -72,7 +72,14 @@ public class Server extends ServerResponder {
 
     private void handleIncomingConn(Socket s) {
         try {
-            cm.temp().add(new Connectivity(s));
+            Connectivity conn = new Connectivity(s);
+            RemoteNode freeNode = nm.getFreeNode();
+            if (freeNode != null) {
+                conn.sendln(new MsgRedirect(freeNode.hostname, freeNode.port));
+                conn.close();
+                return;
+            }
+            cm.temp().add(conn);
         } catch (IOException e) {
             e.printStackTrace();
         }

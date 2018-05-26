@@ -140,17 +140,12 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
                     context.set("secret", m.secret);
                     cm.possibleClients().transfer(context.connectivity, cm.clients());
                     // todo: load balance: redirect
-                    RemoteNode freeNode = nm.getFreeNode();
-                    if (freeNode != null) {
-                        context.write(new MsgRedirect(freeNode.hostname, freeNode.port));
-                        sm.markAsOffline(context.get("username"));
-                        context.close();
-                        return;
-                    }
-                    ArrayList<String> cachedMessages = messageCache.pop(context.get("username"));
-                    for (String message : cachedMessages) {
-                        Util.async(() -> context.connectivity.sendln(message));
-                    }
+                    Util.async(() -> {
+                        ArrayList<String> cachedMessages = messageCache.pop(context.get("username"));
+                        for (String message : cachedMessages) {
+                            context.connectivity.sendln(message);
+                        }
+                    });
                 });
     }
 
