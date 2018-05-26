@@ -36,12 +36,14 @@ class MessageCache {
 
     ArrayList<String> pop(String sender) {
         ArrayList<String> messages = new ArrayList<>();
-        ArrayList<MessageCacheItem> list = map.get(sender);
-        list.sort(new MessageCacheComparator());
-        for (MessageCacheItem item : list) {
-            messages.add(item.message);
+        if (map.containsKey(sender)) {
+            ArrayList<MessageCacheItem> list = map.get(sender);
+            list.sort(new MessageCacheComparator());
+            for (MessageCacheItem item : list) {
+                messages.add(item.message);
+            }
+            map.remove(sender);
         }
-        map.remove(sender);
         return messages;
     }
 }
