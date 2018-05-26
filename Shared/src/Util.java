@@ -8,20 +8,15 @@ class Util {
         return t;
     }
 
-    static boolean wrapException(Runnable fn) {
-        try {
-            fn.run();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    static void retry(Supplier<Boolean> fn, int interval, int timeout) throws InterruptedException {
+    static void retry(Supplier<Boolean> fn, int interval, int timeout) {
         long startTime = System.currentTimeMillis();
         long endTime = startTime + timeout;
         while (fn.get()) {
-            Thread.sleep(interval);
+            try {
+                Thread.sleep(interval);
+            } catch (InterruptedException e) {
+                break;
+            }
             long currentTime = System.currentTimeMillis();
             if (currentTime >= endTime) {
                 break;
@@ -29,7 +24,4 @@ class Util {
         }
     }
 
-    static void retry(Runnable fn, int interval, int timeout) throws InterruptedException {
-        retry(() -> wrapException(fn), interval, timeout);
-    }
 }

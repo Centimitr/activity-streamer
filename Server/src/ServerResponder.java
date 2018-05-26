@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 @SuppressWarnings({"WeakerAccess", "Convert2MethodRef"})
 abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNode {
@@ -176,11 +177,7 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
             String username = entry.getKey();
             Connectivity conn = entry.getValue();
             if (receivers.contains(username)) {
-                // retry
-                boolean ok = conn.sendln(msg);
-                if (!ok) {
-                    failedUsers.add(username);
-                }
+                Util.retry(() -> conn.sendln(msg), Env.RETRY_INTERVAL, Env.SESSION_TIMEOUT);
             }
         }
         return failedUsers;

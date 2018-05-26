@@ -4,6 +4,8 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 
 @SuppressWarnings("WeakerAccess")
 class NodesManager {
@@ -88,33 +90,43 @@ class NodesManager {
         // retry until SESSION_TIMEOUT
         ArrayList<String> allFailedUsers = new ArrayList<>();
         for (IRemoteNode node : nodes()) {
-            // retry until SESSION_TIMEOUT
-            try {
-                ArrayList<String> receivers = node.getUserList();
-                ArrayList<String> failedUsers = node.sendMessage(sender, receivers, msg, false);
-                allFailedUsers.addAll(failedUsers);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
+            Supplier<Boolean> fn = () -> {
+                try {
+                    ArrayList<String> receivers = node.getUserList();
+                    ArrayList<String> failedUsers = node.sendMessage(sender, receivers, msg, false);
+                    allFailedUsers.addAll(failedUsers);
+                    return true;
+                } catch (RemoteException e) {
+                    return false;
+                }
+            };
+            Util.retry(fn, Env.RETRY_INTERVAL, Env.INTERNAL_NETWORK_TIMEOUT);
         }
         for (IRemoteNode node : nodes()) {
-            // retry until SESSION_TIMEOUT
-            try {
-                node.sendMessage(sender, allFailedUsers, msg, true);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
+            Supplier<Boolean> fn = () -> {
+                try {
+                    node.sendMessage(sender, allFailedUsers, msg, true);
+                    return true;
+                } catch (RemoteException e) {
+                    return false;
+                }
+            };
+            Util.retry(fn, Env.RETRY_INTERVAL, Env.INTERNAL_NETWORK_TIMEOUT);
         }
     }
 
     boolean register(String id, String username, String secret) {
         // retry until SESSION_TIMEOUT
         for (IRemoteNode node : nodes()) {
-            try {
-                node.register(id, username, secret);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
+            Supplier<Boolean> fn = () -> {
+                try {
+                    node.register(id, username, secret);
+                    return true;
+                } catch (RemoteException e) {
+                    return false;
+                }
+            };
+            Util.retry(fn, Env.RETRY_INTERVAL, Env.INTERNAL_NETWORK_TIMEOUT);
         }
         return true;
     }
@@ -124,10 +136,15 @@ class NodesManager {
         for (Map.Entry<String, RemoteNode> entry : remoteNodes.entrySet()) {
             RemoteNode local = entry.getValue();
             IRemoteNode remote = entry.getValue().node;
-            try {
-                local.updateLoad(remote.getLoad());
-            } catch (RemoteException ignored) {
-            }
+            Supplier<Boolean> fn = () -> {
+                try {
+                    local.updateLoad(remote.getLoad());
+                    return true;
+                } catch (RemoteException e) {
+                    return false;
+                }
+            };
+            Util.retry(fn, Env.RETRY_INTERVAL, Env.INTERNAL_NETWORK_TIMEOUT);
         }
     }
 
