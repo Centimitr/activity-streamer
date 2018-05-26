@@ -3,6 +3,7 @@ import java.net.Socket;
 import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.Map;
 
 // todo: exception when sending data vai a closed connection
 
@@ -45,9 +46,17 @@ public class Server extends ServerResponder {
             if (parent == null) {
                 System.exit(-1);
             }
-            String recoveryDataJson = parent.get().declare(Settings.getSecret(), Settings.getRemoteHostname(), Settings.getRemotePort());
+            String recoveryDataJson = parent.get().declare(Settings.getSecret(), Settings.getLocalHostname(), Settings.getLocalPort(), true);
+            // recover from recovery data
             RecoveryData data = RecoveryData.fromJson(recoveryDataJson);
-
+            rm.recover(data.getRegisteredAccounts());
+            for (EndPoint endPoint : data.getNodesToConnect()) {
+                RemoteNode node = nm.add(endPoint.hostname, endPoint.port);
+                log.info("Connected: " + endPoint.hostname + ":" + endPoint.port);
+                if (node != null) {
+                    node.get().declare(Settings.getSecret(), Settings.getLocalHostname(), Settings.getLocalPort(), false);
+                }
+            }
             recoverLock.unlock();
         }
     }

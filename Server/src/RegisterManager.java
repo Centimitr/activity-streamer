@@ -14,7 +14,7 @@ class Account {
 }
 
 class RegisterManager {
-    private Map<String, Account> accounts = new HashMap<>();
+    private HashMap<String, Account> accounts = new HashMap<>();
 
     boolean has(String username) {
         return accounts.containsKey(username);
@@ -53,5 +53,13 @@ class RegisterManager {
         }
         Account account = accounts.get(username);
         return secret.equals(account.secret);
+    }
+
+    HashMap<String, Account> snapshot() {
+        return this.accounts;
+    }
+
+    void recover(HashMap<String, Account> snapshot) {
+        this.accounts = snapshot;
     }
 }

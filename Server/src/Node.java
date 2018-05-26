@@ -19,3 +19,13 @@ abstract class Node {
         return load;
     }
 }
+
+class EndPoint {
+    String hostname;
+    int port;
+
+    EndPoint(String hostname, int port) {
+        this.hostname = hostname;
+        this.port = port;
+    }
+}

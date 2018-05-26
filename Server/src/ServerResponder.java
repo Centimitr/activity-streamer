@@ -152,16 +152,20 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
     }
 
     @Override
-    public String declare(String secret, String remoteHostname, int remotePort) throws RemoteException {
+    public String declare(String secret, String remoteHostname, int remotePort, boolean needRecovery) throws RemoteException {
         if (!secret.equals(Settings.getSecret())) {
             return null;
         }
         log.info("Connected: " + remoteHostname + ":" + remotePort);
+        String rtn = "{}";
+        if (needRecovery) {
+            recoverLock.lock();
+            RecoveryData data = new RecoveryData(rm, nm);
+            recoverLock.unlock();
+            rtn = data.toJson();
+        }
         nm.add(remoteHostname, remotePort);
-        recoverLock.lock();
-        RecoveryData data = new RecoveryData();
-        recoverLock.unlock();
-        return data.toJson();
+        return rtn;
     }
 
     @Override

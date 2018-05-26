@@ -15,7 +15,7 @@ class NodesManager {
     static final Gson g = new Gson();
 
     private final LocalNode localNode = new LocalNode();
-    private final Map<String, RemoteNode> remoteNodes = new HashMap<>();
+    private HashMap<String, RemoteNode> remoteNodes = new HashMap<>();
 
     LocalNode local() {
         return localNode;
@@ -147,4 +147,14 @@ class NodesManager {
         }
     }
 
+    // recover
+    public ArrayList<EndPoint> snapshot() {
+        ArrayList<EndPoint> nodesToConnect = new ArrayList<>();
+        for (Map.Entry<String, RemoteNode> entry : remoteNodes.entrySet()) {
+            RemoteNode node = entry.getValue();
+            EndPoint endpoint = new EndPoint(node.hostname, node.port);
+            nodesToConnect.add(endpoint);
+        }
+        return nodesToConnect;
+    }
 }
