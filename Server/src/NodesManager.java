@@ -1,6 +1,4 @@
 import com.google.gson.Gson;
-
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;

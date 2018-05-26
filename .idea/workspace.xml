@@ -7,23 +7,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2bae8d95-19df-4f10-8dac-d5664eef7352" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/Shared/src/Util.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/src/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/Client/src/Client.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/src/ClientAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/Client/src/ClientAgent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/src/ClientResponder.java" beforeDir="false" afterPath="$PROJECT_DIR$/Client/src/ClientResponder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/src/View.java" beforeDir="false" afterPath="$PROJECT_DIR$/Client/src/View.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/src/IRemoteNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server/src/IRemoteNode.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Server/src/NodesManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server/src/NodesManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/src/RegisterManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server/src/RegisterManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/src/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server/src/Server.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/src/ServerResponder.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server/src/ServerResponder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/src/_deprecated/_LoadsManager.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/src/_deprecated/_RegisterManager.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/src/_deprecated/_Servers.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shared/src/Async.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shared/src/LagencyLock.java" beforeDir="false" afterPath="$PROJECT_DIR$/Shared/src/LegacyLock.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shared/src/Listener.java" beforeDir="false" afterPath="$PROJECT_DIR$/Shared/src/Listener.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -37,11 +21,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="NodesManager.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="NodesManager.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Server/src/NodesManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="504">
-              <caret line="25" column="35" lean-forward="true" selection-start-line="25" selection-start-column="35" selection-end-line="25" selection-end-column="35" />
+            <state relative-caret-position="574">
+              <caret line="97" column="38" lean-forward="true" selection-start-line="97" selection-start-column="38" selection-end-line="97" selection-end-column="38" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -49,20 +33,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Client.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Client/src/Client.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="740">
-              <caret line="72" column="5" lean-forward="true" selection-start-line="72" selection-start-column="5" selection-end-line="72" selection-end-column="5" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="View.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="View.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Client/src/View.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="432">
-              <caret line="24" column="49" lean-forward="true" selection-start-line="24" selection-start-column="49" selection-end-line="24" selection-end-column="49" />
+            <state>
+              <caret line="6" column="36" lean-forward="true" selection-start-line="6" selection-start-column="36" selection-end-line="6" selection-end-column="36" />
             </state>
           </provider>
         </entry>
@@ -178,7 +153,6 @@
         <option value="$PROJECT_DIR$/Client/src/ClientAgent.java" />
         <option value="$PROJECT_DIR$/Server/src/Server.java" />
         <option value="$PROJECT_DIR$/Server/src/IRemoteNode.java" />
-        <option value="$PROJECT_DIR$/Server/src/NodesManager.java" />
         <option value="$PROJECT_DIR$/Server/src/RegisterManager.java" />
         <option value="$PROJECT_DIR$/Shared/src/Async.java" />
         <option value="$PROJECT_DIR$/Shared/src/Listener.java" />
@@ -190,6 +164,7 @@
         <option value="$PROJECT_DIR$/Shared/src/LegacyLock.java" />
         <option value="$PROJECT_DIR$/Server/src/ServerResponder.java" />
         <option value="$PROJECT_DIR$/Client/src/View.java" />
+        <option value="$PROJECT_DIR$/Server/src/NodesManager.java" />
       </list>
     </option>
   </component>
@@ -388,12 +363,12 @@
       <workItem from="1527211302119" duration="628000" />
       <workItem from="1527229192988" duration="22241000" />
       <workItem from="1527291918648" duration="6563000" />
-      <workItem from="1527302753897" duration="13152000" />
+      <workItem from="1527302753897" duration="13198000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="371991000" />
+    <option name="totallyTimeSpent" value="372037000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -861,27 +836,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Server/src/NodesManager.java">
+    <entry file="file://$PROJECT_DIR$/Client/src/View.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="504">
-          <caret line="25" column="35" lean-forward="true" selection-start-line="25" selection-start-column="35" selection-end-line="25" selection-end-column="35" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state>
+          <caret line="6" column="36" lean-forward="true" selection-start-line="6" selection-start-column="36" selection-end-line="6" selection-end-column="36" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Client/src/Client.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="740">
+        <state relative-caret-position="718">
           <caret line="72" column="5" lean-forward="true" selection-start-line="72" selection-start-column="5" selection-end-line="72" selection-end-column="5" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Client/src/View.java">
+    <entry file="file://$PROJECT_DIR$/Server/src/NodesManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="432">
-          <caret line="24" column="49" lean-forward="true" selection-start-line="24" selection-start-column="49" selection-end-line="24" selection-end-column="49" />
+        <state relative-caret-position="574">
+          <caret line="97" column="38" lean-forward="true" selection-start-line="97" selection-start-column="38" selection-end-line="97" selection-end-column="38" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
