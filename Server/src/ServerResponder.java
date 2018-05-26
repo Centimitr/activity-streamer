@@ -8,7 +8,6 @@ import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
 @SuppressWarnings({"WeakerAccess", "Convert2MethodRef"})
 abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNode {
@@ -21,6 +20,8 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
     final RegisterManager rm = new RegisterManager();
     final SessionManager sm = new SessionManager();
     final Lock recoverLock = new ReentrantLock();
+    final MessageCache messageCache = new MessageCache();
+    final MessageCounter messageCounter = new MessageCounter();
 
     ServerResponder() throws RemoteException {
         nm.local().bindConnectivitySet(cm.clients());
@@ -109,7 +110,7 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
                     }
                     m.activity.put("authenticated_user", context.get("username"));
                     MsgActivityBroadcast broadcast = new MsgActivityBroadcast(m.activity);
-                    nm.sendMessages(context.get("username"), g.toJson(broadcast));
+                    nm.sendMessages(context.get("username"), messageCounter.getIndex(context.get("username")), g.toJson(broadcast));
                 })
                 .handle(MessageCommands.REGISTER, context -> {
                     MsgInvalidMessage res = new MsgInvalidMessage("User has already logged in.");
@@ -145,6 +146,11 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
                         context.write(new MsgRedirect(freeNode.hostname, freeNode.port));
                         sm.markAsOffline(context.get("username"));
                         context.close();
+                        return;
+                    }
+                    ArrayList<String> cachedMessages = messageCache.pop(context.get("username"));
+                    for (String message : cachedMessages) {
+                        Util.async(() -> context.connectivity.sendln(message));
                     }
                 });
     }
@@ -172,7 +178,7 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
     }
 
     @Override
-    public ArrayList<String> sendMessage(String sender, ArrayList<String> receivers, String msg, boolean retry) throws RemoteException {
+    public ArrayList<String> sendMessage(String sender, int index, ArrayList<String> receivers, String msg, boolean retry) throws RemoteException {
         // todo: feedback
         ArrayList<String> failedUsers = new ArrayList<>();
         for (Map.Entry<String, Connectivity> entry : sm.getConnectivities().entrySet()) {
@@ -180,6 +186,8 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
             Connectivity conn = entry.getValue();
             if (receivers.contains(username)) {
                 Util.retry(() -> conn.sendln(msg), Env.RETRY_INTERVAL, Env.SESSION_TIMEOUT);
+            } else {
+                messageCache.put(sender, index, msg);
             }
         }
         return failedUsers;

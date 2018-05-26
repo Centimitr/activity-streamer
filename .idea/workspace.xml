@@ -7,9 +7,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2bae8d95-19df-4f10-8dac-d5664eef7352" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/Server/src/MessageCache.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/src/IRemoteNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server/src/IRemoteNode.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Server/src/NodesManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server/src/NodesManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Server/src/ServerResponder.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server/src/ServerResponder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Shared/src/Util.java" beforeDir="false" afterPath="$PROJECT_DIR$/Shared/src/Util.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -26,17 +28,32 @@
       <file leaf-file-name="ServerResponder.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Server/src/ServerResponder.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="431">
-              <caret line="111" column="31" selection-start-line="111" selection-start-column="31" selection-end-line="111" selection-end-column="31" />
+            <state relative-caret-position="79">
+              <caret line="47" column="27" lean-forward="true" selection-start-line="47" selection-start-column="27" selection-end-line="47" selection-end-column="27" />
+              <folding>
+                <element signature="e#1231#1808#0" />
+                <element signature="e#1884#3282#0" />
+                <element signature="e#2103#2388#0" />
+                <element signature="e#3313#4157#0" />
+                <element signature="e#4233#4363#0" />
+                <element signature="e#4423#5705#0" />
+                <element signature="e#5757#5962#0" />
+                <element signature="e#5993#6213#0" />
+                <element signature="method#declare#0;class#ServerResponder#0" />
+                <element signature="method#getUserList#0;class#ServerResponder#0" />
+                <element signature="method#sendMessage#0;class#ServerResponder#0" />
+                <element signature="method#register#0;class#ServerResponder#0" />
+                <element signature="method#getLoad#0;class#ServerResponder#0" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="NodesManager.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Server/src/NodesManager.java">
+      <file leaf-file-name="MessageCache.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Server/src/MessageCache.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="431">
-              <caret line="88" column="50" lean-forward="true" selection-start-line="88" selection-start-column="50" selection-end-line="88" selection-end-column="50" />
+            <state relative-caret-position="120">
+              <caret line="5" selection-start-line="5" selection-end-line="5" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -116,7 +133,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/Shared/src/MessageCommands.java" />
         <option value="$PROJECT_DIR$/Shared/src/ConnectivitySetGroup.java" />
         <option value="$PROJECT_DIR$/Shared/src/MessageRouter.java" />
         <option value="$PROJECT_DIR$/Shared/src/SingleConnectivitySet.java" />
@@ -158,15 +174,16 @@
         <option value="$PROJECT_DIR$/Shared/src/LegacyLock.java" />
         <option value="$PROJECT_DIR$/Client/src/View.java" />
         <option value="$PROJECT_DIR$/Server/src/Env.java" />
-        <option value="$PROJECT_DIR$/Server/src/IRemoteNode.java" />
         <option value="$PROJECT_DIR$/Server/src/LocalNode.java" />
         <option value="$PROJECT_DIR$/Server/src/RegisterManager.java" />
         <option value="$PROJECT_DIR$/Server/src/Node.java" />
         <option value="$PROJECT_DIR$/Server/src/Server.java" />
         <option value="$PROJECT_DIR$/Server/src/RecoveryData.java" />
-        <option value="$PROJECT_DIR$/Server/src/ServerResponder.java" />
-        <option value="$PROJECT_DIR$/Server/src/NodesManager.java" />
         <option value="$PROJECT_DIR$/Shared/src/Util.java" />
+        <option value="$PROJECT_DIR$/Server/src/IRemoteNode.java" />
+        <option value="$PROJECT_DIR$/Server/src/NodesManager.java" />
+        <option value="$PROJECT_DIR$/Server/src/ServerResponder.java" />
+        <option value="$PROJECT_DIR$/Server/src/MessageCache.java" />
       </list>
     </option>
   </component>
@@ -207,6 +224,12 @@
               <item name="Server" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="ConnectivityManager.java" type="529ef68f:ClassesTreeStructureProvider$PsiClassOwnerTreeNode" />
+            </path>
+            <path>
+              <item name="COMP90015" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Server" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="MessageCache.java" type="529ef68f:ClassesTreeStructureProvider$PsiClassOwnerTreeNode" />
             </path>
             <path>
               <item name="COMP90015" type="b2602c69:ProjectViewProjectNode" />
@@ -384,12 +407,12 @@
       <workItem from="1527229192988" duration="22241000" />
       <workItem from="1527291918648" duration="6563000" />
       <workItem from="1527302753897" duration="21048000" />
-      <workItem from="1527325666926" duration="2329000" />
+      <workItem from="1527325666926" duration="4995000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="382216000" />
+    <option name="totallyTimeSpent" value="384882000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -414,7 +437,7 @@
       <window_info anchor="right" id="Maven Projects" order="6" />
       <window_info anchor="bottom" id="Database Changes" order="8" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="9" weight="0.329296" />
-      <window_info anchor="right" x="287" y="300" width="1252" height="705" id="Run" order="10" side_tool="true" visible="true" weight="0.40664062" />
+      <window_info anchor="right" x="287" y="300" width="1252" height="705" id="Run" order="10" side_tool="true" visible="true" weight="0.3625" />
       <window_info anchor="bottom" id="Terminal" order="10" weight="0.31491295" />
       <window_info id="Capture Tool" order="6" />
       <window_info id="Designer" order="3" />
@@ -447,16 +470,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Shared/src/log4j2.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="264">
-          <caret line="11" column="13" lean-forward="true" selection-start-line="11" selection-end-line="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Client/Client.iml">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
@@ -581,17 +594,6 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Server/src/_deprecated/_Servers.java" />
     <entry file="file://$PROJECT_DIR$/Server/src/_deprecated/_LoadsManager.java" />
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk-10.jdk/Contents/Home/lib/src.zip!/java.base/java/util/ArrayList.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="373">
-          <caret line="869" column="23" selection-start-line="869" selection-start-column="23" selection-end-line="869" selection-end-column="23" />
-          <folding>
-            <element signature="e#31918#31919#0" expanded="true" />
-            <element signature="e#31950#31951#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Shared/src/ConnectivitySet.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="384">
@@ -737,13 +739,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Server/src/IRemoteNode.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="16" lean-forward="true" selection-start-line="16" selection-end-line="16" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Server/src/Node.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="600">
@@ -790,10 +785,52 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Shared/src/Util.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="576">
+          <caret line="24" column="5" lean-forward="true" selection-start-line="24" selection-start-column="5" selection-end-line="24" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk-10.jdk/Contents/Home/lib/src.zip!/java.base/java/util/Arrays.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="561">
+          <caret line="1500" column="42" lean-forward="true" selection-start-line="1500" selection-start-column="42" selection-end-line="1500" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk-10.jdk/Contents/Home/lib/src.zip!/java.base/java/util/ArrayList.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="912">
+          <caret line="1584" column="17" selection-start-line="1584" selection-start-column="17" selection-end-line="1584" selection-end-column="17" />
+          <folding>
+            <element signature="e#31918#31919#0" expanded="true" />
+            <element signature="e#31950#31951#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Server/src/IRemoteNode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="192">
+          <caret line="10" column="59" selection-start-line="10" selection-start-column="59" selection-end-line="10" selection-end-column="59" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Server/src/NodesManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="696">
+          <caret line="33" column="58" lean-forward="true" selection-start-line="33" selection-start-column="58" selection-end-line="33" selection-end-column="58" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Server/src/ConnectivityManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="908">
-          <caret line="95" column="6" selection-start-line="95" selection-start-column="6" selection-end-line="95" selection-end-column="6" />
+        <state relative-caret-position="672">
+          <caret line="48" column="6" selection-start-line="48" selection-start-column="6" selection-end-line="48" selection-end-column="6" />
           <folding>
             <element signature="method#ConnectivityManager#0;class#ConnectivityManager#0" />
             <element signature="e#1081#1082#0" expanded="true" />
@@ -807,22 +844,30 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Server/src/ServerResponder.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="431">
-          <caret line="111" column="31" selection-start-line="111" selection-start-column="31" selection-end-line="111" selection-end-column="31" />
+        <state relative-caret-position="79">
+          <caret line="47" column="27" lean-forward="true" selection-start-line="47" selection-start-column="27" selection-end-line="47" selection-end-column="27" />
+          <folding>
+            <element signature="e#1231#1808#0" />
+            <element signature="e#1884#3282#0" />
+            <element signature="e#2103#2388#0" />
+            <element signature="e#3313#4157#0" />
+            <element signature="e#4233#4363#0" />
+            <element signature="e#4423#5705#0" />
+            <element signature="e#5757#5962#0" />
+            <element signature="e#5993#6213#0" />
+            <element signature="method#declare#0;class#ServerResponder#0" />
+            <element signature="method#getUserList#0;class#ServerResponder#0" />
+            <element signature="method#sendMessage#0;class#ServerResponder#0" />
+            <element signature="method#register#0;class#ServerResponder#0" />
+            <element signature="method#getLoad#0;class#ServerResponder#0" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Shared/src/Util.java">
+    <entry file="file://$PROJECT_DIR$/Server/src/MessageCache.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="576">
-          <caret line="24" column="5" lean-forward="true" selection-start-line="24" selection-start-column="5" selection-end-line="24" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Server/src/NodesManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="431">
-          <caret line="88" column="50" lean-forward="true" selection-start-line="88" selection-start-column="50" selection-end-line="88" selection-end-column="50" />
+        <state relative-caret-position="120">
+          <caret line="5" selection-start-line="5" selection-end-line="5" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
