@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 @SuppressWarnings("WeakerAccess")
@@ -15,7 +16,7 @@ class NodesManager {
     static final Gson g = new Gson();
 
     private final LocalNode localNode = new LocalNode();
-    private HashMap<String, RemoteNode> remoteNodes = new HashMap<>();
+    private ConcurrentHashMap<String, RemoteNode> remoteNodes = new ConcurrentHashMap<>();
 
     LocalNode local() {
         return localNode;
