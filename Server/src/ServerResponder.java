@@ -109,7 +109,7 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
                     }
                     m.activity.put("authenticated_user", context.get("username"));
                     MsgActivityBroadcast broadcast = new MsgActivityBroadcast(m.activity);
-                    nm.sendMessages(context.get("username"), broadcast, true);
+                    nm.sendMessages(context.get("username"), g.toJson(broadcast), true);
                     // todo: send messages
 //                    cm.clients().broadcast(broadcast);
                 })
@@ -170,7 +170,7 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
     }
 
     @Override
-    public ArrayList<String> sendMessage(String sender, ArrayList<String> receivers, MsgActivityBroadcast msg, boolean retry) throws RemoteException {
+    public ArrayList<String> sendMessage(String sender, ArrayList<String> receivers, String msg, boolean retry) throws RemoteException {
         // todo: feedback
         ArrayList<String> failedUsers = new ArrayList<>();
         for (Map.Entry<String, Connectivity> entry : sm.getConnectivities().entrySet()) {

@@ -4,7 +4,6 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
 @SuppressWarnings("WeakerAccess")
@@ -86,7 +85,7 @@ class NodesManager {
     }
 
     // group methods
-    void sendMessages(String sender, MsgActivityBroadcast msg, boolean retry) {
+    void sendMessages(String sender, String msg, boolean retry) {
         // retry until SESSION_TIMEOUT
         ArrayList<String> allFailedUsers = new ArrayList<>();
         for (IRemoteNode node : nodes()) {
