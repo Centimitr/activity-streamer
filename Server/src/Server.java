@@ -46,7 +46,10 @@ public class Server extends ServerResponder {
             if (parent == null) {
                 System.exit(-1);
             }
-            String recoveryDataJson = parent.get().declare(Settings.getSecret(), Settings.getLocalHostname(), Settings.getLocalPort(), true);
+            String recoveryDataJson = parent.get().declare(Settings.getSecret(),
+                    Settings.getLocalHostname(), Settings.getLocalPort(),
+                    Settings.getClientHostname(), Settings.getClientPort(),
+                    true);
             // recover from recovery data
             RecoveryData data = RecoveryData.fromJson(recoveryDataJson);
             rm.recover(data.getRegisteredAccounts());
@@ -54,7 +57,10 @@ public class Server extends ServerResponder {
                 RemoteNode node = nm.add(endPoint.hostname, endPoint.port);
                 log.info("Connected: " + endPoint.hostname + ":" + endPoint.port);
                 if (node != null) {
-                    node.get().declare(Settings.getSecret(), Settings.getLocalHostname(), Settings.getLocalPort(), false);
+                    node.get().declare(Settings.getSecret(),
+                            Settings.getLocalHostname(), Settings.getLocalPort(),
+                            Settings.getClientHostname(), Settings.getClientPort(),
+                            false);
                 }
             }
             recoverLock.unlock();

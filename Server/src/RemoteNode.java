@@ -8,16 +8,20 @@ class RemoteNode extends Node {
     String id;
     final String hostname;
     final int port;
+    final String clientHostname;
+    final int clientPort;
     final String serviceName;
 
-    RemoteNode(String hostname, int port, String name) {
+    RemoteNode(String hostname, int port, String clientHostname, int clientPort, String name) {
         this.hostname = hostname;
         this.port = port;
         this.serviceName = name;
+        this.clientHostname = clientHostname;
+        this.clientPort = clientPort;
     }
 
-    RemoteNode(String hostname, int port) {
-        this(hostname, port, RemoteNode.defaultServiceName);
+    RemoteNode(String hostname, int port, String clientHostname, int clientPort) {
+        this(hostname, port, clientHostname, clientPort, RemoteNode.defaultServiceName);
     }
 
     boolean connect() {

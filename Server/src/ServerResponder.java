@@ -141,7 +141,7 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
                     cm.possibleClients().transfer(context.connectivity, cm.clients());
                     RemoteNode freeNode = nm.getFreeNode();
                     if (freeNode != null) {
-                        context.write(new MsgRedirect(freeNode.hostname, freeNode.port));
+                        context.write(new MsgRedirect(freeNode.clientHostname, freeNode.clientPort));
                         sm.markAsOffline(context.get("username"));
                         context.close();
                         return;
@@ -156,7 +156,7 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
     }
 
     @Override
-    public String declare(String secret, String remoteHostname, int remotePort, boolean needRecovery) throws RemoteException {
+    public String declare(String secret, String remoteHostname, int remotePort, String clientHost, int clientPort, boolean needRecovery) throws RemoteException {
         if (!secret.equals(Settings.getSecret())) {
             return null;
         }
@@ -168,7 +168,7 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
             recoverLock.unlock();
             rtn = data.toJson();
         }
-        nm.add(remoteHostname, remotePort);
+        nm.add(remoteHostname, remotePort, clientHost, clientPort);
         return rtn;
     }
 

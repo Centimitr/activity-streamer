@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public interface IRemoteNode extends Remote {
 
-    String declare(String secret, String remoteHostname, int remotePort, boolean needRecovery) throws RemoteException;
+    String declare(String secret, String remoteHostname, int remotePort, String clientHostname, int clientPort, boolean needRecovery) throws RemoteException;
 
     ArrayList<String> getUserList() throws RemoteException;
 

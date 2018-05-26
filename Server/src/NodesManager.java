@@ -36,11 +36,11 @@ class NodesManager {
         remoteNodes.put(id, node);
     }
 
-    RemoteNode add(String hostname, int port) {
+    RemoteNode add(String hostname, int port, String clientHostname, int clientPort) {
         if (has(hostname, port)) {
             return null;
         }
-        RemoteNode node = new RemoteNode(hostname, port);
+        RemoteNode node = new RemoteNode(hostname, port, clientHostname, clientPort);
         boolean ok = node.connect();
         if (!ok) {
             return null;
@@ -86,7 +86,6 @@ class NodesManager {
 
     // group methods
     void sendMessages(String sender, int index, String msg) {
-        // retry until SESSION_TIMEOUT
         ArrayList<String> allFailedUsers = new ArrayList<>();
         for (IRemoteNode node : nodes()) {
             Supplier<Boolean> fn = () -> {
