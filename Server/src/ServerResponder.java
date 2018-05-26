@@ -139,7 +139,13 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
                     context.set("username", m.username);
                     context.set("secret", m.secret);
                     cm.possibleClients().transfer(context.connectivity, cm.clients());
-                    // todo: load balance: redirect
+                    RemoteNode freeNode = nm.getFreeNode();
+                    if (freeNode != null) {
+                        context.write(new MsgRedirect(freeNode.hostname, freeNode.port));
+                        sm.markAsOffline(context.get("username"));
+                        context.close();
+                        return;
+                    }
                     Util.async(() -> {
                         ArrayList<String> cachedMessages = messageCache.pop(context.get("username"));
                         for (String message : cachedMessages) {
@@ -179,7 +185,14 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
             String username = entry.getKey();
             Connectivity conn = entry.getValue();
             if (receivers.contains(username)) {
-                Util.retry(() -> conn.sendln(msg), Env.RETRY_INTERVAL, Env.SESSION_TIMEOUT);
+                if (retry) {
+                    Util.retry(() -> conn.sendln(msg), Env.RETRY_INTERVAL, Env.SESSION_TIMEOUT);
+                } else {
+                    boolean ok = conn.sendln(msg);
+                    if (!ok) {
+                        failedUsers.add(username);
+                    }
+                }
             } else {
                 messageCache.put(sender, index, msg);
             }
