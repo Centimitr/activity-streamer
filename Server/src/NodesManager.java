@@ -96,14 +96,11 @@ class NodesManager {
         }
     }
 
-    boolean requestRegister(String username, String secret) {
+    boolean register(String id, String username, String secret) {
         // retry until SESSION_TIMEOUT
         for (IRemoteNode node : nodes()) {
             try {
-                boolean ok = node.requestRegister(username, secret);
-                if (!ok) {
-                    return false;
-                }
+                node.register(id, username, secret);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }

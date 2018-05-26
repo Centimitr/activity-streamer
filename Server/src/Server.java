@@ -47,6 +47,7 @@ public class Server extends ServerResponder {
             }
             String recoveryDataJson = parent.get().declare(Settings.getSecret(), Settings.getRemoteHostname(), Settings.getRemotePort());
             RecoveryData data = RecoveryData.fromJson(recoveryDataJson);
+
             recoverLock.unlock();
         }
     }

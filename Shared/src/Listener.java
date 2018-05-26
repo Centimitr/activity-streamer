@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class Listener extends Async {
+public class Listener extends Thread {
     private static final Logger log = LogManager.getLogger();
     private ServerSocket serverSocket;
     private boolean term = false;
@@ -27,7 +27,7 @@ public class Listener extends Async {
             Socket clientSocket;
             try {
                 clientSocket = serverSocket.accept();
-                async(() -> fn.accept(clientSocket));
+                Util.async(() -> fn.accept(clientSocket));
             } catch (IOException e) {
                 log.info("received exception, shutting down");
                 term = true;

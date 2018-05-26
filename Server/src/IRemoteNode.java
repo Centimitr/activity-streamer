@@ -10,7 +10,7 @@ public interface IRemoteNode extends Remote {
 
     boolean sendMessage(String sender, ArrayList<String> receivers, MsgActivityBroadcast msg, boolean canSpread) throws RemoteException;
 
-    boolean requestRegister(String username, String secret) throws RemoteException;
+    void register(String id, String username, String secret) throws RemoteException;
 
     int getLoad() throws RemoteException;
 }

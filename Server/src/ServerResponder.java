@@ -59,13 +59,8 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
                         handleRegisteredRequest.run();
                         return;
                     }
-                    boolean ok = nm.requestRegister(m.username, m.secret);
-                    if (!ok) {
-//                        log.info("Register: Remote already registered: " + m.username + " " + m.secret);
-                        handleRegisteredRequest.run();
-                        return;
-                    }
-                    rm.add(m.username, m.secret);
+                    Util.async(() -> nm.register(id, m.username, m.secret));
+                    rm.put(id, m.username, m.secret);
                     String info = "register success for " + m.username;
                     MsgRegisterSuccess res = new MsgRegisterSuccess(info);
                     context.write(res);
@@ -154,7 +149,6 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
                 });
     }
 
-
     @Override
     public String declare(String secret, String remoteHostname, int remotePort) throws RemoteException {
         if (!secret.equals(Settings.getSecret())) {
@@ -186,7 +180,7 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
                     if (canSpread) {
                         spreadList.add(username);
                     } else {
-                        // retry
+                        // todo:
                     }
                 }
             }
@@ -198,9 +192,8 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
         return true;
     }
 
-    @Override
-    public boolean requestRegister(String username, String secret) throws RemoteException {
-        return rm.has(username);
+    public void register(String id, String username, String secret) throws RemoteException {
+        rm.put(id, username, secret);
     }
 
     @Override

@@ -1,5 +1,5 @@
 // combination better than inheritance here
-class LagencyLock {
+class LegacyLock {
     private WaitGroup wg = new WaitGroup();
     private boolean locked = false;
 
