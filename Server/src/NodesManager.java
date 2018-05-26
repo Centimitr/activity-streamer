@@ -86,7 +86,7 @@ class NodesManager {
     }
 
     // group methods
-    void sendMessages(String sender, String msg, boolean retry) {
+    void sendMessages(String sender, String msg) {
         // retry until SESSION_TIMEOUT
         ArrayList<String> allFailedUsers = new ArrayList<>();
         for (IRemoteNode node : nodes()) {

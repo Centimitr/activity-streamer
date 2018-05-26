@@ -109,9 +109,7 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
                     }
                     m.activity.put("authenticated_user", context.get("username"));
                     MsgActivityBroadcast broadcast = new MsgActivityBroadcast(m.activity);
-                    nm.sendMessages(context.get("username"), g.toJson(broadcast), true);
-                    // todo: send messages
-//                    cm.clients().broadcast(broadcast);
+                    nm.sendMessages(context.get("username"), g.toJson(broadcast));
                 })
                 .handle(MessageCommands.REGISTER, context -> {
                     MsgInvalidMessage res = new MsgInvalidMessage("User has already logged in.");

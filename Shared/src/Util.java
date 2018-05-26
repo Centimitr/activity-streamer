@@ -11,7 +11,7 @@ class Util {
     static void retry(Supplier<Boolean> fn, int interval, int timeout) {
         long startTime = System.currentTimeMillis();
         long endTime = startTime + timeout;
-        while (fn.get()) {
+        while (!fn.get()) {
             try {
                 Thread.sleep(interval);
             } catch (InterruptedException e) {
