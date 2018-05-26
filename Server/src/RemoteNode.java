@@ -4,13 +4,11 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 @SuppressWarnings("WeakerAccess")
-class RemoteNode {
-    private static final String defaultServiceName = "Node";
+class RemoteNode extends Node {
     String id;
     final String hostname;
     final int port;
     final String serviceName;
-    IRemoteNode node;
 
     RemoteNode(String hostname, int port, String name) {
         this.hostname = hostname;
@@ -20,10 +18,6 @@ class RemoteNode {
 
     RemoteNode(String hostname, int port) {
         this(hostname, port, RemoteNode.defaultServiceName);
-    }
-
-    IRemoteNode get() {
-        return node;
     }
 
     boolean connect() {
@@ -37,14 +31,4 @@ class RemoteNode {
         }
         return false;
     }
-
-//    boolean onConnect() {
-//        try {
-//            return this.node.declare(Settings.getSecret(), id, Settings.getRemoteHostname(), Settings.getRemotePort(), true);
-//        } catch (RemoteException e) {
-//            e.printStackTrace();
-//        }
-//        return false;
-//    }
-
 }

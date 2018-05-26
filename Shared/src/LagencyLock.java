@@ -1,5 +1,5 @@
 // combination better than inheritance here
-class Lock {
+class LagencyLock {
     private WaitGroup wg = new WaitGroup();
     private boolean locked = false;
 
@@ -9,11 +9,6 @@ class Lock {
 
     void lock() {
         locked = true;
-    }
-
-    void until() {
-        wg.wait(1);
-        locked = false;
     }
 
     void lockAndWait() {

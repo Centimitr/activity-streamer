@@ -11,6 +11,7 @@ public class Server extends ServerResponder {
 
     private Listener listener;
     private boolean term = false;
+    final Thread looper = (new Thread(this::run));
 
     protected static Server control = null;
 
@@ -30,7 +31,7 @@ public class Server extends ServerResponder {
         super();
         init();
         startListen();
-        (new Thread(this::run)).run();
+        looper.run();
     }
 
     private void init() throws RemoteException {
@@ -44,8 +45,9 @@ public class Server extends ServerResponder {
             if (parent == null) {
                 System.exit(-1);
             }
-            parent.get().declare(Settings.getSecret(), Settings.getRemoteHostname(), Settings.getRemotePort());
-            recoverLock.until();
+            String recoveryDataJson = parent.get().declare(Settings.getSecret(), Settings.getRemoteHostname(), Settings.getRemotePort());
+            RecoveryData data = RecoveryData.fromJson(recoveryDataJson);
+            recoverLock.unlock();
         }
     }
 
@@ -82,21 +84,9 @@ public class Server extends ServerResponder {
     }
 
     public boolean doActivity() {
-//        doServerAnnounce();
+        nm.updateLoads();
         return false;
     }
-
-//    private void doServerAnnounce() {
-//        Integer load = cm.clients().size();
-////        log.info("-Activity.Announce Load: " + load);
-//        MsgServerAnnounce m = new MsgServerAnnounce(
-//                uuid,
-//                Settings.getLocalHostname(),
-//                Settings.getLocalPort(),
-//                load
-//        );
-//        cm.servers().broadcast(m);
-//    }
 
     public final void terminate() {
         if (!term) {
@@ -108,4 +98,5 @@ public class Server extends ServerResponder {
             System.exit(0);
         }
     }
+
 }

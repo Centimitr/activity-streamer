@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.function.Consumer;
 
 class ConnectivitySet extends MessageRouterRepresenter implements IForEachConnectivity {
@@ -23,6 +24,16 @@ class ConnectivitySet extends MessageRouterRepresenter implements IForEachConnec
 
     Integer size() {
         return conns.size();
+    }
+
+    int effectiveSize() {
+        int size = 0;
+        for (Connectivity conn : conns) {
+            if (conn.isClosed()) {
+                size++;
+            }
+        }
+        return size;
     }
 
     public synchronized boolean add(Connectivity c) {

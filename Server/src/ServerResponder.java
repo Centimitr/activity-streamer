@@ -1,15 +1,12 @@
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.rmi.NotBoundException;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BiConsumer;
 
 @SuppressWarnings({"WeakerAccess", "Convert2MethodRef"})
@@ -21,9 +18,11 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
     final ConnectivityManager cm = new ConnectivityManager();
     final NodesManager nm = new NodesManager();
     final RegisterManager rm = new RegisterManager();
-    final Lock recoverLock = new Lock();
+    final SessionManager sm = new SessionManager();
+    final Lock recoverLock = new ReentrantLock();
 
     ServerResponder() throws RemoteException {
+        nm.local().bindConnectivitySet(cm.clients());
         RouterManager routers = cm.routerManager();
         BiConsumer<MessageContext, String> commonErrorHandler = (context, error) -> {
             String info;
@@ -54,26 +53,19 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
                         context.close();
                     };
                     boolean anonymous = m.username.equals("anonymous");
-                    boolean registered = rm.users().has(m.username);
+                    boolean registered = rm.has(m.username);
                     if (registered || anonymous) {
 //                        log.info("Register: Local already registered: " + m.username + " " + m.secret);
                         handleRegisteredRequest.run();
                         return;
                     }
-
-                    //                    // ask other servers' options
-//                    MsgLockRequest req = new MsgLockRequest(m.username, m.secret);
-////                    cm.servers().broadcast(req);
-//                    boolean available = rm.wait(m.username, m.secret, 0);
-//                    if (!available) {
-////                        log.info("Register: Remote already registered: " + m.username + " " + m.secret);
-//                        handleRegisteredRequest.run();
-//                        return;
-//                    }
-                    // todo: new register process
-
-                    rm.users().add(m.username, m.secret);
-
+                    boolean ok = nm.requestRegister(m.username, m.secret);
+                    if (!ok) {
+//                        log.info("Register: Remote already registered: " + m.username + " " + m.secret);
+                        handleRegisteredRequest.run();
+                        return;
+                    }
+                    rm.add(m.username, m.secret);
                     String info = "register success for " + m.username;
                     MsgRegisterSuccess res = new MsgRegisterSuccess(info);
                     context.write(res);
@@ -100,9 +92,11 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
                 });
         routers.client()
                 .handle(MessageCommands.LOGOUT, context -> {
+                    sm.markAsOffline(context.get("username"));
                     context.close();
                 })
                 .handle(MessageCommands.ACTIVITY_MESSAGE, context -> {
+                    sm.markAsOnline(context.get("username"), context.connectivity);
                     MsgActivityMessage m = context.read(MsgActivityMessage.class);
                     boolean anonymous = m.username.equals("anonymous");
                     boolean match = m.username.equals(context.get("username")) && m.secret.equals(context.get("secret"));
@@ -117,19 +111,10 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
                         context.close();
                         return;
                     }
-                    try {
-//                        JsonObject activity = (new JsonParser()).parse(m.activity).getAsJsonObject();
-//                        activity.addProperty("authenticated_user", context.get("username"));
-                        m.activity.put("authenticated_user", context.get("username"));
-                        MsgActivityBroadcast broadcast = new MsgActivityBroadcast(m.activity);
-//                        cm.servers().broadcast(broadcast);
-                        // todo: server broadcast
-                        cm.clients().broadcast(broadcast);
-                    } catch (JsonSyntaxException e) {
-                        MsgInvalidMessage res = new MsgInvalidMessage("activity object json syntax error");
-                        context.write(res);
-                        context.close();
-                    }
+                    m.activity.put("authenticated_user", context.get("username"));
+                    MsgActivityBroadcast broadcast = new MsgActivityBroadcast(m.activity);
+                    nm.sendMessages(context.get("username"), sm.getUserList(), broadcast, true);
+                    cm.clients().broadcast(broadcast);
                 })
                 .handle(MessageCommands.REGISTER, context -> {
                     MsgInvalidMessage res = new MsgInvalidMessage("User has already logged in.");
@@ -137,6 +122,7 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
                     context.close();
                 })
                 .handleError((context, error) -> {
+                    sm.markAsOffline(context.get("username"));
                     log.info("client error: ", error);
                     commonErrorHandler.accept(context, error);
                 });
@@ -144,9 +130,10 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
         // group routing
         routers.possibleClient()
                 .handle(MessageCommands.LOGIN, context -> {
+                    sm.markAsOnline(context.get("username"), context.connectivity);
                     MsgLogin m = context.read(MsgLogin.class);
                     boolean anonymous = m.username.equals("anonymous");
-                    boolean match = rm.users().match(m.username, m.secret);
+                    boolean match = rm.match(m.username, m.secret);
                     if (!match && !anonymous) {
                         context.write(new MsgLoginFailed("attempt to login with wrong secret"));
                         context.close();
@@ -157,30 +144,68 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
                     context.set("secret", m.secret);
                     cm.possibleClients().transfer(context.connectivity, cm.clients());
                     // todo: load balance: redirect
-                    int currentLoad = cm.clients().size();
-//                    ServerRecord availableServer = servers.balancer().getAvailableServer(currentLoad);
-//                    boolean needRedirect = availableServer != null;
-//                    if (needRedirect) {
-//                        context.write(new MsgRedirect(availableServer.hostname, availableServer.port));
-//                        context.close();
-//                    }
+                    RemoteNode freeNode = nm.getFreeNode();
+                    boolean needRedirect = freeNode != null;
+                    if (needRedirect) {
+                        context.write(new MsgRedirect(freeNode.hostname, freeNode.port));
+                        sm.markAsOffline(context.get("username"));
+                        context.close();
+                    }
                 });
     }
 
 
     @Override
-    public boolean declare(String secret, String remoteHostname, int remotePort) throws RemoteException {
+    public String declare(String secret, String remoteHostname, int remotePort) throws RemoteException {
         if (!secret.equals(Settings.getSecret())) {
-            return false;
+            return null;
         }
         log.info("Connected: " + remoteHostname + ":" + remotePort);
         nm.add(remoteHostname, remotePort);
-        return true;
-//        return recoverData;
+        recoverLock.lock();
+        RecoveryData data = new RecoveryData();
+        recoverLock.unlock();
+        return data.toJson();
     }
 
-//    @Override
-//    public void update() throws RemoteException {
-//        nm.broadcast();
-//    }
+    @Override
+    public ArrayList<String> getUserList() throws RemoteException {
+        return sm.getUserList();
+    }
+
+    @Override
+    public boolean sendMessage(String sender, ArrayList<String> receivers, MsgActivityBroadcast msg, boolean canSpread) throws RemoteException {
+        // todo: feedback
+        ArrayList<String> spreadList = new ArrayList<>();
+        for (Map.Entry<String, Connectivity> entry : sm.getConnectivities().entrySet()) {
+            String username = entry.getKey();
+            Connectivity conn = entry.getValue();
+            if (receivers.contains(username)) {
+                boolean ok = conn.sendln(msg);
+                if (!ok) {
+                    if (canSpread) {
+                        spreadList.add(username);
+                    } else {
+                        // retry
+                    }
+                }
+            }
+        }
+        if (canSpread && spreadList.size() > 0) {
+            nm.sendMessages(sender, spreadList, msg, false);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean requestRegister(String username, String secret) throws RemoteException {
+        return rm.has(username);
+    }
+
+    @Override
+    public int getLoad() throws RemoteException {
+        return nm.local().getLoad();
+    }
+
 }

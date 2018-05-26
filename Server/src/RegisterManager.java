@@ -1,34 +1,34 @@
 import java.util.HashMap;
 import java.util.Map;
 
-class User {
+class Account {
     String username;
     String secret;
 
-    User(String username, String secret) {
+    Account(String username, String secret) {
         this.username = username;
         this.secret = secret;
     }
 }
 
-class Users implements IRecoverable {
-    private Map<String, User> users = new HashMap<>();
+class RegisterManager {
+    private Map<String, Account> accounts = new HashMap<>();
 
     boolean has(String username) {
-        return users.containsKey(username);
+        return accounts.containsKey(username);
     }
 
     boolean add(String username, String secret) {
         if (has(username)) {
             return false;
         }
-        User u = new User(username, secret);
-        users.put(username, u);
+        Account account = new Account(username, secret);
+        accounts.put(username, account);
         return true;
     }
 
     boolean delete(String username, String secret) {
-        return users.remove(username, secret);
+        return accounts.remove(username, secret);
     }
 
     boolean match(String username, String secret) {
@@ -38,26 +38,15 @@ class Users implements IRecoverable {
         if (secret == null) {
             return false;
         }
-        User u = users.get(username);
-        return secret.equals(u.secret);
-    }
-
-    @Override
-    public String snapshot() {
-        return null;
-    }
-
-    @Override
-    public void recover(String snapshot) {
-
-    }
-
-}
-
-class RegisterManager {
-    private final Users _users = new Users();
-
-    Users users() {
-        return _users;
+        Account account = accounts.get(username);
+        return secret.equals(account.secret);
     }
 }
+//
+//class RegisterManager {
+//    private final Users _users = new Users();
+//
+//    Users users() {
+//        return _users;
+//    }
+//}

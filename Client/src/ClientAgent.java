@@ -14,8 +14,8 @@ public class ClientAgent extends ConnectivityAgent {
     private boolean needReconnect = false;
     String reconnectHostname;
     int reconnectPort;
-    Lock registerLock = new Lock();
-    Lock loginLock = new Lock();
+    LagencyLock registerLock = new LagencyLock();
+    LagencyLock loginLock = new LagencyLock();
     boolean viewConnectLock = true;
     WebEngine engine;
     ArrayList<String> scripts = new ArrayList<>();
