@@ -1,8 +1,6 @@
 import java.io.IOException;
 import java.net.Socket;
 import java.rmi.*;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.Map;
 
 // todo: exception when sending data vai a closed connection
@@ -12,7 +10,8 @@ public class Server extends ServerResponder {
 
     private Listener listener;
     private boolean term = false;
-    final Thread looper = (new Thread(this::run));
+    final Thread loadUpdateDaemon = (new Thread(this::updateLoadNotify));
+    final Thread eventualBalanceDaemon = (new Thread(this::checkPossibleBalance));
 
     protected static Server control = null;
 
@@ -32,7 +31,8 @@ public class Server extends ServerResponder {
         super();
         init();
         startListen();
-        looper.run();
+        loadUpdateDaemon.run();
+        eventualBalanceDaemon.run();
     }
 
     private void init() throws RemoteException {
@@ -78,24 +78,45 @@ public class Server extends ServerResponder {
         }
     }
 
-    public void run() {
+    public void updateLoadNotify() {
         log.info("Activity.Start Interval: " + Settings.getActivityInterval());
-        while (!term) {
-            term = doActivity();
-            if (!term) {
-                try {
-                    Thread.sleep(Settings.getActivityInterval());
-                } catch (InterruptedException e) {
-                    log.info("Interrupt");
-                    break;
-                }
+        while (true) {
+            nm.updateLoads();
+            try {
+                Thread.sleep(Settings.getActivityInterval());
+            } catch (InterruptedException e) {
+                log.info("Interrupt");
+                break;
             }
         }
     }
 
-    public boolean doActivity() {
-        nm.updateLoads();
-        return false;
+    public void checkPossibleBalance() {
+        while (true) {
+            RemoteNode freeNode = nm.getFreeNode();
+            if (freeNode != null) {
+                int transferNumber = (freeNode.getLoad() - nm.local().getLoad()) / 2;
+                int transferredNumber = 0;
+                for (Map.Entry<String, Connectivity> entry : sm.getConnectivities().entrySet()) {
+                    String username = entry.getKey();
+                    Connectivity conn = entry.getValue();
+                    conn.sendln(new MsgRedirect(freeNode.hostname, freeNode.port));
+                    sm.markAsOffline(username);
+                    conn.close();
+                    transferredNumber++;
+                    if (transferredNumber >= transferNumber) {
+                        break;
+                    }
+                }
+            }
+            try {
+                Thread.sleep(Env.CHECK_BALANCE_INTERVAL);
+            } catch (InterruptedException e) {
+                log.info("Interrupt");
+                break;
+            }
+        }
+
     }
 
     public final void terminate() {

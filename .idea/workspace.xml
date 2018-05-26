@@ -7,10 +7,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2bae8d95-19df-4f10-8dac-d5664eef7352" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/Server/src/MessageCache.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/src/IRemoteNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server/src/IRemoteNode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/src/Env.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server/src/Env.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Server/src/NodesManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server/src/NodesManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/src/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server/src/Server.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Server/src/ServerResponder.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server/src/ServerResponder.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -25,11 +24,32 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="Server.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Server/src/Server.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="702">
+              <caret line="98" column="42" selection-start-line="98" selection-start-column="42" selection-end-line="98" selection-end-column="42" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="NodesManager.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Server/src/NodesManager.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="389">
+              <caret line="63" selection-start-line="63" selection-end-line="63" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="ServerResponder.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Server/src/ServerResponder.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="79">
-              <caret line="47" column="27" lean-forward="true" selection-start-line="47" selection-start-column="27" selection-end-line="47" selection-end-column="27" />
+            <state relative-caret-position="847">
+              <caret line="143" selection-start-line="143" selection-end-line="143" />
               <folding>
                 <element signature="e#1231#1808#0" />
                 <element signature="e#1884#3282#0" />
@@ -44,18 +64,6 @@
                 <element signature="method#sendMessage#0;class#ServerResponder#0" />
                 <element signature="method#register#0;class#ServerResponder#0" />
                 <element signature="method#getLoad#0;class#ServerResponder#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MessageCache.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Server/src/MessageCache.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
-              <caret line="5" selection-start-line="5" selection-end-line="5" />
-              <folding>
-                <element signature="imports" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -173,17 +181,17 @@
         <option value="$PROJECT_DIR$/Shared/src/LagecyLock.java" />
         <option value="$PROJECT_DIR$/Shared/src/LegacyLock.java" />
         <option value="$PROJECT_DIR$/Client/src/View.java" />
-        <option value="$PROJECT_DIR$/Server/src/Env.java" />
         <option value="$PROJECT_DIR$/Server/src/LocalNode.java" />
         <option value="$PROJECT_DIR$/Server/src/RegisterManager.java" />
         <option value="$PROJECT_DIR$/Server/src/Node.java" />
-        <option value="$PROJECT_DIR$/Server/src/Server.java" />
         <option value="$PROJECT_DIR$/Server/src/RecoveryData.java" />
         <option value="$PROJECT_DIR$/Shared/src/Util.java" />
         <option value="$PROJECT_DIR$/Server/src/IRemoteNode.java" />
-        <option value="$PROJECT_DIR$/Server/src/NodesManager.java" />
-        <option value="$PROJECT_DIR$/Server/src/ServerResponder.java" />
         <option value="$PROJECT_DIR$/Server/src/MessageCache.java" />
+        <option value="$PROJECT_DIR$/Server/src/Env.java" />
+        <option value="$PROJECT_DIR$/Server/src/ServerResponder.java" />
+        <option value="$PROJECT_DIR$/Server/src/Server.java" />
+        <option value="$PROJECT_DIR$/Server/src/NodesManager.java" />
       </list>
     </option>
   </component>
@@ -407,12 +415,12 @@
       <workItem from="1527229192988" duration="22241000" />
       <workItem from="1527291918648" duration="6563000" />
       <workItem from="1527302753897" duration="21048000" />
-      <workItem from="1527325666926" duration="4995000" />
+      <workItem from="1527325666926" duration="6330000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="384882000" />
+    <option name="totallyTimeSpent" value="386217000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -429,7 +437,7 @@
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="bottom" id="TODO" order="5" weight="0.32291666" />
-      <window_info anchor="bottom" id="Messages" order="6" sideWeight="0.49960938" weight="0.14657739" />
+      <window_info active="true" anchor="bottom" id="Messages" order="6" sideWeight="0.49960938" visible="true" weight="0.14657739" />
       <window_info anchor="right" id="Palette&#9;" order="4" />
       <window_info id="Image Layers" order="2" />
       <window_info anchor="right" id="Capture Analysis" order="5" />
@@ -441,8 +449,9 @@
       <window_info anchor="bottom" id="Terminal" order="10" weight="0.31491295" />
       <window_info id="Capture Tool" order="6" />
       <window_info id="Designer" order="3" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.4985119" visible="true" weight="0.134375" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4985119" visible="true" weight="0.134375" />
       <window_info anchor="right" id="Database" order="7" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32886904" />
       <window_info id="Structure" order="1" sideWeight="0.5014881" side_tool="true" weight="0.12382813" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info id="UI Designer" order="4" />
@@ -455,7 +464,6 @@
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Cvs" order="3" weight="0.25" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32914045" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -708,13 +716,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Server/src/Env.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="5" lean-forward="true" selection-start-line="5" selection-end-line="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Server/src/RegisterManager.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="360">
@@ -775,16 +776,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Server/src/Server.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="622">
-          <caret line="90" column="17" selection-start-line="87" selection-start-column="49" selection-end-line="90" selection-end-column="17" />
-          <folding>
-            <element signature="e#232#265#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Shared/src/Util.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="576">
@@ -817,16 +808,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Server/src/NodesManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="696">
-          <caret line="33" column="58" lean-forward="true" selection-start-line="33" selection-start-column="58" selection-end-line="33" selection-end-column="58" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Server/src/ConnectivityManager.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="672">
@@ -842,10 +823,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Server/src/MessageCache.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="17" lean-forward="true" selection-start-line="17" selection-end-line="17" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Server/src/Env.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="5" column="1" lean-forward="true" selection-start-line="5" selection-start-column="1" selection-end-line="5" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Server/src/ServerResponder.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="79">
-          <caret line="47" column="27" lean-forward="true" selection-start-line="47" selection-start-column="27" selection-end-line="47" selection-end-column="27" />
+        <state relative-caret-position="847">
+          <caret line="143" selection-start-line="143" selection-end-line="143" />
           <folding>
             <element signature="e#1231#1808#0" />
             <element signature="e#1884#3282#0" />
@@ -864,10 +862,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Server/src/MessageCache.java">
+    <entry file="file://$PROJECT_DIR$/Server/src/Server.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="5" selection-start-line="5" selection-end-line="5" />
+        <state relative-caret-position="702">
+          <caret line="98" column="42" selection-start-line="98" selection-start-column="42" selection-end-line="98" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Server/src/NodesManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="389">
+          <caret line="63" selection-start-line="63" selection-end-line="63" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

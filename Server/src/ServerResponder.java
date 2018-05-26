@@ -141,8 +141,7 @@ abstract class ServerResponder extends UnicastRemoteObject implements IRemoteNod
                     cm.possibleClients().transfer(context.connectivity, cm.clients());
                     // todo: load balance: redirect
                     RemoteNode freeNode = nm.getFreeNode();
-                    boolean needRedirect = freeNode != null;
-                    if (needRedirect) {
+                    if (freeNode != null) {
                         context.write(new MsgRedirect(freeNode.hostname, freeNode.port));
                         sm.markAsOffline(context.get("username"));
                         context.close();
