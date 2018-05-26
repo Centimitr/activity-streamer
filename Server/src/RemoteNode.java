@@ -8,8 +8,8 @@ class RemoteNode extends Node {
     String id;
     final String hostname;
     final int port;
-    final String clientHostname;
-    final int clientPort;
+    String clientHostname;
+    int clientPort;
     final String serviceName;
 
     RemoteNode(String hostname, int port, String clientHostname, int clientPort, String name) {

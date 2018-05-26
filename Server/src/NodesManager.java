@@ -36,6 +36,14 @@ class NodesManager {
         remoteNodes.put(id, node);
     }
 
+    void put(String hostname, int port, String clientHostname, int clientPort) {
+        RemoteNode node = get(hostname, port);
+        if (node != null) {
+            node.clientHostname = clientHostname;
+            node.clientPort = clientPort;
+        }
+    }
+
     RemoteNode add(String hostname, int port, String clientHostname, int clientPort) {
         if (has(hostname, port)) {
             return null;

@@ -7,8 +7,15 @@ class RecoveryData {
     static final Gson g = new Gson();
     private HashMap<String, Account> registeredAccounts;
     private ArrayList<EndPoint> nodesToConnect;
+    String clientHostname;
+    int clientPort;
 
-    RecoveryData(RegisterManager rm, NodesManager nm) {
+    RecoveryData(String clientHostname, int clientPort) {
+        this.clientHostname = clientHostname;
+        this.clientPort = clientPort;
+    }
+
+    void supply(RegisterManager rm, NodesManager nm) {
         registeredAccounts = rm.snapshot();
         nodesToConnect = nm.snapshot();
     }

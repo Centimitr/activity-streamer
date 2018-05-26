@@ -41,7 +41,7 @@ public class Server extends ServerResponder {
         // connect remote parent node
         if (Settings.getRemoteHostname() != null) {
             recoverLock.lock();
-            RemoteNode parent = nm.add(Settings.getRemoteHostname(), Settings.getRemotePort());
+            RemoteNode parent = nm.add(Settings.getRemoteHostname(), Settings.getRemotePort(), null, 0);
             log.info("Connected: " + Settings.getRemoteHostname() + ":" + Settings.getRemotePort());
             if (parent == null) {
                 System.exit(-1);
@@ -53,14 +53,17 @@ public class Server extends ServerResponder {
             // recover from recovery data
             RecoveryData data = RecoveryData.fromJson(recoveryDataJson);
             rm.recover(data.getRegisteredAccounts());
+            nm.put(Settings.getRemoteHostname(), Settings.getRemotePort(), data.clientHostname, data.clientPort);
             for (EndPoint endPoint : data.getNodesToConnect()) {
-                RemoteNode node = nm.add(endPoint.hostname, endPoint.port);
+                RemoteNode node = nm.add(endPoint.hostname, endPoint.port, null, 0);
                 log.info("Connected: " + endPoint.hostname + ":" + endPoint.port);
                 if (node != null) {
-                    node.get().declare(Settings.getSecret(),
+                    String clientsInfoDataJson = node.get().declare(Settings.getSecret(),
                             Settings.getLocalHostname(), Settings.getLocalPort(),
                             Settings.getClientHostname(), Settings.getClientPort(),
                             false);
+                    RecoveryData clientsInfoData = RecoveryData.fromJson(clientsInfoDataJson);
+                    nm.put(endPoint.hostname, endPoint.port, clientsInfoData.clientHostname, clientsInfoData.clientPort);
                 }
             }
             recoverLock.unlock();
