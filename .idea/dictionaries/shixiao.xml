@@ -2,10 +2,12 @@
   <dictionary name="shixiao">
     <words>
       <w>authtentication</w>
+      <w>connectivities</w>
       <w>conns</w>
       <w>devbycmagent</w>
       <w>devbycmstream</w>
       <w>receiveln</w>
+      <w>recoverables</w>
       <w>representer</w>
       <w>sema</w>
       <w>sendln</w>

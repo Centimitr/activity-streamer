@@ -40,7 +40,7 @@ public class Client extends ClientResponder {
         try {
             connectivity = new Connectivity(hostname, port);
             agent.bind(connectivity);
-            async(() -> {
+            Util.async(() -> {
                 boolean normalExit = connectivity.redirect(router);
                 if (normalExit) {
                     log.info("normal exit");

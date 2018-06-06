@@ -24,7 +24,6 @@ public class Connectivity extends Thread {
     private MessageContext context;
     private ArrayList<Runnable> whenClosedCallbacks = new ArrayList<>();
 
-
     Connectivity(String hostname, int port) throws IOException {
         this(new Socket(hostname, port));
     }

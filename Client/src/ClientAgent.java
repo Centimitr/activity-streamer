@@ -14,8 +14,8 @@ public class ClientAgent extends ConnectivityAgent {
     private boolean needReconnect = false;
     String reconnectHostname;
     int reconnectPort;
-    Lock registerLock = new Lock();
-    Lock loginLock = new Lock();
+    LegacyLock registerLock = new LegacyLock();
+    LegacyLock loginLock = new LegacyLock();
     boolean viewConnectLock = true;
     WebEngine engine;
     ArrayList<String> scripts = new ArrayList<>();
@@ -94,14 +94,14 @@ public class ClientAgent extends ConnectivityAgent {
         String secret = Settings.nextSecret();
         MsgRegister m = new MsgRegister(username, secret);
         sendln(m);
-        registerLock.lock();
+        registerLock.lockAndWait();
         return secret;
     }
 
     void login(String username, String secret) {
         MsgLogin m = new MsgLogin(username, secret);
         sendln(m);
-        loginLock.lock();
+        loginLock.lockAndWait();
     }
 
     public void logout() {

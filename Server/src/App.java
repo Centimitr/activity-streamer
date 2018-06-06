@@ -29,8 +29,10 @@ public class App {
         Options options = new Options();
         options.addOption("lp", true, "local port number");
         options.addOption("rp", true, "remote port number");
+        options.addOption("cp", true, "local port number for client");
         options.addOption("rh", true, "remote hostname");
         options.addOption("lh", true, "local hostname");
+        options.addOption("ch", true, "local hostname for client");
         options.addOption("a", true, "activity interval in milliseconds");
         options.addOption("s", true, "secret for the server to use");
 
@@ -51,6 +53,16 @@ public class App {
                 Settings.setLocalPort(port);
             } catch (NumberFormatException e) {
                 log.info("-lp requires a port number, parsed: " + cmd.getOptionValue("lp"));
+                help(options);
+            }
+        }
+
+        if (cmd.hasOption("cp")) {
+            try {
+                int port = Integer.parseInt(cmd.getOptionValue("cp"));
+                Settings.setClientPort(port);
+            } catch (NumberFormatException e) {
+                log.info("-cp requires a port number, parsed: " + cmd.getOptionValue("cp"));
                 help(options);
             }
         }
@@ -89,6 +101,10 @@ public class App {
             Settings.setLocalHostname(cmd.getOptionValue("lh"));
         }
 
+        if (cmd.hasOption("ch")) {
+            Settings.setClientHostname(cmd.getOptionValue("ch"));
+        }
+
         if (cmd.hasOption("s")) {
             Settings.setSecret(cmd.getOptionValue("s"));
         }
@@ -98,9 +114,9 @@ public class App {
         final Server c = Server.getInstance();
         // the following shutdown hook doesn't really work, it doesn't give us enough time to
         // cleanup all of our connections before the jvm is terminated.
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            c.terminate();
-            c.interrupt();
-        }));
+//        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+//            c.terminate();
+//            c.interrupt();
+//        }));
     }
 }

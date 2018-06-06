@@ -8,12 +8,9 @@ class ConnectivityManager {
 
     private final ConnectivitySet temp = new ConnectivitySet();
     private final ConnectivitySet clients = new ConnectivitySet();
-    private final ConnectivitySet servers = new ConnectivitySet();
-    private final SingleConnectivitySet server = new SingleConnectivitySet();
 
     private final ConnectivitySetGroup possibleClients = new ConnectivitySetGroup(temp, clients);
-    private final ConnectivitySetGroup allServers = new ConnectivitySetGroup(servers, server);
-    private final ConnectivitySetGroup all = new ConnectivitySetGroup(temp, servers, clients, server);
+    private final ConnectivitySetGroup all = new ConnectivitySetGroup(temp, clients);
 
     private final CentralRouter centralRouter = new CentralRouter(this);
     private final RouterManager routers = new RouterManager();
@@ -25,11 +22,7 @@ class ConnectivityManager {
         // set represented routers
         temp.setRouter(routers.temp());
         clients.setRouter(routers.client());
-        servers.setRouter(routers.child());
-        server.setRouter(routers.parent());
-
         possibleClients.setRouter(routers.possibleClient());
-        allServers.setRouter(routers.server());
     }
 
     RouterManager routerManager() {
@@ -48,18 +41,6 @@ class ConnectivityManager {
         return possibleClients;
     }
 
-    SingleConnectivitySet parent() {
-        return server;
-    }
-
-    ConnectivitySet children() {
-        return servers;
-    }
-
-    ConnectivitySetGroup servers() {
-        return allServers;
-    }
-
     ConnectivitySetGroup all() {
         return all;
     }
@@ -71,8 +52,8 @@ class CentralRouter implements IMessageRouter {
     private ConnectivitySetGroup[] compounds;
 
     CentralRouter(ConnectivityManager cm) {
-        primitives = new ConnectivitySet[]{cm.temp(), cm.clients(), cm.parent(), cm.children()};
-        compounds = new ConnectivitySetGroup[]{cm.possibleClients(), cm.servers(), cm.all()};
+        primitives = new ConnectivitySet[]{cm.temp(), cm.clients()};
+        compounds = new ConnectivitySetGroup[]{cm.possibleClients(), cm.all()};
     }
 
     @Override
@@ -92,7 +73,7 @@ class CentralRouter implements IMessageRouter {
         }
         for (ConnectivitySetGroup group : compounds) {
             if (group.contains(c)) {
-                if (group.router()!=null && group.router().support(command)) {
+                if (group.router() != null && group.router().support(command)) {
                     return group.router().getHandler(c, command);
                 }
             }
@@ -101,7 +82,7 @@ class CentralRouter implements IMessageRouter {
     }
 
     @Override
-    public BiConsumer<MessageContext,String> getErrorHandler(Connectivity c) {
+    public BiConsumer<MessageContext, String> getErrorHandler(Connectivity c) {
         for (ConnectivitySet set : primitives) {
             if (set.contains(c)) {
                 return set.router().getErrorHandler(c);
@@ -116,9 +97,6 @@ class RouterManager {
     private MessageRouter temp = new MessageRouter();
     private MessageRouter client = new MessageRouter();
     private MessageRouter possibleClient = new MessageRouter();
-    private MessageRouter server = new MessageRouter();
-    private MessageRouter parent = new MessageRouter();
-    private MessageRouter child = new MessageRouter();
 
     MessageRouter temp() {
         return temp;
@@ -130,18 +108,6 @@ class RouterManager {
 
     MessageRouter possibleClient() {
         return possibleClient;
-    }
-
-    MessageRouter server() {
-        return server;
-    }
-
-    MessageRouter parent() {
-        return parent;
-    }
-
-    MessageRouter child() {
-        return child;
     }
 
 }

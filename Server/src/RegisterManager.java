@@ -1,36 +1,65 @@
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
-class RegisterRequest extends WaitGroup {
-    private String username;
-    private String secret;
+class Account {
+    String registerSourceId;
+    String username;
+    String secret;
 
-    RegisterRequest(String username, String secret) {
+    Account(String registerSourceId, String username, String secret) {
+        this.registerSourceId = registerSourceId;
         this.username = username;
         this.secret = secret;
-    }
-
-    boolean match(String username, String secret) {
-        return this.username.equals(username) && this.secret.equals(secret);
     }
 }
 
 class RegisterManager {
-    private ArrayList<RegisterRequest> requests = new ArrayList<>();
+    private HashMap<String, Account> accounts = new HashMap<>();
 
-    boolean wait(String username, String secret, int num) {
-        RegisterRequest req = new RegisterRequest(username, secret);
-        requests.add(req);
-        boolean notCancelled = req.wait(num);
-        requests.remove(req);
-        return notCancelled;
+    boolean has(String username) {
+        return accounts.containsKey(username);
     }
 
-    RegisterRequest get(String username, String secret) {
-        for (RegisterRequest req : requests) {
-            if (req.match(username, secret)) {
-                return req;
+//    boolean add(String username, String secret) {
+//        if (has(username)) {
+//            return false;
+//        }
+//        Account account = new Account(username, secret);
+//        accounts.put(username, account);
+//        return true;
+//    }
+
+    void put(String registerSourceId, String username, String secret) {
+        Account candidate = new Account(registerSourceId, username, secret);
+        if (has(username)) {
+            Account existed = accounts.get(username);
+            if (candidate.registerSourceId.compareTo(existed.registerSourceId) >= 0) {
+                return;
             }
         }
-        return null;
+        accounts.put(username, candidate);
+    }
+
+    boolean delete(String username, String secret) {
+        return accounts.remove(username, secret);
+    }
+
+    boolean match(String username, String secret) {
+        if (!has(username)) {
+            return false;
+        }
+        if (secret == null) {
+            return false;
+        }
+        Account account = accounts.get(username);
+        return secret.equals(account.secret);
+    }
+
+    HashMap<String, Account> snapshot() {
+        return this.accounts;
+    }
+
+    void recover(HashMap<String, Account> snapshot) {
+        this.accounts = snapshot;
     }
 }

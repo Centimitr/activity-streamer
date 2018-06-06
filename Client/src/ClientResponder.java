@@ -2,7 +2,7 @@ import com.google.gson.Gson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-abstract class ClientResponder extends Async {
+abstract class ClientResponder extends Thread {
     static final Logger log = LogManager.getLogger();
     private static final Gson g = new Gson();
     Connectivity connectivity;
